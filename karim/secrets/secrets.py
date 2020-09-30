@@ -2,18 +2,18 @@ import json
 
 def get_var(key="", parent="", default="", value=""):
     """
-    Retrieve configuration variables from the env_variables.json file.
-    :variable: String of the name of the variable you are retrieving (see env_variables.json)
+    Retrieve configuration variables from the secrets.json file.
+    :variable: String of the name of the variable you are retrieving (see secrets.json)
     """
     variables = {}
-    with open('movement_assistant/secrets/env_variables.json') as variables_file:
+    with open('karim/secrets/secrets.json') as variables_file:
         variables = json.load(variables_file)
     if value != "":
         if value in variables.values():
-            print("Value {} is in env_variables.json".format(value))
+            print("Value {} is in secrets.json".format(value))
             return True
         else:
-            print("Value {} is NOT in env_variables.json".format(value))
+            print("Value {} is NOT in secrets.json".format(value))
             return False
 
     elif parent == "":
@@ -35,13 +35,13 @@ def set_var(key, value):
     :key: String (all caps) with the dictionary name of the variable (type str)
     :value: the value of the variable (type str)
     """
-    with open('movement_assistant/secrets/env_variables.json') as variables_file:
+    with open('karim/secrets/secrets.json') as variables_file:
         variables = json.load(variables_file)
 
     if key in variables:
         del variables[key]
     variables[key] = value
 
-    with open('movement_assistant/secrets/env_variables.json', 'w') as output_file:
+    with open('karim/secrets/secrets.json', 'w') as output_file:
         json.dump(variables, output_file)
     print("SETTINGS: Set variable ", key)

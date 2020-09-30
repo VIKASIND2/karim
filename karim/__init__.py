@@ -7,10 +7,10 @@ from karim.bot import telebot
 BOT_TOKEN = secrets.get_var('BOT_TOKEN')
 URL = secrets.get_var('SERVER_APP_DOMAIN')
 bot = telegram.Bot(token=BOT_TOKEN)
-update_queue = telebot.setup(secrets.get_var('BOT_TOKEN'))
+update_queue = telebot.setup(secrets.get_var('BOT_TOKEN'), bot)
 
 # Setup Telegram Webhook
-s = bot.setWebhook('{URL}{HOOK}'.format(URL=URL, HOOK=BOT_TOKEN))
+s = bot.setWebhook('{URL}/{HOOK}'.format(URL=URL, HOOK=BOT_TOKEN))
 
 # Initialize Flask App
 app = Flask(__name__)
