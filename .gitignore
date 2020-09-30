@@ -1,0 +1,8 @@
+secrets.json
+.vscode
+__pycache__
+env
+data.db
+secrets.json
+anon.session
+bot.session
