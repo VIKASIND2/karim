@@ -6,3 +6,5 @@ data.db
 secrets.json
 anon.session
 bot.session
+anon.session-journal
+persistence

@@ -16,8 +16,7 @@ import os
 import html
 import pickle
 
-from karim.bot.texts  import *
-from karim.classes import *
+from karim.classes.callbacks import *
 from karim.secrets import secrets
 from karim import bot
 
@@ -27,39 +26,6 @@ logging.basicConfig(
 logger = logging.getLogger("telegram.bot")
 # GLOBAL VARIABLES - CONVERSATION
 TIMEOUT = -2
-
-def send_typing_action(func):
-    """Sends typing action while processing func command."""
-
-    @wraps(func)
-    def command_func(update, context, *args, **kwargs):
-        context.bot.send_chat_action(
-            chat_id=update.effective_message.chat_id, action=ChatAction.TYPING)
-        return func(update, context, *args, **kwargs)
-
-    return command_func
-
-
-def create_menu(button_titles, callbacks, cols=1):
-    print("BOT: menu()")
-    keyboard = []
-    index = 0
-    row = []
-    for title in button_titles:
-        keyboard_button = InlineKeyboardButton(
-            title, callback_data=callbacks[index])
-        if len(row) < cols:
-            row.append(keyboard_button)
-        else:
-            keyboard.append(row)
-            row = []
-            row.append(keyboard_button)
-        index += 1
-    if row != "":
-        keyboard.append(row)
-    markup = InlineKeyboardMarkup(keyboard)
-    return markup
-
 
 def error(update, context):
     """Log the error and send a telegram message to notify the developer."""
@@ -74,15 +40,9 @@ def error(update, context):
     # Build the message with some markup and additional information about what happened.
     # You might need to add some logic to deal with messages longer than the 4096 character limit.
     message = (
-        'An exception was raised while handling an update\n'
-        '<pre>update = {}</pre>\n\n'
-        '<pre>context.chat_data = {}</pre>\n\n'
-        '<pre>context.user_data = {}</pre>\n\n'
+        '<b>An exception was raised while handling an update</b>\n'
         '<pre>{}</pre>'
     ).format(
-        html.escape(json.dumps(update.to_dict(), indent=2, ensure_ascii=False)),
-        html.escape(str(context.chat_data)),
-        html.escape(str(context.user_data)),
         html.escape(tb)
     )
 
