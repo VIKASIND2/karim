@@ -10,7 +10,7 @@ def forward_message(update, context):
     """Initialize Forwarder Conversation. Ask for message input"""
     forwarder = Forwarder(update)
     result = forwarder.check_connection()
-    if not result:
+    if result:
         # User is authorised
         # Ask for message text
         markup = CreateMarkup({Callbacks.CANCEL: 'Cancel'}).create_markup()
@@ -35,7 +35,7 @@ def select_message(update, context):
     # SEND GROUP SELECTION
     # Check User Connection to the Client
     result = forwarder.check_connection()
-    if not result:
+    if result:
         # User is authorised
         # Get Group List
         try:
@@ -90,7 +90,7 @@ def select_group(update, context):
     # SEND GROUP SELECTION
     # Check User Connection to the Client
     result = forwarder.check_connection()
-    if not result:
+    if result:
         # User is authorised
         # Get Group List
         try:

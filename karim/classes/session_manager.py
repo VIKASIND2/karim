@@ -5,6 +5,7 @@ from telethon.errors.rpcerrorlist import PhoneCodeExpiredError, PhoneCodeInvalid
 from telethon.tl.types.auth import SentCode
 from karim.secrets import secrets
 
+
 class SessionManager(Persistence):
     """Used for persistance and passing of login information"""
     def __init__(self, update):
@@ -94,5 +95,4 @@ class SessionManager(Persistence):
         client.disconnect()
         try: os.remove('karim/bot/sessions/{}.session'.format(self.user_id)) 
         except: pass
-        return result
-        
+        return result      
