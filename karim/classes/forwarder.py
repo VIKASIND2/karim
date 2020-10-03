@@ -1,3 +1,5 @@
+from logging import root
+from typing import Dict
 from telethon.tl.functions.messages import GetDialogsRequest
 from telethon.tl.types import InputPeerEmpty
 from telethon.errors.rpcbaseerrors import UnauthorizedError
@@ -7,23 +9,27 @@ class Forwarder(SessionManager):
     """
     Manages requests to the TelegramClient regarding the steps to scrape data from the Telegram API
     """
-    def __init__(self, update):
+    def __init__(self, update, last_index=0):
         Persistence.__init__(self, update, self.FORWARDER)
         SessionManager.__init__(self, update)
-        self.selection = []
+        self.selection = {}
         self.groups = None
-        self.message = None
+        self.shown_groups = None
+        self.text = None
         self.participants = []
+        self.rotate_size = 6
+        self.first_index = 0
+        self.last_index = self.first_index + self.rotate_size
 
     # Connects to Telegram API
     def get_dialogues(self, last_date=None, chunk_size=200):
         """
-        Return a list of dialogues the client is connected to.
+        Return a dict of dialogues the client is connected to.
         """
         try:
             client = self.connect()
             chats = []
-            groups=[]
+            groups = {}
             
             result = client(GetDialogsRequest(
                         offset_date=last_date,
@@ -37,7 +43,7 @@ class Forwarder(SessionManager):
             for chat in chats:
                 try:
                     if not chat.is_user:
-                        groups.append(chat)
+                        groups[chat.id] = chat.title
                 except:
                     continue
             client.disconnect()
@@ -56,7 +62,11 @@ class Forwarder(SessionManager):
                 client = self.connect()
                 all_participants = client.get_participants(target_group, aggressive=True)
                 client.disconnect()
-                return all_participants
+                participant_ids = []
+                for participant in all_participants:
+                    participant_ids.append(participant.id)
+                client.disconnect()
+                return participant_ids
             except UnauthorizedError:
                 raise UnauthorizedError
             except Exception:
@@ -68,17 +78,33 @@ class Forwarder(SessionManager):
     def set_groups(self, groups):
         self.groups = groups
 
+    def set_text(self, text):
+        self.text = text
+        return self.text
+
     def add_selection(self, selected):
-        self.selection.append(selected)
+        self.selection[selected] = self.groups[selected]
         return self.selection.copy()
 
     def remove_selection(self, selected):
-        self.selection.remove(selected)
+        del self.selection[selected]
         return self.selection.copy()
 
     def add_participants(self, participants):
         self.participants.extend(participants)
         return self.participants.copy()
+
+    def rotate(self, direction):
+        if direction == Callbacks.LEFT:
+            if self.first_index - self.rotate_size < 0:
+                """Calculate first index"""
+
+
+
+        self.shown_groups = self.groups[self.first_index:self.last_index]
+
+
+
 
     
             

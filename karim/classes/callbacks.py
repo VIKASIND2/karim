@@ -2,6 +2,9 @@ class Callbacks:
     """Object to store PTB conversations Callbacks"""
     CANCEL = 'CANCEL'
     NONE = 'NONE'
+    DONE= 'DONE'
+    LEFT = 'LEFT'
+    RIGHT = 'RIGHT'
 
 
 class StartStates:
@@ -13,5 +16,6 @@ class StartStates:
 
 class MessageStates:
     """Object to store PTB Message Conversation Handler states indicators"""
-    SELECT_GROUP = 1
-    SELECT_MESSAGE = 2
+    MESSAGE = 1
+    SELECT_GROUP = 2
+    CONFIRM = 3
