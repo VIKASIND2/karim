@@ -51,6 +51,11 @@ class CreateMarkup():
     def create_markup(self):
         return InlineKeyboardMarkup(self.keyboard)
 
+class MarkupDivider(CreateMarkup):
+    """An InlineMarkupButton with no attached callback used to divide sections of the ForwarderMarkup"""
+    def __init__(self, title):
+        CreateMarkup.__init__(self, [title], [Callbacks.NONE], cols=1)
+        self.title = title
 
 
 class ForwarderMarkup(CreateMarkup):

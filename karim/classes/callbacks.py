@@ -1,6 +1,7 @@
 class Callbacks:
     """Object to store PTB conversations Callbacks"""
     CANCEL = 'CANCEL'
+    NONE = 'NONE'
 
 
 class StartStates:
