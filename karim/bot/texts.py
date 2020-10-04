@@ -1,5 +1,5 @@
 # Help Command
-help_text = 'Karim Test'
+help_text = '<b>Available Commands:</b>\n/account - Returns the current connection status to the Telegram Client (if the user is logged in and with which Telegram Account)\n\n/signin - Asks the user to input Telegram Credentials and attempts to sign in the Telegram Client. No credentials will be stored in the server.\n -> <code>phone</code> - The user\'s telegram account\'s phone number (<code>+49 123 123 1234</code>)\n -> <code>code</code> - The security code sent by Telegram to verify the identity. It is important to send the code separated by dots (<code>1.2.3.4.5</code>) otherwise it will immediatelly expire.\n -> <code>password</code> - In case the user has set a 2-steps-verification password, this will be required to sign in correctly.\n\n/signout - Signs out of the Telegram Client and deletes the session.\n\n/forward - Allows the user to forward a message to all the chat members present in a selection of group chats, via the user\'s own account.'
 
 # START/SIGN IN CONVERSATION
 client_already_signed_in = 'You are already signed into the Telegram Client. If you wish to sign in with another account, please make sure to log out first with /signout'
