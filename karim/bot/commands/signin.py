@@ -1,22 +1,31 @@
-from telethon.errors.rpcerrorlist import PhoneCodeExpiredError, PhoneCodeInvalidError, FloodWaitError, SessionPasswordNeededError
+import time
+import threading
+from telethon.errors.rpcerrorlist import PasswordHashInvalidError, PhoneCodeExpiredError, PhoneCodeInvalidError, FloodWaitError, SessionPasswordNeededError
 from karim.secrets import secrets
 from karim.bot.commands import *
 import re
 
+@send_typing_action
 def client_sign_in(update, context):
     """Initializes the bot and sign into the Telegram Client. Walks the user through a wizard, asking to input Telegram phone number, password and security code to sign into the client."""
     # Check if user is already signed in
-    manager = SessionManager(update)
-    if manager.check_connection():
+    manager = SessionManager(update, Persistence.SIGNIN)
+    result =  manager.check_connection()
+    if result:
         # User is already authorised
         message = update.effective_chat.send_message(client_already_signed_in, parse_mode = ParseMode.HTML)
+        manager.discard()
         return ConversationHandler.END
-    else:
+    elif not result:
         # Request Phone Number Input from user
         markup = CreateMarkup({Callbacks.CANCEL: 'Cancel'}).create_markup()
         message = update.effective_chat.send_message(request_phone_text, parse_mode = ParseMode.HTML, reply_markup = markup)
         manager.set_message(message)
         return StartStates.INPUT_PHONE
+    else:
+        # Error
+        update.effective_chat.send_message(error_checking_connection, parse_mode=ParseMode.HTML)
+        return ConversationHandler.END
 
 
 def validNumber(phone_number):
@@ -31,9 +40,10 @@ def validNumber(phone_number):
     return Pattern.match(phone_number) 
     
 
+@send_typing_action
 def input_phone(update, context):
     """Input Telegram phone number to log into the Telegram client"""
-    manager = Persistence.load_pkl(Persistence.ATTEMPT, update)
+    manager = Persistence.deserialize(Persistence.SIGNIN, update)
     if not manager:
         # Another user tried to enter the conversation
         return
@@ -51,9 +61,10 @@ def input_phone(update, context):
     return manage_code_request(update, context, request_code_text, manager)
     
 
+@send_typing_action
 def input_code(update, context):
     """Input Telegram security code to log into the Telegram client"""
-    manager: SessionManager = Persistence.load_pkl(Persistence.ATTEMPT, update)
+    manager: SessionManager = Persistence.deserialize(Persistence.SIGNIN, update)
     if not manager:
         # Another user tried to enter the conversation
         return
@@ -64,8 +75,8 @@ def input_code(update, context):
     try:
         # SIGN IN
         manager.sign_in()
-        update.message.reply_text(client_signing_successful, reply_markup=markup, parse_mode=ParseMode.HTML)
-        manager.delete_pkl()
+        update.message.reply_text(client_signing_successful, parse_mode=ParseMode.HTML)
+        manager.discard()
         return ConversationHandler.END
 
     except PhoneCodeInvalidError:
@@ -87,14 +98,15 @@ def input_code(update, context):
 
     except:
         # SIGN IN FAILED
-        update.message.reply_text(failed_client_signin, reply_markup=markup, parse_mode=ParseMode.HTML)
-        cancel_start(update, context)
+        update.message.reply_text(failed_client_signin, parse_mode=ParseMode.HTML)
+        cancel_start(update, context, include_message=False)
         return ConversationHandler.END   
 
 
+@send_typing_action
 def input_password(update, context):
     """Input Telegram password to log into the Telegram client"""
-    manager = Persistence.load_pkl(Persistence.ATTEMPT, update)
+    manager: SessionManager = Persistence.deserialize(Persistence.SIGNIN, update)
     if not manager:
         # Another user tried to enter the conversation
         return
@@ -102,19 +114,45 @@ def input_password(update, context):
     manager.set_password(password)
 
     # ATTEMPT SIGN IN
+    # SIGN IN
+    try:
+        manager.sign_in(password=True)
+        update.message.reply_text(client_signing_successful, parse_mode=ParseMode.HTML)
+        manager.discard()
+        return ConversationHandler.END
+    except PasswordHashInvalidError:
+        # Password is wrong, ask again
+        markup = CreateMarkup({Callbacks.CANCEL: 'Cancel'}).create_markup()
+        message = update.message.reply_text(wrong_password_text, reply_markup=markup, parse_mode=ParseMode.HTML)
+        manager.set_message(message)
+        return StartStates.INPUT_PASSWORD
+    except:
+        # Attempt Another Sign In after 15 seconds
+        time.sleep(5)
+        try:
+            manager.sign_in(password=True)
+            update.message.reply_text(client_signing_successful, parse_mode=ParseMode.HTML)
+            manager.discard()
+            return ConversationHandler.END
+        except:
+            # SIGN IN FAILED
+            update.message.reply_text(failed_client_signin, parse_mode=ParseMode.HTML)
+            cancel_start(update, context, include_message=False)
+            return ConversationHandler.END   
 
-    
-def cancel_start(update, context):
+
+def cancel_start(update, context, include_message=True):
     """Fallback method. Cancels Start manager"""
-    manager = Persistence.load_pkl(Persistence.ATTEMPT, update)
+    manager = Persistence.deserialize(Persistence.SIGNIN, update)
     if not manager:
         # Another user tried to enter the conversation
         return
-    if update.callback_query is not None:
-        update.callback_query.edit_message_text('Sign In Cancelled')
-    else:
-        update.effective_chat.send_message('Sign In Cancelled')
-    manager.delete_pkl()
+    if include_message:
+        if update.callback_query is not None:
+            update.callback_query.edit_message_text('Sign In Cancelled')
+        else:
+            update.effective_chat.send_message('Sign In Cancelled')
+    manager.discard()
     return ConversationHandler.END
 
 

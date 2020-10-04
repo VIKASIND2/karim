@@ -1,9 +1,26 @@
+from functools import wraps
+import json
+
+from telegram import update
+from telethon.tl.functions.phone import DiscardCallRequest
 from karim.bot import persistence
-import pickle, os, joblib
+import os, jsonpickle
+
+def persistence_decorator(func):
+    def wrapper(self, *args, **kw):
+        # Call function
+        print('Pikling: ', type(self))
+        output = func(self, *args, **kw)
+        # Post Processing
+        self.serialize()
+        return output
+    return wrapper
 
 class Persistence(object):
     """Class to save objects in pickle files for bot Conversation Persistance"""
-    ATTEMPT = 'attempt'
+    SIGNIN = 'signin'
+    SIGNOUT = 'signout'
+    ACCOUNT = 'account'
     FORWARDER = 'forwarder'
     
     def __init__(self, update, method):
@@ -12,38 +29,37 @@ class Persistence(object):
         self.user_id = update.effective_user.id
         self.update = None
         self.message = None
-        self.dump_pkl()
 
     def get_obj(self):
         return self.obj
 
+    @persistence_decorator
     def set_update(self, update):
         self.update = update
-        self.dump_pkl()
-        return self
+        self.serialize()
+        return self.update
 
+    @persistence_decorator
     def set_message(self, message):
         self.message = message
-        self.dump_pkl()
-        return self
+        self.serialize()
+        return self.message
 
-    def dump_pkl(self):
-        path = r'karim\bot\persistence'
-        if not os.path.exists(path):
-            os.makedirs(path)
-        joblib.dump(
-            self, "karim/bot/persistence/{}_{}_{}.pkl".format(self.method, self.chat_id, self.user_id))
-        return self
-
-    def delete_pkl(self):
-        os.remove(
-            "karim/bot/persistence/{}_{}_{}.pkl".format(self.method, self.chat_id, self.user_id))
-        return self
-
-    def load_pkl(method, update):
+    def discard(self):
         try:
-            obj = joblib.load(
-                "karim/bot/persistence/{}_{}_{}.pkl".format(method, update.effective_chat.id, update.effective_user.id))
-            return obj
-        except:
-            return None
+            os.remove(
+            "karim/bot/persistence/{}{}{}.json".format(self.method, self.user_id, self.chat_id))
+        except FileNotFoundError:
+            return self
+
+    def serialize(self):
+        with open("karim/bot/persistence/{}{}{}.json".format(self.method, self.user_id, self.chat_id), "w") as write_file:
+            objJSON = jsonpickle.encode(self, unpicklable=True)
+            json.dump(objJSON, write_file, default=lambda o: o.__dict__, indent=4)
+        return self
+
+    def deserialize(method, update):
+        with open("karim/bot/persistence/{}{}{}.json".format(method, update.effective_chat.id, update.effective_chat.id), "r") as file:
+            data = json.load(file)
+            obj = jsonpickle.decode(data)
+        return obj

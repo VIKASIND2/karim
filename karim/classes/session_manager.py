@@ -1,3 +1,5 @@
+from karim.classes.persistence import persistence_decorator
+from re import escape
 from karim.bot.commands import *
 import asyncio
 from telethon.sync import TelegramClient
@@ -8,23 +10,34 @@ from karim.secrets import secrets
 
 class SessionManager(Persistence):
     """Used for persistance and passing of login information"""
-    def __init__(self, update):
-        Persistence.__init__(self, update, self.ATTEMPT)
-        self.user_id = update.effective_user.id
+    @persistence_decorator
+    def __init__(self, update, method):
+        super().__init__(update, method)
         self.phone = None
         self.password = None
         self.code = None
         self.phone_code_hash = None
         self.code_tries = 0
 
+    @persistence_decorator
     def set_phone(self, phone):
-        self.phone = phone
+        self.phone = phone.replace(' ', '')
+        self.serialize()
 
+    @persistence_decorator
     def set_password(self, password):
         self.password = password
+        self.serialize()
 
+    @persistence_decorator
     def set_code(self, code):
         self.code = code.replace('.', '')
+        self.serialize()
+
+    def discard(self):
+        super().discard()
+        loop = asyncio.get_event_loop()
+        loop.close()
 
     def create_client(self, user_id):
         """Creates and returns a TelegramClient"""
@@ -63,13 +76,16 @@ class SessionManager(Persistence):
         Check if the session has access to the client user account
         :returns: None if user has access | UnauthorizedError if user does not have access | Exception if an error occured
         """
-        if not client:
-            client = self.create_client(self.user_id)
-        client.connect()
-        result = client.is_user_authorized()
-        client.disconnect()
-        return result
-
+        try:
+            if not client:
+                client = self.create_client(self.user_id)
+                client.connect()
+                result = client.is_user_authorized()
+                client.disconnect()
+                return result
+        except: 
+            return Exception
+        
     def connect(self, client=None):
         """
         Connect to the Telegram Client

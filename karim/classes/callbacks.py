@@ -5,6 +5,11 @@ class Callbacks:
     DONE= 'DONE'
     LEFT = 'LEFT'
     RIGHT = 'RIGHT'
+    LOGOUT = 'LOGOUT'
+    LOGIN = 'LOGIN'
+    SELECT = 'SELECT'
+    UNSELECT = 'UNSELECT'
+    CONFIRM = 'CONFIRM'
 
 
 class StartStates:
@@ -12,6 +17,11 @@ class StartStates:
     INPUT_PHONE = 1
     INPUT_PASSWORD = 2
     INPUT_CODE = 3
+
+
+class LogOutStates:
+    """Object to store PTB Sign Out Conversation Handler states indicators"""
+    CONFIRM = 1
 
 
 class MessageStates:

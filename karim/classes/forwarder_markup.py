@@ -1,3 +1,4 @@
+from karim.classes import forwarder
 from typing import Dict
 
 from rsa import key
@@ -9,13 +10,13 @@ class CreateMarkup():
     """
     def __init__(self, items: Dict, cols=1):
         self.items = items
-        self.titles = items.values()
-        self.callbacks = items.keys()
+        self.titles = list(items.values())
+        self.callbacks = list(items.keys())
         self.cols = cols
-        self.keyboard = []
+        self.keyboard = self.create_keyboard()
         self.markup = None
 
-    def set_titels(self, titles):
+    def set_titel(self, titles):
         self.titles = titles
         return self.titles.copy()
 
@@ -59,18 +60,28 @@ class CreateMarkup():
 class MarkupDivider(CreateMarkup):
     """An InlineMarkupButton with no attached callback used to divide sections of the ForwarderMarkup"""
     def __init__(self, title):
-        CreateMarkup.__init__(self, {title: Callbacks.NONE}, cols=1)
+        CreateMarkup.__init__(self, {Callbacks.NONE: title}, cols=1)
 
 
-class ForwarderMarkup(CreateMarkup):
+class ForwarderMarkup():
+    CHECKBOX = '(•) '
     def __init__(self, forwarder: Forwarder):
-        self.selected_div = 'Selected Groups:'
-        self.selected = forwarder.get_selection()
-        self.shown_div = 'Select below:'
-        self.shown_selection = forwarder.get_shown()
-        self.arrows = {Callbacks.LEFT: '<-', Callbacks.RIGHT: '->'}
+        self.selected_div = 'SELECTED GROUPS:'
+        self.selected = self.__format_dicts(forwarder.get_selection(), Callbacks.UNSELECT)
+        self.shown_div = 'SELECT BELOW [{}/{}]'.format(forwarder.page_index, forwarder.pages)
+        self.shown_selection = self.__format_dicts(forwarder.get_shown(), Callbacks.SELECT, forwarder.get_selection())
+        self.arrows = {Callbacks.LEFT: '<', Callbacks.RIGHT: '>'}
         self.options = {Callbacks.CANCEL: 'Cancel', Callbacks.DONE: 'Done'}
         self.set_keyboard()
+
+    def __format_dicts(self, dict, callback, selected=None):
+        updated_dict = {}
+        for key in dict:
+            if callback is Callbacks.SELECT and key in selected:
+                updated_dict[callback+str(key)] = self.CHECKBOX+dict[key]
+            else:
+                updated_dict[callback+str(key)] = dict[key]
+        return updated_dict
 
     def set_keyboard(self):
         selected_div_kb = MarkupDivider(self.selected_div).create_keyboard()
@@ -78,9 +89,9 @@ class ForwarderMarkup(CreateMarkup):
         shown_div_kb = MarkupDivider(self.shown_div).create_keyboard()
         shown_selection_kb = CreateMarkup(self.shown_selection).create_keyboard()
         arrows_kb = CreateMarkup(self.arrows, cols=2).create_keyboard()
-        options_kb = CreateMarkup(self.options).create_keyboard()
+        options_kb = CreateMarkup(self.options, cols=2).create_keyboard()
 
-        keyboard = [selected_div_kb]
+        keyboard = [selected_div_kb[0]]
         for row in selected_kb:
             keyboard.append(row)
         keyboard.append(shown_div_kb[0])
@@ -90,6 +101,9 @@ class ForwarderMarkup(CreateMarkup):
         keyboard.append(options_kb[0])
         self.keyboard = keyboard
         return keyboard
+
+    def create_markup(self):
+        return InlineKeyboardMarkup(self.keyboard)
 
 
 
