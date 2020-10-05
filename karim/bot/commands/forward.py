@@ -7,7 +7,7 @@ from jinja2.runtime import markup_join
 from telethon.errors.rpcbaseerrors import UnauthorizedError
 from karim.bot.commands import *
 
-
+@run_async
 @send_typing_action
 def forward_message(update, context):
     """Initialize Forwarder Conversation. Ask for message input"""
@@ -32,7 +32,7 @@ def forward_message(update, context):
         return ConversationHandler.END
 
 
-
+@run_async
 @send_typing_action
 def select_message(update, context):
     """Initialize message Conversation"""
@@ -79,6 +79,7 @@ def select_message(update, context):
         return ConversationHandler.END
 
     
+@run_async
 def select_group(update, context):
     forwarder: Forwarder = Forwarder.deserialize(Forwarder.FORWARDER, update)
     if not forwarder:
@@ -149,9 +150,8 @@ def select_group(update, context):
         return
 
 
-    
 
-
+@run_async
 @send_typing_action
 def confirm(update, context):
     """Confirm forward settings"""
@@ -173,6 +173,7 @@ def confirm(update, context):
         return ConversationHandler.END
 
 
+@run_async
 def cancel_forward(update, context, send_message=True):
     forwarder = Persistence.deserialize(Persistence.FORWARDER, update)
     if not forwarder:

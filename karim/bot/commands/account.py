@@ -2,6 +2,7 @@ from karim.bot.commands import *
 
 
 @send_typing_action
+@run_async
 def check_account(update, context):
     manager = SessionManager(update, Persistence.ACCOUNT)
     try:

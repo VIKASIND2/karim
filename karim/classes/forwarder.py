@@ -153,7 +153,7 @@ class Forwarder(SessionManager):
             # SEND MESSAGES
             for target in targets:
                 try:
-                    client.send_message(target, self.text.text)
+                    client.send_message(target, self.text.text_markdown)
                     count += 1
                 except:
                     fail += 1

@@ -1,5 +1,6 @@
 from karim.bot.commands import *
 
+@run_async
 @send_typing_action
 def sign_out(update, context):
     manager = SessionManager(update, Persistence.SIGNOUT)
@@ -26,6 +27,7 @@ def sign_out(update, context):
         return ConversationHandler.END
 
 
+@run_async
 @send_typing_action
 def confirm_sign_out(update, context):
     manager:SessionManager = SessionManager.deserialize(SessionManager.SIGNOUT, update)
@@ -47,6 +49,7 @@ def confirm_sign_out(update, context):
         return cancel_sign_out(update, context)
 
 
+@run_async
 def cancel_sign_out(update, context):
     manager:SessionManager = SessionManager.deserialize(SessionManager.SIGNOUT, update)
     if not manager:
