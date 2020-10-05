@@ -1,5 +1,4 @@
 from karim.classes.persistence import persistence_decorator
-from re import escape
 from karim.bot.commands import *
 import asyncio
 from telethon.sync import TelegramClient

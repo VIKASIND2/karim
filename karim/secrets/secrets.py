@@ -1,32 +1,40 @@
 import json
+import os
+
+
 
 def get_var(key="", parent="", default="", value=""):
     """
     Retrieve configuration variables from the secrets.json file.
     :variable: String of the name of the variable you are retrieving (see secrets.json)
     """
-    variables = {}
-    with open('karim/secrets/secrets.json') as variables_file:
-        variables = json.load(variables_file)
-    if value != "":
-        if value in variables.values():
-            print("Value {} is in secrets.json".format(value))
-            return True
-        else:
-            print("Value {} is NOT in secrets.json".format(value))
-            return False
+    if os.environ.get('PORT') in (None, ""):
+        # CODE RUNNING LOCALLY
+        variables = {}
+        with open('karim/secrets/secrets.json') as variables_file:
+            variables = json.load(variables_file)
+        if value != "":
+            if value in variables.values():
+                print("Value {} is in secrets.json".format(value))
+                return True
+            else:
+                print("Value {} is NOT in secrets.json".format(value))
+                return False
 
-    elif parent == "":
-        requested = variables.get(str(key))
-    else:
-        requested = variables[parent][str(key)]
-    if requested in ("", None, "insert_here", "insert_here_if_available"):
-        if default == "":
-            return None
+        elif parent == "":
+            requested = variables.get(str(key))
         else:
-            return default
+            requested = variables[parent][str(key)]
+        if requested in ("", None, "insert_here", "insert_here_if_available"):
+            if default == "":
+                return None
+            else:
+                return default
+        else:
+            return requested
     else:
-        return requested
+        # CODE RUNNING ON SERVER
+        return os.environ.get(key)
 
 
 def set_var(key, value):

@@ -1,9 +1,5 @@
-from itertools import groupby
-from jinja2.environment import create_cache
-
 from telethon import client
 from karim.classes.persistence import persistence_decorator
-from logging import root
 from telethon.tl.functions.messages import GetDialogsRequest
 from telethon.tl.types import InputPeerEmpty
 from telethon.errors.rpcbaseerrors import UnauthorizedError
