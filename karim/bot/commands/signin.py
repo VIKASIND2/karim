@@ -5,6 +5,7 @@ from karim.secrets import secrets
 from karim.bot.commands import *
 import re
 
+@run_async
 @send_typing_action
 def client_sign_in(update, context):
     """Initializes the bot and sign into the Telegram Client. Walks the user through a wizard, asking to input Telegram phone number, password and security code to sign into the client."""
@@ -40,6 +41,7 @@ def validNumber(phone_number):
     return Pattern.match(phone_number) 
     
 
+@run_async
 @send_typing_action
 def input_phone(update, context):
     """Input Telegram phone number to log into the Telegram client"""
@@ -61,6 +63,7 @@ def input_phone(update, context):
     return manage_code_request(update, context, request_code_text, manager)
     
 
+@run_async
 @send_typing_action
 def input_code(update, context):
     """Input Telegram security code to log into the Telegram client"""
@@ -103,6 +106,7 @@ def input_code(update, context):
         return ConversationHandler.END   
 
 
+@run_async
 @send_typing_action
 def input_password(update, context):
     """Input Telegram password to log into the Telegram client"""
@@ -141,6 +145,7 @@ def input_password(update, context):
             return ConversationHandler.END   
 
 
+@run_async
 def cancel_start(update, context, include_message=True):
     """Fallback method. Cancels Start manager"""
     manager = Persistence.deserialize(Persistence.SIGNIN, update)
