@@ -49,10 +49,13 @@ class Persistence(object):
         try:
             os.remove(
             "karim/bot/persistence/{}{}{}.json".format(self.method, self.user_id, self.chat_id))
+            return self
         except FileNotFoundError:
             return self
 
     def serialize(self):
+        if not os.path.exists('karim/bot/persistence'):
+            os.makedirs('karim/bot/persistence')
         with open("karim/bot/persistence/{}{}{}.json".format(self.method, self.user_id, self.chat_id), "w") as write_file:
             objJSON = jsonpickle.encode(self, unpicklable=True)
             json.dump(objJSON, write_file, default=lambda o: o.__dict__, indent=4)

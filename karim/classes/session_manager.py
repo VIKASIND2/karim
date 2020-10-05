@@ -45,6 +45,8 @@ class SessionManager(Persistence):
         asyncio.set_event_loop(loop)
         api_id = secrets.get_var('API_ID')
         api_hash = secrets.get_var('API_HASH')
+        if not os.path.exists('karim/bot/sessions'):
+            os.makedirs('karim/bot/sessions')
         client = TelegramClient('karim/bot/sessions/{}'.format(user_id), api_id, api_hash, loop=loop)
         return client
 
