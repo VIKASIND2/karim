@@ -1,3 +1,4 @@
+from karim.classes.teleredis import RedisSession
 from karim.classes.persistence import persistence_decorator
 from karim.bot.commands import *
 import asyncio
@@ -5,6 +6,7 @@ from telethon.sync import TelegramClient
 from telethon.errors.rpcerrorlist import PhoneCodeExpiredError, PhoneCodeInvalidError, FloodWaitError, SessionPasswordNeededError, UnauthorizedError
 from telethon.tl.types.auth import SentCode
 from karim.secrets import secrets
+from karim import LOCALHOST, redis_connector
 
 
 class SessionManager(Persistence):
@@ -44,9 +46,12 @@ class SessionManager(Persistence):
         asyncio.set_event_loop(loop)
         api_id = secrets.get_var('API_ID')
         api_hash = secrets.get_var('API_HASH')
-        if not os.path.exists('karim/bot/sessions'):
-            os.makedirs('karim/bot/sessions')
-        client = TelegramClient('karim/bot/sessions/{}'.format(user_id), api_id, api_hash, loop=loop)
+
+        if LOCALHOST:
+            session = 'karim/bot/persistence/{}'.format(user_id)
+        else:
+            session = RedisSession(user_id, redis_connector)
+        client = TelegramClient(session, api_id, api_hash, loop=loop)
         return client
 
     def request_code(self):
@@ -110,6 +115,10 @@ class SessionManager(Persistence):
             client.connect()
         result = client.log_out()
         client.disconnect()
-        try: os.remove('karim/bot/sessions/{}.session'.format(self.user_id)) 
-        except: pass
+        if LOCALHOST:
+            try:
+                os.remove('karim/bot/persistence/{}.session'.format(self.user_id))
+            except: pass 
+        else: 
+            print('Should delete Redis Session...')
         return result      

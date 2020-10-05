@@ -147,9 +147,10 @@ class Forwarder(SessionManager):
             # LOAD & SCRAPE TARGETS
             targets = self.__load_targets(client, groups)
             # SEND MESSAGES
+            print(self.text.text_markdown_v2_urled)
             for target in targets:
                 try:
-                    client.send_message(target, self.text.text_markdown)
+                    client.send_message(target, self.text.text_markdown_v2_urled)
                     count += 1
                 except:
                     fail += 1
@@ -177,7 +178,6 @@ class Forwarder(SessionManager):
         """
         try:
             all_participants = client.get_participants(target_group, aggressive=True)
-            print(all_participants)
             return all_participants
         except UnauthorizedError:
             raise UnauthorizedError
