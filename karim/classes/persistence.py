@@ -1,3 +1,4 @@
+import base64
 from functools import wraps
 import json
 from karim import LOCALHOST, redis_connector
@@ -70,7 +71,10 @@ class Persistence(object):
             # Turn Json into string
             objString = json.dumps(objJSON, indent=4)
             # Save string in Redis
-            redis_connector.set('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id), objString)
+            message_bytes = objString.encode('ascii')
+            base64_bytes = base64.b64encode(message_bytes)
+            base64_message = base64_bytes.decode('ascii')
+            redis_connector.set('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id), base64_message)
         return self
 
     def deserialize(method, update):
@@ -82,7 +86,10 @@ class Persistence(object):
         else:
             # Code Running on Heroku
             # Get Redis String
-            rstring = redis_connector.get("persistence:{}{}{}".format(method, update.effective_chat.id, update.effective_chat.id))
+            base64_message = redis_connector.get("persistence:{}{}{}".format(method, update.effective_chat.id, update.effective_chat.id))
+            base64_bytes = base64_message.encode('ascii')
+            message_bytes = base64.b64decode(base64_bytes)
+            rstring = message_bytes.decode('ascii')
             # Turn into Object
             obj = jsonpickle.decode(rstring)
         return obj
