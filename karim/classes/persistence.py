@@ -3,7 +3,6 @@ import json
 
 from telegram import update
 from telethon.tl.functions.phone import DiscardCallRequest
-from karim.bot import persistence
 import os, jsonpickle
 
 def persistence_decorator(func):
