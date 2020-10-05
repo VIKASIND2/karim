@@ -1,5 +1,6 @@
 from functools import wraps
 import json
+from karim import LOCALHOST, redis_connector
 
 from telegram import update
 from telethon.tl.functions.phone import DiscardCallRequest
@@ -46,20 +47,43 @@ class Persistence(object):
         return self.message
 
     def discard(self):
-        try:
-            os.remove(
-            "karim/bot/persistence/{}{}{}.json".format(self.method, self.user_id, self.chat_id))
-        except FileNotFoundError:
-            return self
+        if LOCALHOST:
+            # CODE RUNNING LOCALLY
+            try:
+                os.remove(
+                "karim/bot/persistence/{}{}{}.json".format(self.method, self.user_id, self.chat_id))
+            except FileNotFoundError:
+                return self
+        else:
+            # CODE RUNNING ON SERVER
+            redis_connector.delete('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id))
 
     def serialize(self):
-        with open("karim/bot/persistence/{}{}{}.json".format(self.method, self.user_id, self.chat_id), "w") as write_file:
-            objJSON = jsonpickle.encode(self, unpicklable=True)
-            json.dump(objJSON, write_file, default=lambda o: o.__dict__, indent=4)
+        if LOCALHOST:
+            # CODE RUNNING LOCALLY
+            with open("karim/bot/persistence/{}{}{}.json".format(self.method, self.user_id, self.chat_id), "w") as write_file:
+                objJSON = jsonpickle.encode(self, unpicklable=True)
+                json.dump(objJSON, write_file, default=lambda o: o.__dict__, indent=4)
+        else:
+            # Code running on Heroku
+            # Turn object into Json
+            objJSON = jsonpickle.encode(self, unpickable=True)
+            # Turn Json into string
+            objString = json.dumps(objJSON, indent=4)
+            # Save string in Redis
+            redis_connector.set('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id), objString)
         return self
 
     def deserialize(method, update):
-        with open("karim/bot/persistence/{}{}{}.json".format(method, update.effective_chat.id, update.effective_chat.id), "r") as file:
-            data = json.load(file)
-            obj = jsonpickle.decode(data)
+        if LOCALHOST:
+            # CODE RUNNING LOCALLY
+            with open("karim/bot/persistence/{}{}{}.json".format(method, update.effective_chat.id, update.effective_chat.id), "r") as file:
+                data = json.load(file)
+                obj = jsonpickle.decode(data)
+        else:
+            # Code Running on Heroku
+            # Get Redis String
+            rstring = redis_connector.get("persistence:{}{}{}".format(method, update.effective_chat.id, update.effective_chat.id))
+            # Turn into Object
+            obj = jsonpickle.decode(rstring)
         return obj
