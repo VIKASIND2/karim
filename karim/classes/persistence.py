@@ -66,7 +66,7 @@ class Persistence(object):
         else:
             # Code running on Heroku
             # Turn object into Json
-            objJSON = jsonpickle.encode(self, unpickable=True)
+            objJSON = jsonpickle.encode(self, unpicklable=True)
             # Turn Json into string
             objString = json.dumps(objJSON, indent=4)
             # Save string in Redis
