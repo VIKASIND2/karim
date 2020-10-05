@@ -11,14 +11,14 @@ from karim.bot.commands import *
 @send_typing_action
 def forward_message(update, context):
     """Initialize Forwarder Conversation. Ask for message input"""
-    forwarder = Forwarder(update)
+    forwarder = Forwarder(Persistence.FORWARDER, chat_id=update.effective_chat.id, user_id=update.effective_chat.id, message_id=update.message.message_id)
     result = forwarder.check_connection()
     if result:
         # User is authorised
         # Ask for message text
         markup = CreateMarkup({Callbacks.CANCEL: 'Cancel'}).create_markup()
         message = update.effective_chat.send_message(send_message_to_forward, reply_markup=markup, parse_mode=ParseMode.HTML)
-        forwarder.set_message(message)            
+        forwarder.set_message(message.message_id)            
         return MessageStates.MESSAGE
     elif not result:
         # User is not logged in
@@ -36,12 +36,12 @@ def forward_message(update, context):
 @send_typing_action
 def select_message(update, context):
     """Initialize message Conversation"""
-    forwarder: Forwarder = Forwarder.deserialize(Forwarder.FORWARDER, update)
+    forwarder: Forwarder = dict_to_obj(Forwarder.deserialize(Forwarder.FORWARDER, update), method=Objects.FORWARDER)
     if not forwarder:
         # Another user tried to enter the conversation
         return
     # Set Forwarder Message
-    forwarder.set_text(update.message)
+    forwarder.set_text(update.message.text_markdown_v2)
 
     # SEND GROUP SELECTION
     # Check User Connection to the Client
@@ -57,7 +57,7 @@ def select_message(update, context):
             reply_markup = markup.create_markup()
             # Send Message
             message = update.effective_chat.send_message(select_group_text, reply_markup=reply_markup, parse_mode=ParseMode.HTML)
-            forwarder.set_message(message)
+            forwarder.set_message(message.message_id)
             return MessageStates.SELECT_GROUP
         except UnauthorizedError:
             # User is not logged in
@@ -81,7 +81,7 @@ def select_message(update, context):
     
 @run_async
 def select_group(update, context):
-    forwarder: Forwarder = Forwarder.deserialize(Forwarder.FORWARDER, update)
+    forwarder: Forwarder = dict_to_obj(Forwarder.deserialize(Forwarder.FORWARDER, update), method=Objects.FORWARDER)
     if not forwarder:
         # Another user tried to enter the conversation
         return
@@ -89,10 +89,9 @@ def select_group(update, context):
     # GET INPUT CALLBACK 
     data = update.callback_query.data
     update.callback_query.answer()
-    print(data)
     if data == Callbacks.CANCEL:
         # CANCEL
-        return cancel_forward(update, context)
+        return cancel_forward(update, context, forwarder=forwarder)
 
     elif data == Callbacks.DONE:
         # TODO DONE
@@ -101,9 +100,9 @@ def select_group(update, context):
         text = ''
         for group in list(forwarder.selected.values()):
             text += '\n- {}'.format(group)
-        forwarder.message.delete()
-        message = forwarder.text.reply_text(confirm_forwarding.format(text), reply_markup=markup, parse_mode=ParseMode.HTML)
-        forwarder.set_message(message)
+        context.bot.delete_message(forwarder.chat_id, forwarder.message_id)
+        message = update.effective_chat.send_message(confirm_forwarding.format(text), reply_markup=markup, parse_mode=ParseMode.HTML)
+        forwarder.set_message(message.message_id)
         return MessageStates.CONFIRM
 
     elif data == Callbacks.LEFT:
@@ -111,7 +110,7 @@ def select_group(update, context):
         forwarder.rotate(Callbacks.LEFT)
         markup = ForwarderMarkup(forwarder).create_markup()
         message = update.callback_query.edit_message_text(select_group_text, reply_markup=markup, parse_mode=ParseMode.HTML)
-        forwarder.set_message(message)
+        forwarder.set_message(message.message_id)
         return MessageStates.SELECT_GROUP
 
     elif data == Callbacks.RIGHT:
@@ -120,7 +119,7 @@ def select_group(update, context):
         markup = ForwarderMarkup(forwarder).create_markup()
         # Send Message
         message = update.callback_query.edit_message_text(select_group_text, reply_markup=markup, parse_mode=ParseMode.HTML)
-        forwarder.set_message(message)
+        forwarder.set_message(message.message_id)
         return MessageStates.SELECT_GROUP
 
     elif Callbacks.UNSELECT in data:
@@ -131,18 +130,20 @@ def select_group(update, context):
         markup = ForwarderMarkup(forwarder).create_markup()
         # Send Message
         message = update.callback_query.edit_message_text(select_group_text, reply_markup=markup, parse_mode=ParseMode.HTML)
-        forwarder.set_message(message)
+        forwarder.set_message(message.message_id)
         return MessageStates.SELECT_GROUP
 
     elif Callbacks.SELECT in data:
         # Update Selections
         selected_id = data.replace(Callbacks.SELECT, '')
-        forwarder.add_selection(selected_id)
+        result = forwarder.add_selection(selected_id)
         # Redraw Markup
         markup = ForwarderMarkup(forwarder).create_markup()
         # Send Message
-        message = update.callback_query.edit_message_text(select_group_text, reply_markup=markup, parse_mode=ParseMode.HTML)
-        forwarder.set_message(message)
+        if result is not Exception:
+            message = update.callback_query.edit_message_text(select_group_text, reply_markup=markup, parse_mode=ParseMode.HTML)
+            forwarder.set_message(message.message_id)
+        update.callback_query.answer()
         return MessageStates.SELECT_GROUP
 
     else:
@@ -155,27 +156,28 @@ def select_group(update, context):
 @send_typing_action
 def confirm(update, context):
     """Confirm forward settings"""
-    forwarder: Forwarder = Persistence.deserialize(Forwarder.FORWARDER, update)
+    forwarder: Forwarder = dict_to_obj(Persistence.deserialize(Forwarder.FORWARDER, update), method=Objects.FORWARDER)
     if not forwarder:
         # Another user tried to enter the conversation
         return
 
     data = update.callback_query.data
     if data is Callbacks.CANCEL:
-        forwarder.message.edit_text(cancel_forward_text, parse_mode=ParseMode.HTML)
+        context.bot.edit_message_text(cancel_forward_text, parse_mode=ParseMode.HTML, chat_id=update.effective_chat.id, message_id=forwarder.message_id)
         forwarder.discard()
         return ConversationHandler.END
     else:
         # Send Messages
         count = forwarder.send()
-        forwarder.message.edit_text(forward_successful.format(count[0], count[1]), parse_mode=ParseMode.HTML)
+        context.bot.edit_message_text(forward_successful.format(count[0], count[1]), chat_id=forwarder.chat_id, message_id=forwarder.message_id, parse_mode=ParseMode.HTML)
         forwarder.discard()
         return ConversationHandler.END
 
 
 @run_async
-def cancel_forward(update, context, send_message=True):
-    forwarder = Persistence.deserialize(Persistence.FORWARDER, update)
+def cancel_forward(update, context, send_message=True, forwarder=None):
+    if not forwarder:
+        forwarder = dict_to_obj(Persistence.deserialize(Persistence.FORWARDER, update), method=Objects.FORWARDER)
     if not forwarder:
         # Another user tried to enter the conversation
         return

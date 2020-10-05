@@ -5,6 +5,8 @@ from karim.classes.session_manager import SessionManager
 from karim.classes.forwarder import Forwarder
 from karim.classes.forwarder_markup import ForwarderMarkup, CreateMarkup, MarkupDivider
 from telethon.sync import TelegramClient
+from karim.modules.create_objs import dict_to_obj
+from karim.classes.callbacks import *
 
 
 

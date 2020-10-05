@@ -12,13 +12,13 @@ from karim import LOCALHOST, redis_connector
 class SessionManager(Persistence):
     """Used for persistance and passing of login information"""
     @persistence_decorator
-    def __init__(self, update, method):
-        super().__init__(update, method)
-        self.phone = None
-        self.password = None
-        self.code = None
-        self.phone_code_hash = None
-        self.code_tries = 0
+    def __init__(self, method, chat_id, user_id, message_id, phone=None, password=None, code=None, phone_code_hash=None, code_tries=0):
+        super().__init__(method=method, chat_id=chat_id, user_id=user_id, message_id=message_id)
+        self.phone = phone
+        self.password = password
+        self.code = code
+        self.phone_code_hash = phone_code_hash
+        self.code_tries = code_tries
 
     @persistence_decorator
     def set_phone(self, phone):
@@ -37,8 +37,11 @@ class SessionManager(Persistence):
 
     def discard(self):
         super().discard()
-        loop = asyncio.get_event_loop()
-        loop.close()
+        try:
+            loop = asyncio.get_event_loop()
+            loop.close()
+        except:
+            pass
 
     def create_client(self, user_id):
         """Creates and returns a TelegramClient"""
@@ -121,4 +124,4 @@ class SessionManager(Persistence):
             except: pass 
         else: 
             print('Should delete Redis Session...')
-        return result      
+        return result 

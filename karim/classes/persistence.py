@@ -1,8 +1,5 @@
-import base64
-from functools import wraps
 import json
 from karim import LOCALHOST, redis_connector
-
 from telegram import update
 from telethon.tl.functions.phone import DiscardCallRequest
 import os, jsonpickle
@@ -24,27 +21,17 @@ class Persistence(object):
     ACCOUNT = 'account'
     FORWARDER = 'forwarder'
     
-    def __init__(self, update, method):
+    def __init__(self, method, chat_id, user_id, message_id=None):
         self.method = method
-        self.chat_id = update.effective_chat.id
-        self.user_id = update.effective_user.id
-        self.update = None
-        self.message = None
+        self.chat_id = chat_id
+        self.user_id = user_id
+        self.message_id = message_id
 
-    def get_obj(self):
-        return self.obj
 
     @persistence_decorator
-    def set_update(self, update):
-        self.update = update
-        self.serialize()
-        return self.update
-
-    @persistence_decorator
-    def set_message(self, message):
-        self.message = message
-        self.serialize()
-        return self.message
+    def set_message(self, message_id):
+        self.message_id = message_id
+        return self.message_id
 
     def discard(self):
         if LOCALHOST:
@@ -61,35 +48,36 @@ class Persistence(object):
     def serialize(self):
         if LOCALHOST:
             # CODE RUNNING LOCALLY
+            obj_dict = self.__dict__
             with open("karim/bot/persistence/{}{}{}.json".format(self.method, self.user_id, self.chat_id), "w") as write_file:
-                objJSON = jsonpickle.encode(self, unpicklable=True)
-                json.dump(objJSON, write_file, default=lambda o: o.__dict__, indent=4)
+
+                json.dump(obj_dict, write_file, indent=4)
         else:
             # Code running on Heroku
             # Turn object into Json
-            objJSON = jsonpickle.encode(self, unpicklable=True)
+            """ objJSON = jsonpickle.encode(self, unpicklable=True)
             # Turn Json into string
             objString = json.dumps(objJSON, indent=4)
             # Save string in Redis
             message_bytes = objString.encode('ascii')
             base64_bytes = base64.b64encode(message_bytes)
-            base64_message = base64_bytes.decode('ascii')
-            redis_connector.set('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id), base64_message)
+            base64_message = base64_bytes.decode('ascii') """
+            obj_dict = self.__dict__
+            redis_connector.hmset('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id), obj_dict)
         return self
 
     def deserialize(method, update):
         if LOCALHOST:
             # CODE RUNNING LOCALLY
-            with open("karim/bot/persistence/{}{}{}.json".format(method, update.effective_chat.id, update.effective_chat.id), "r") as file:
-                data = json.load(file)
-                obj = jsonpickle.decode(data)
+            with open("karim/bot/persistence/{}{}{}.json".format(method, update.effective_chat.id, update.effective_chat.id)) as file:
+                return json.load(file)
         else:
             # Code Running on Heroku
             # Get Redis String
-            base64_message = redis_connector.get("persistence:{}{}{}".format(method, update.effective_chat.id, update.effective_chat.id))
-            base64_bytes = base64_message.encode('ascii')
+            obj_dict = redis_connector.hgetall("persistence:{}{}{}".format(method, update.effective_chat.id, update.effective_chat.id))
+            """base64_bytes = base64_message.encode('ascii')
             message_bytes = base64.b64decode(base64_bytes)
-            rstring = message_bytes.decode('ascii')
+            rstring = message_bytes.decode('ascii') """
             # Turn into Object
-            obj = jsonpickle.decode(rstring)
-        return obj
+            # Class is Persistence
+            return obj_dict

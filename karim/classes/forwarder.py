@@ -1,41 +1,58 @@
+import jsonpickle
 from telethon import client
 from karim.classes.persistence import persistence_decorator
 from telethon.tl.functions.messages import GetDialogsRequest
 from telethon.tl.types import InputPeerEmpty
 from telethon.errors.rpcbaseerrors import UnauthorizedError
 from karim.bot.commands import *
+from karim.classes.callbacks import Callbacks
 import math
 
 class Forwarder(SessionManager):
     """Manages requests to the TelegramClient regarding the steps to scrape data from the Telegram API"""
-    def __init__(self, update, last_index=0):
+    def __init__(self, method, chat_id, user_id, message_id, phone=None, password=None, code=None, phone_code_hash=None, code_tries=0, selected_ids=[], group_ids=None, group_titles=None, shown_ids=[], text=None, targets=[], rotate_size=6, first_index=0, last_index=None, page_index=1, pages=None):
         """
         groups: List of Dictionaries {id: title}
-        selected: Dictionary(id: title)
+        selected_ids: Dictionary(id: title)
         shown_groups: Dictionary(id: title)
         """
-        SessionManager.__init__(self, update, self.FORWARDER)
-        self.selected = {}
-        self.groups = None
-        self.shown_groups = {}
-        self.text = None
-        self.targets = []
-        self.rotate_size = 6
-        self.first_index = 0
+        SessionManager.__init__(self, method=method, chat_id=chat_id, user_id=user_id, message_id=message_id, phone=phone, password=password, code=code, phone_code_hash=phone_code_hash, code_tries=code_tries)
+        self.selected_ids = selected_ids
+        self.group_ids = group_ids
+        self.group_titles = group_titles
+        self.shown_ids = shown_ids
+        self.text = text
+        self.targets = targets
+        self.rotate_size = rotate_size
+        self.first_index = first_index
         self.last_index = self.first_index + self.rotate_size
-        self.page_index = 1
-        self.pages = None
+        self.page_index = page_index
+        self.pages = pages
+
+
 
     def get_selection(self):
-        return self.selected.copy()
+        """Return list()"""
+        return self.selected_ids.copy()
 
-    def get_groups(self):
-        return self.groups.copy()
+    def get_groups(self, titles=False):
+        """Return list()"""
+        if titles:
+            return self.group_titles.copy()
+        return self.group_ids.copy()
+
+    def get_groups_dict(self):
+        groups = {}
+        for index, group in enumerate(self.get_groups()):
+            groups[group] = self.group_titles[index]
+        return groups
 
     def get_shown(self):
-        return self.shown_groups.copy()
+        """Return list()"""
+        return self.shown_ids.copy()
 
     def get_targets(self):
+        """Return list()"""
         return self.targets.copy()
 
     # Connects to Telegram API
@@ -45,19 +62,21 @@ class Forwarder(SessionManager):
         """
         try:
             client = self.connect()
-            groups = []
+            group_titles = []
+            group_ids = []
             chats = client.get_dialogs()
             for chat in chats:
                 try:
                     if not chat.is_user:
-                        groups.append({chat.id: chat.title})
+                        group_ids.append(chat.id)
+                        group_titles.append(chat.title)
                 except:
                     print('Error')
                     continue
             client.disconnect()
-            self.__set_groups(groups)
-            shown = groups[self.first_index:self.last_index+1]
-            self.__set_shown(shown)
+            self.__set_groups(group_ids, group_titles)
+            shown_ids = group_ids[self.first_index:self.last_index+1]
+            self.__set_shown(shown_ids)
             return self.get_groups()
         except UnauthorizedError:
             raise UnauthorizedError
@@ -65,19 +84,18 @@ class Forwarder(SessionManager):
             raise Exception
 
     @persistence_decorator
-    def __set_groups(self, groups):
-        self.pages = math.ceil(len(groups)//self.rotate_size)
-        self.groups = groups
+    def __set_groups(self, group_ids, group_titles):
+        """Set group titles and ids"""
+        self.pages = math.ceil(len(group_ids)//self.rotate_size)
+        self.group_ids = group_ids
+        self.group_titles = group_titles
 
     @persistence_decorator
-    def __set_shown(self, shown):
+    def __set_shown(self, shown_ids):
         """
-        shown: List of Dictionaries (id: title)
+        shown: List of group ids 
         """
-        updated_shown = {}
-        for item in shown:
-            updated_shown[list(item.keys())[0]] = list(item.values())[0]
-        self.shown_groups = updated_shown
+        self.shown_ids = shown_ids
 
     @persistence_decorator
     def set_text(self, text):
@@ -87,23 +105,25 @@ class Forwarder(SessionManager):
     # MANAGE MARKUP ROTATION AND SELECTIONS
     @persistence_decorator
     def add_selection(self, id):
-        if str(Callbacks.UNSELECT+id) in self.selected:
-            return
-        self.selected[id] = self.shown_groups[id]
-        return self.selected.copy()
+        """id: group_id"""
+        if str(id) in self.selected_ids:
+            return Exception
+        self.selected_ids.append(id)
+        return self.selected_ids.copy()
 
     @persistence_decorator
     def remove_selection(self, id):
-        del self.selected[id]
-        return self.selected.copy()
+        """id: group_id"""
+        self.selected_ids.remove(id)
+        return self.selected_ids.copy()
 
     @persistence_decorator
     def rotate(self, direction):
         if direction == Callbacks.LEFT:
             if self.first_index == 0:
                 self.page_index = self.pages
-                self.first_index = len(self.groups) - self.rotate_size
-                self.last_index = len(self.groups)-1
+                self.first_index = len(self.group_ids) - self.rotate_size -1
+                self.last_index = len(self.group_ids)
             elif self.first_index - self.rotate_size < 0:
                 self.page_index -= 1
                 self.last_index = self.first_index
@@ -114,19 +134,21 @@ class Forwarder(SessionManager):
                 self.last_index -= self.rotate_size +1
 
         elif direction == Callbacks.RIGHT:
-            if self.last_index == len(self.groups) -1:
+            if self.last_index == len(self.group_ids):
                 self.page_index = 1
                 self.first_index = 0
                 self.last_index = self.first_index + self.rotate_size
-            elif self.last_index + self.rotate_size > len(self.groups):
+            elif self.last_index + self.rotate_size > len(self.group_ids):
                 self.page_index += 1
                 self.first_index = self.last_index
-                self.last_index = len(self.groups)
+                self.last_index = len(self.group_ids)
             else:
                 self.page_index += 1
                 self.first_index += self.rotate_size+1
                 self.last_index += self.rotate_size+1
-        shown = self.groups[self.first_index:self.last_index+1]
+        print('First Index: ', self.first_index)
+        print('Last Index: ', self.last_index)
+        shown = self.group_ids[self.first_index:self.last_index+1]
         self.__set_shown(shown)
         return self.get_shown()
 
@@ -143,14 +165,12 @@ class Forwarder(SessionManager):
             for chat in chats:
                 if str(chat.id) in self.get_selection():
                     groups.append(chat)
-                    print(chat.title)
             # LOAD & SCRAPE TARGETS
             targets = self.__load_targets(client, groups)
             # SEND MESSAGES
-            print(self.text.text_markdown_v2_urled)
             for target in targets:
                 try:
-                    client.send_message(target, self.text.text_markdown_v2_urled)
+                    client.send_message(target, self.text)
                     count += 1
                 except:
                     fail += 1
@@ -168,20 +188,18 @@ class Forwarder(SessionManager):
             for member in members:
                 if member.id not in targets:
                     targets.append(member)
-        self.targets = targets
-        return  self.targets
+        return  targets
 
     # Connects to Telegram API
     def __scrape_participants(self, target_group, client):
         """
-        Returns a list of all participants of a selected group or channel
+        Returns a list of all participants of a selected_ids group or channel
         """
         try:
             all_participants = client.get_participants(target_group, aggressive=True)
             return all_participants
         except UnauthorizedError:
             raise UnauthorizedError
-    
             
 
 

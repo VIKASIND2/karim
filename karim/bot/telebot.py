@@ -3,6 +3,7 @@ from karim.bot.commands.help import *
 from karim.bot.commands.signout import *
 from karim.bot.commands.forward import *
 from karim.bot.commands.account import *
+from karim.classes.callbacks import *
 
 
 def setup(telebot):

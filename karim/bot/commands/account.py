@@ -4,7 +4,7 @@ from karim.bot.commands import *
 @send_typing_action
 @run_async
 def check_account(update, context):
-    manager = SessionManager(update, Persistence.ACCOUNT)
+    manager= SessionManager(Persistence.ACCOUNT, chat_id=update.effective_chat.id, user_id=update.effective_chat.id, message_id=update.message.message_id)
     try:
         if manager.check_connection():
             # User is logged in

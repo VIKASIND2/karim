@@ -16,7 +16,6 @@ import os
 import html
 import pickle
 
-from karim.classes.callbacks import *
 from karim.secrets import secrets
 from karim import bot
 

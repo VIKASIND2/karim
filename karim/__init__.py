@@ -1,12 +1,10 @@
 import os
-import re
 import telegram
 from flask import Flask
 from telegram.utils.request import Request
 from karim.secrets import secrets
 from telegram.error import RetryAfter
 import time
-from karim.classes.teleredis import RedisSession
 import redis
 
 # SET UP REDIS SESSION CONNECTOR

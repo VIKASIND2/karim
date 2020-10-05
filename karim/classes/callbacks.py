@@ -29,3 +29,8 @@ class MessageStates:
     MESSAGE = 1
     SELECT_GROUP = 2
     CONFIRM = 3
+
+class Objects:
+    PERSISTENCE = 1
+    SESSION_MANAGER = 2
+    FORWARDER = 3

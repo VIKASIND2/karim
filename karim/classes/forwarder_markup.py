@@ -1,14 +1,11 @@
-from karim.classes import forwarder
-from typing import Dict
-
-from rsa import key
+from karim.classes.callbacks import Callbacks
 from karim.bot.commands import *
 
 class CreateMarkup():
     """
     Class describing a Reply Markup Menu.
     """
-    def __init__(self, items: Dict, cols=1):
+    def __init__(self, items, cols=1):
         self.items = items
         self.titles = list(items.values())
         self.callbacks = list(items.keys())
@@ -66,6 +63,7 @@ class MarkupDivider(CreateMarkup):
 class ForwarderMarkup():
     CHECKBOX = '(•) '
     def __init__(self, forwarder: Forwarder):
+        self.groups = forwarder.get_groups_dict()
         self.selected_div = 'SELECTED GROUPS:'
         self.selected = self.__format_dicts(forwarder.get_selection(), Callbacks.UNSELECT)
         self.shown_div = 'SELECT BELOW [{}/{}]'.format(forwarder.page_index, forwarder.pages)
@@ -74,13 +72,16 @@ class ForwarderMarkup():
         self.options = {Callbacks.CANCEL: 'Cancel', Callbacks.DONE: 'Done'}
         self.set_keyboard()
 
-    def __format_dicts(self, dict, callback, selected=None):
+    def __format_dicts(self, groups, callback, selected=None):
         updated_dict = {}
-        for key in dict:
-            if callback is Callbacks.SELECT and key in selected:
-                updated_dict[callback+str(key)] = self.CHECKBOX+dict[key]
+        for group in groups:
+            if callback is Callbacks.SELECT:
+                if int(group) in selected or str(group) in selected:
+                    updated_dict[callback+str(group)] = self.CHECKBOX+self.groups[group]
+                else:
+                    updated_dict[callback+str(group)] = self.groups[group]
             else:
-                updated_dict[callback+str(key)] = dict[key]
+                updated_dict[callback+str(group)] = self.groups[int(group)]
         return updated_dict
 
     def set_keyboard(self):
