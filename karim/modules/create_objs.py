@@ -2,7 +2,7 @@ from karim.classes.persistence import Persistence
 from karim.classes.callbacks import Objects
 from karim.classes.forwarder import Forwarder
 from karim.classes.session_manager import SessionManager
-from karim.classes.persistence import Perstence
+from karim.classes.persistence import Persistence
 
 def dict_to_obj(obj_dict, method):
     print('CONVERTING DICT TO OBJ: ', obj_dict)
