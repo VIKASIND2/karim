@@ -2,7 +2,7 @@ import json
 from karim import LOCALHOST, redis_connector
 from telegram import update
 from telethon.tl.functions.phone import DiscardCallRequest
-import os, jsonpickle
+import os, jsonpickle, redis
 
 def persistence_decorator(func):
     def wrapper(self, *args, **kw):
@@ -50,7 +50,6 @@ class Persistence(object):
             # CODE RUNNING LOCALLY
             obj_dict = self.__dict__
             with open("karim/bot/persistence/{}{}{}.json".format(self.method, self.user_id, self.chat_id), "w") as write_file:
-
                 json.dump(obj_dict, write_file, indent=4)
         else:
             # Code running on Heroku
@@ -65,7 +64,8 @@ class Persistence(object):
             obj_dict = self.__dict__
             #redis_connector.hmset('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id), obj_dict)
             # test:
-            redis_connector.set('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id), 'test')
+            connector = redis.from_url(os.environ.get('REDIS_URL'))
+            connector.set('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id), obj_dict)
         return self
 
     def deserialize(method, update):
