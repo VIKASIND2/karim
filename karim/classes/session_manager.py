@@ -53,7 +53,7 @@ class SessionManager(Persistence):
         if LOCALHOST:
             session = 'karim/bot/persistence/{}'.format(user_id)
         else:
-            session = RedisSession(user_id, redis_connector)
+            session = RedisSession(str(user_id), redis_connector)
         client = TelegramClient(session, api_id, api_hash, loop=loop)
         return client
 
