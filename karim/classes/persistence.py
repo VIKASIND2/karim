@@ -65,7 +65,7 @@ class Persistence(object):
             #redis_connector.hmset('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id), obj_dict)
             # test:
             connector = redis.from_url(os.environ.get('REDIS_URL'))
-            connector.set('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id), obj_dict)
+            connector.hmset('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id), obj_dict)
         return self
 
     def deserialize(method, update):
