@@ -61,7 +61,7 @@ class Persistence(object):
                     obj_dict[key] = -1
 
             print(obj_dict)
-            redis_connector.hmset('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id), obj_dict)
+            redis_connector.set('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id), str(obj_dict))
         return self
 
     def deserialize(method, update):
@@ -72,10 +72,7 @@ class Persistence(object):
         else:
             # Code Running on Heroku
             # Get Redis String
-            obj_dict = redis_connector.hgetall("persistence:{}{}{}".format(method, update.effective_chat.id, update.effective_chat.id))
-            """base64_bytes = base64_message.encode('ascii')
-            message_bytes = base64.b64decode(base64_bytes)
-            rstring = message_bytes.decode('ascii') """
+            obj_dict = redis_connector.get("persistence:{}{}{}".format(method, update.effective_chat.id, update.effective_chat.id))
             # Turn into Object
             # Class is Persistence
-            return obj_dict
+            return dict(obj_dict)
