@@ -63,7 +63,9 @@ class Persistence(object):
             base64_bytes = base64.b64encode(message_bytes)
             base64_message = base64_bytes.decode('ascii') """
             obj_dict = self.__dict__
-            redis_connector.hmset('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id), obj_dict)
+            #redis_connector.hmset('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id), obj_dict)
+            # test:
+            redis_connector.set('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id), 'test')
         return self
 
     def deserialize(method, update):
