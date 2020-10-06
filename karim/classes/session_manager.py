@@ -1,9 +1,11 @@
+import redis
 from karim.classes.teleredis import RedisSession
 from karim.classes.persistence import persistence_decorator
 from karim.bot.commands import *
 import asyncio
 from telethon.sync import TelegramClient
-from telethon.errors.rpcerrorlist import PhoneCodeExpiredError, PhoneCodeInvalidError, FloodWaitError, SessionPasswordNeededError, UnauthorizedError
+from telethon.errors.rpcerrorlist import PasswordHashInvalidError, PhoneCodeExpiredError, PhoneCodeInvalidError, FloodWaitError, PhoneNumberInvalidError, SessionPasswordNeededError, UnauthorizedError
+from telethon.sessions import StringSession
 from telethon.tl.types.auth import SentCode
 from karim.secrets import secrets
 from karim import LOCALHOST, redis_connector
@@ -43,7 +45,7 @@ class SessionManager(Persistence):
         except:
             pass
 
-    def create_client(self, user_id):
+    def create_client(self, user_id, sign_in=False):
         """Creates and returns a TelegramClient"""
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
@@ -53,7 +55,12 @@ class SessionManager(Persistence):
         if LOCALHOST:
             session = 'karim/bot/persistence/{}'.format(user_id)
         else:
-            session = RedisSession(str(user_id), redis_connector)
+            if sign_in:
+                # New Login
+                session = StringSession()
+            else:
+                session_string = redis_connector.get('session:{}'.format(self.user_id))
+                session = StringSession(session_string)
         client = TelegramClient(session, api_id, api_hash, loop=loop)
         return client
 
@@ -71,14 +78,33 @@ class SessionManager(Persistence):
         Sign into the Telegram Client using the user's session file - tied thanks to the user id
         :returns: TelegramClient (if user has access) | PhoneCodeInvalidError (if security code is wrong)
         """
-        if not client:
-            client = self.create_client(self.user_id)
-        client.connect()
-        if not password:
-            client.sign_in(phone=self.phone, code=self.code, phone_code_hash=self.phone_code_hash)
-        else:
-            client.sign_in(phone=self.phone, password=self.password)
-        client.disconnect()
+        try:
+            if not client:
+                client = self.create_client(self.user_id, sign_in=True)
+            client.connect()
+            if not password:
+                client.sign_in(phone=self.phone, code=self.code, phone_code_hash=self.phone_code_hash)
+            else:
+                client.sign_in(phone=self.phone, password=self.password)
+            string_session = client.session.save()
+            # Save session in database
+            redis_connector.set('session:{}'.format(self.user_id), string_session)
+            result = client.is_user_authorized()
+            client.disconnect()
+            return result
+        except UnauthorizedError as unauthorized:
+            raise unauthorized
+        except PhoneCodeExpiredError as code_expired:
+            raise code_expired
+        except PhoneCodeInvalidError as code_invalid:
+            raise code_invalid
+        except PhoneNumberInvalidError as phone_invalid:
+            raise phone_invalid
+        except PasswordHashInvalidError as password_error:
+            raise password_error
+        except Exception as exception:
+            print(exception.args)
+            raise exception
 
     def check_connection(self, client=None):
         """
@@ -124,4 +150,5 @@ class SessionManager(Persistence):
             except: pass 
         else: 
             print('Should delete Redis Session...')
+            redis_connector.delete('session:{}'.format(self.user_id))
         return result 

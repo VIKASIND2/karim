@@ -1,5 +1,6 @@
 import jsonpickle
 from telethon import client
+from telethon.errors.rpcerrorlist import FirstNameInvalidError
 from karim.classes.persistence import persistence_decorator
 from telethon.tl.functions.messages import GetDialogsRequest
 from telethon.tl.types import InputPeerEmpty
@@ -124,10 +125,10 @@ class Forwarder(SessionManager):
                 self.page_index = self.pages
                 self.first_index = len(self.group_ids) - self.rotate_size -1
                 self.last_index = len(self.group_ids)
-            elif self.first_index - self.rotate_size < 0:
-                self.page_index -= 1
-                self.last_index = self.first_index
-                self.first_index = 0
+            elif self.page_index == 1:
+                self.page_index == self.pages
+                self.first_index = len(self.group_ids) - self.rotate_size-1
+                self.last_index = len(self.group_ids) -1
             else:
                 self.page_index -= 1
                 self.first_index -= self.rotate_size +1
@@ -138,10 +139,14 @@ class Forwarder(SessionManager):
                 self.page_index = 1
                 self.first_index = 0
                 self.last_index = self.first_index + self.rotate_size
-            elif self.last_index + self.rotate_size > len(self.group_ids):
+            elif self.page_index == self.pages-1:
                 self.page_index += 1
                 self.first_index = self.last_index
                 self.last_index = len(self.group_ids)
+            elif self.page_index == self.pages:
+                self.page_index = 1
+                self.first_index = 0
+                self.last_index = self.first_index + self.rotate_size
             else:
                 self.page_index += 1
                 self.first_index += self.rotate_size+1

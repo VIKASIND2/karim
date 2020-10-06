@@ -98,8 +98,11 @@ def select_group(update, context):
         print('Done')
         markup = CreateMarkup({Callbacks.CONFIRM: 'Confirm', Callbacks.CANCEL: 'Cancel'}).create_markup()
         text = ''
-        for group in list(forwarder.selected.values()):
-            text += '\n- {}'.format(group)
+        groups = forwarder.get_groups_dict()
+        print(groups)
+        for group_id in forwarder.get_selection():
+            print('GET ', group_id)
+            text += '\n- {}'.format(groups.get(int(group_id)))
         context.bot.delete_message(forwarder.chat_id, forwarder.message_id)
         message = update.effective_chat.send_message(confirm_forwarding.format(text), reply_markup=markup, parse_mode=ParseMode.HTML)
         forwarder.set_message(message.message_id)
@@ -169,6 +172,9 @@ def confirm(update, context):
     else:
         # Send Messages
         count = forwarder.send()
+        """TESTING"""
+        for target in forwarder.targets:
+            context.bot.send_message(forwarder.text, chat_id=forwarder.chat_id, parse_mode=ParseMode.MARKDOWN_V2)
         context.bot.edit_message_text(forward_successful.format(count[0], count[1]), chat_id=forwarder.chat_id, message_id=forwarder.message_id, parse_mode=ParseMode.HTML)
         forwarder.discard()
         return ConversationHandler.END

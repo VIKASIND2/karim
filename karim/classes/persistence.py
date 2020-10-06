@@ -1,6 +1,7 @@
 import json
 from karim import LOCALHOST, redis_connector
 from telegram import update
+from telethon.sessions import StringSession
 from telethon.tl.functions.phone import DiscardCallRequest
 import os, jsonpickle, redis
 
@@ -53,23 +54,14 @@ class Persistence(object):
                 json.dump(obj_dict, write_file, indent=4)
         else:
             # Code running on Heroku
-            # Turn object into Json
-            """ objJSON = jsonpickle.encode(self, unpicklable=True)
-            # Turn Json into string
-            objString = json.dumps(objJSON, indent=4)
-            # Save string in Redis
-            message_bytes = objString.encode('ascii')
-            base64_bytes = base64.b64encode(message_bytes)
-            base64_message = base64_bytes.decode('ascii') """
+            # Turn object into dict
             obj_dict = self.__dict__
-            fixed_dict = {}
             for key in obj_dict.keys():
                 if obj_dict.get(key) is None:
                     obj_dict[key] = -1
 
             print(obj_dict)
-            connector = redis.from_url(os.environ.get('REDIS_URL'))
-            connector.hmset('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id), obj_dict)
+            redis_connector.hmset('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id), obj_dict)
         return self
 
     def deserialize(method, update):

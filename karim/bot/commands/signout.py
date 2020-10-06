@@ -43,6 +43,7 @@ def confirm_sign_out(update, context):
     if data == Callbacks.LOGOUT:
         if manager.sign_out():
             # Log Out Successful
+            print('CHAT ID: ', manager.chat_id)
             context.bot.edit_message_text(chat_id=manager.chat_id, message_id=manager.message_id, text=sign_out_successful, parse_mode=ParseMode.HTML)
         else:
             # Error in Log Out 
