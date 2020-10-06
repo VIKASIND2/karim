@@ -1,5 +1,4 @@
 import redis
-from karim.classes.teleredis import RedisSession
 from karim.classes.persistence import persistence_decorator
 from karim.bot.commands import *
 import asyncio
