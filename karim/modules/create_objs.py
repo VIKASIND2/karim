@@ -7,45 +7,45 @@ def dict_to_obj(obj_dict, method):
     print('CONVERTING DICT TO OBJ: ', obj_dict)
     if method == Objects.FORWARDER:
         obj = Forwarder(
-                    method=obj_dict.get('method'), 
-                    chat_id=obj_dict.get('chat_id'),
-                    user_id=obj_dict.get('user_id'),
-                    message_id=obj_dict.get('message_id'),
-                    phone=obj_dict.get('phone'),
-                    password=obj_dict.get('password'),
-                    code=obj_dict.get('code'),
-                    phone_code_hash=obj_dict.get('phone_code_hash'),
-                    code_tries=obj_dict.get('code_tries'),
-                    selected_ids=obj_dict.get('selected_ids'),
-                    group_ids=obj_dict.get('group_ids'),
-                    group_titles=obj_dict.get('group_titles'),
-                    shown_ids=obj_dict.get('shown_ids'),
-                    text=obj_dict.get('text'),
-                    targets=obj_dict.get('targets'),
-                    rotate_size=obj_dict.get('rotate_size'),
-                    first_index=obj_dict.get('first_index'),
-                    last_index=obj_dict.get('last_index'),
-                    page_index=obj_dict.get('page_index'),
-                    pages=obj_dict.get('pages')
+                    method=None if obj_dict.get('method') is -1 else obj_dict.get('method'), 
+                    chat_id=None if obj_dict.get('method') is -1 else obj_dict.get('method'),
+                    user_id=None if obj_dict.get('method') is -1 else obj_dict.get('method'),
+                    message_id=None if obj_dict.get('method') is -1 else obj_dict.get('method'),
+                    phone=None if obj_dict.get('method') is -1 else obj_dict.get('method'),
+                    password=None if obj_dict.get('method') is -1 else obj_dict.get('method'),
+                    code=None if obj_dict.get('method') is -1 else obj_dict.get('method'),
+                    phone_code_hash=None if obj_dict.get('method') is -1 else obj_dict.get('method'),
+                    code_tries=None if obj_dict.get('method') is -1 else obj_dict.get('method'),
+                    selected_ids=None if obj_dict.get('method') is -1 else obj_dict.get('method'),
+                    group_ids=None if obj_dict.get('method') is -1 else obj_dict.get('method'),
+                    group_titles=None if obj_dict.get('method') is -1 else obj_dict.get('method'),
+                    shown_ids=None if obj_dict.get('method') is -1 else obj_dict.get('method'),
+                    text=None if obj_dict.get('method') is -1 else obj_dict.get('method'),
+                    targets=None if obj_dict.get('method') is -1 else obj_dict.get('method'),
+                    rotate_size=None if obj_dict.get('method') is -1 else obj_dict.get('method'),
+                    first_index=None if obj_dict.get('method') is -1 else obj_dict.get('method'),
+                    last_index=None if obj_dict.get('method') is -1 else obj_dict.get('method'),
+                    page_index=None if obj_dict.get('method') is -1 else obj_dict.get('method'),
+                    pages=None if obj_dict.get('method') is -1 else obj_dict.get('method')
                 )
     elif method == Objects.SESSION_MANAGER:
         # Class is Session Manager
         obj = SessionManager(
-            method=obj_dict.get('method'), 
-            chat_id=obj_dict.get('chat_id'),
-            user_id=obj_dict.get('user_id'),
-            message_id=obj_dict.get('message_id'),
-            phone=obj_dict.get('phone'),
-            password=obj_dict.get('password'),
-            code=obj_dict.get('code'),
-            phone_code_hash=obj_dict.get('phone_code_hash'),
-            code_tries=obj_dict.get('code_tries'),
+            method=None if obj_dict.get('method') is -1 else obj_dict.get('method'), 
+            chat_id=None if obj_dict.get('method') is -1 else obj_dict.get('method'),
+            user_id=None if obj_dict.get('method') is -1 else obj_dict.get('method'),
+            message_id=None if obj_dict.get('method') is -1 else obj_dict.get('method'),
+            phone=None if obj_dict.get('method') is -1 else obj_dict.get('method'),
+            password=None if obj_dict.get('method') is -1 else obj_dict.get('method'),
+            code=None if obj_dict.get('method') is -1 else obj_dict.get('method'),
+            phone_code_hash=None if obj_dict.get('method') is -1 else obj_dict.get('method'),
+            code_tries=None if obj_dict.get('method') is -1 else obj_dict.get('method'),
         )
     else:
         obj = Persistence(
-                method=obj_dict.get('method'), 
-                chat_id=obj_dict.get('chat_id'),
-                user_id=obj_dict.get('user_id'),
-                message_id=obj_dict.get('message_id'),
+                method=None if obj_dict.get('method') is -1 else obj_dict.get('method'), 
+                chat_id=None if obj_dict.get('method') is -1 else obj_dict.get('method'),
+                user_id=None if obj_dict.get('method') is -1 else obj_dict.get('method'),
+                message_id=None if obj_dict.get('method') is -1 else obj_dict.get('method'),
             )
     return obj
