@@ -62,9 +62,11 @@ class Persistence(object):
             base64_bytes = base64.b64encode(message_bytes)
             base64_message = base64_bytes.decode('ascii') """
             obj_dict = self.__dict__
-            for item in obj_dict:
-                if obj_dict[item] is None:
-                    obj_dict[item] == -1
+            fixed_dict = {}
+            for key in obj_dict.keys():
+                if obj_dict.get(key) is None:
+                    obj_dict[key] = -1
+
             print(obj_dict)
             connector = redis.from_url(os.environ.get('REDIS_URL'))
             connector.hmset('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id), obj_dict)
