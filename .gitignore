@@ -8,4 +8,4 @@ anon.session
 bot.session
 anon.session-journal
 persistence
-sessions
+scripts

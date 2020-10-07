@@ -165,7 +165,7 @@ def cancel_start(update, context, include_message=True):
     return ConversationHandler.END
 
 
-def manage_code_request(update, context, text, manager):
+def manage_code_request(update, context, text, manager: SessionManager):
     # SEND AND REQUEST SECURITY CODE
     markup = CreateMarkup({Callbacks.CANCEL: 'Cancel'}).create_markup()
     try:
@@ -175,13 +175,15 @@ def manage_code_request(update, context, text, manager):
         manager.set_message(message.message_id)
         return StartStates.INPUT_CODE
 
-    except FloodWaitError:
+    except FloodWaitError as error:
+        print('Error in singin.manage_code_request(): ', error)
         # CODE SENT TOO MANY TIMES
         # Ask to input last sent code
         update.message.reply_text(floodwaiterror_text, parse_mode=ParseMode.HTML)
         return StartStates.INPUT_CODE
 
-    except:
+    except Exception as error:
+        print('Error in singin.manage_code_request(): ', error)
         # CODE REQUEST FAILED
         update.message.reply_text(requestcodefailed_text, parse_mode=ParseMode.HTML)
         cancel_start(update, context)
