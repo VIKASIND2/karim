@@ -61,8 +61,9 @@ class SessionManager(Persistence):
             else:
                 try:
                     connector = redis.from_url(os.environ.get('REDIS_URL'))
-                    session_string = connector.get('session:{}'.format(self.user_id))
+                    session_bytes = connector.get('session:{}'.format(self.user_id))
                     connector.close()
+                    session_string = session_bytes.decode("UTF-8")
                     session = StringSession(session_string)
                 except Exception as error:
                     print('Error in session_manager.create_client(): ', error)
@@ -110,14 +111,19 @@ class SessionManager(Persistence):
             client.disconnect()
             return result
         except UnauthorizedError as unauthorized:
+            print('Exception when Signing In: ', unauthorized.args)
             raise unauthorized
         except PhoneCodeExpiredError as code_expired:
+            print('Exception when Signing In: ', code_expired.args)
             raise code_expired
         except PhoneCodeInvalidError as code_invalid:
+            print('Exception when Signing In: ', code_invalid.args)
             raise code_invalid
         except PhoneNumberInvalidError as phone_invalid:
+            print('Exception when Signing In: ', phone_invalid.args)
             raise phone_invalid
         except PasswordHashInvalidError as password_error:
+            print('Exception when Signing In: ', password_error.args)
             raise password_error
         except Exception as exception:
             print('Exception when Signing In: ', exception.args)
