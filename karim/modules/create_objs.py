@@ -21,7 +21,7 @@ def dict_to_obj(obj_dict, method):
                     group_titles=None if obj_dict.get('group_titles') == -1 else obj_dict.get('group_titles'),
                     shown_ids=None if obj_dict.get('shown_ids') == -1 else obj_dict.get('shown_ids'),
                     text=None if obj_dict.get('text') == -1 else obj_dict.get('text'),
-                    rotate_size=None if obj_dict.get('rotate_size') == -1 else obj_dict.get('rotate_size'),
+                    rotate_size=obj_dict.get('rotate_size'),
                     first_index=obj_dict.get('first_index'),
                     last_index=obj_dict.get('last_index'),
                     page_index=obj_dict.get('page_index'),
