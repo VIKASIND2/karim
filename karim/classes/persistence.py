@@ -91,7 +91,8 @@ class Persistence(object):
                 # Turn into Object
                 # Class is Persistence
                 obj_dict = dict(obj_string)
-                return dict(obj_string)
+                print('Deserialized: ', obj_dict)
+                return obj_string
             except Exception as error:
                 print('Error in persistence.deserialzie(): ', error)
             
