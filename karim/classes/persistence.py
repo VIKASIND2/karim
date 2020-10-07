@@ -63,7 +63,7 @@ class Persistence(object):
                 if obj_dict.get(key) is None:
                     obj_dict[key] = -1
             try:
-                connector.hmset('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id), str(obj_dict))
+                connector.hmset('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id), obj_dict)
             except Exception as error:
                 print('Error in persistence.serialize(): ', error)
         return self
