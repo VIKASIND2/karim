@@ -48,7 +48,7 @@ class Persistence(object):
             try:
                 connector = redis.from_url(os.environ.get('REDIS_URL'))
                 connector.delete('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id))
-                connector.disconnect()
+                connector.close()
             except Exception as error:
                 print('Error in persistence.discard(): ', error)
 
@@ -68,7 +68,7 @@ class Persistence(object):
             try:
                 connector = redis.from_url(os.environ.get('REDIS_URL'))
                 connector.set('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id), str(obj_dict))
-                connector.disconnect()
+                connector.close()
             except Exception as error:
                 print('Error in persistence.serialize(): ', error)
         return self
@@ -84,7 +84,7 @@ class Persistence(object):
             try:
                 connector = redis.from_url(os.environ.get('REDIS_URL'))
                 obj_string = connector.get("persistence:{}{}{}".format(method, update.effective_chat.id, update.effective_chat.id))
-                connector.disconnect()
+                connector.close()
                 obj_dict = dict(obj_string)
                 # Turn into Object
                 # Class is Persistence

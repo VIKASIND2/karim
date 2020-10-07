@@ -17,7 +17,6 @@ if os.environ.get('PORT') in (None, ""):
         os.makedirs('karim/bot/persistence')
 else:
     LOCALHOST = False
-    connector = redis.from_url(os.environ.get("REDIS_URL"))
 
 # Initialize Bot
 from karim.bot import telebot

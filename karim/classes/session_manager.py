@@ -62,7 +62,7 @@ class SessionManager(Persistence):
                 try:
                     connector = redis.from_url(os.environ.get('REDIS_URL'))
                     session_string = connector.get('session:{}'.format(self.user_id))
-                    connector.disconnect()
+                    connector.close()
                     session = StringSession(session_string)
                 except Exception as error:
                     print('Error in session_manager.create_client(): ', error)
@@ -98,7 +98,7 @@ class SessionManager(Persistence):
                 try:
                     connector = redis.from_url(os.environ.get('REDIS_URL'))
                     connector.set('session:{}'.format(self.user_id), string_session)
-                    connector.disconnect()
+                    connector.close()
                 except Exception as error:
                     print('Error in session_manager.sign_in(): ', error)
             result = client.is_user_authorized()
@@ -165,7 +165,7 @@ class SessionManager(Persistence):
             try: 
                 connector = redis.from_url('REDIS_URL')
                 connector.delete('session:{}'.format(self.user_id))
-                connector.disconnect()
+                connector.close()
             except Exception as error:
                 print('Error in session_manager.sign_out(): ', error)
         return result 
