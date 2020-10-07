@@ -84,8 +84,9 @@ class Persistence(object):
             # Get Redis String
             #try:
             connector = redis.from_url(os.environ.get('REDIS_URL'))
-            obj_string = connector.get("persistence:{}{}{}".format(method, update.effective_chat.id, update.effective_chat.id))
+            obj_bytes = connector.get("persistence:{}{}{}".format(method, update.effective_chat.id, update.effective_chat.id))
             connector.close()
+            obj_string = obj_bytes.decode("UTF-8")
             print(obj_string)
             print(type(obj_string))
             obj_dict = dict(obj_string)
