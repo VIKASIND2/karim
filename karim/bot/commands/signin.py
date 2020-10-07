@@ -49,6 +49,7 @@ def validNumber(phone_number):
 @send_typing_action
 def input_phone(update, context):
     """Input Telegram phone number to log into the Telegram client"""
+    print('received phone')
     manager = dict_to_obj(Persistence.deserialize(Persistence.SIGNIN, update), method=Objects.SESSION_MANAGER)
     if not manager:
         # Another user tried to enter the conversation
