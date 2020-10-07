@@ -1,6 +1,7 @@
 import json
 from logging import exception
-from karim import LOCALHOST, connector
+
+from karim import LOCALHOST
 from telegram import update
 from telethon.sessions import StringSession
 import os, jsonpickle, redis
@@ -45,7 +46,9 @@ class Persistence(object):
         else:
             # CODE RUNNING ON SERVER
             try:
+                connector = redis.from_url(os.environ.get('REDIS_URL'))
                 connector.delete('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id))
+                connector.disconnect()
             except Exception as error:
                 print('Error in persistence.discard(): ', error)
 
@@ -63,7 +66,9 @@ class Persistence(object):
                 if obj_dict.get(key) is None:
                     obj_dict[key] = -1
             try:
+                connector = redis.from_url(os.environ.get('REDIS_URL'))
                 connector.set('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id), str(obj_dict))
+                connector.disconnect()
             except Exception as error:
                 print('Error in persistence.serialize(): ', error)
         return self
@@ -76,12 +81,14 @@ class Persistence(object):
         else:
             # Code Running on Heroku
             # Get Redis String
-            #try:
-            obj_string = connector.get("persistence:{}{}{}".format(method, update.effective_chat.id, update.effective_chat.id))
-            obj_dict = dict(obj_string)
-            # Turn into Object
-            # Class is Persistence
-            return dict(obj_dict)
-            """ except Exception as error:
-                print('Error in persistence.deserialzie(): ', error) """
+            try:
+                connector = redis.from_url(os.environ.get('REDIS_URL'))
+                obj_string = connector.get("persistence:{}{}{}".format(method, update.effective_chat.id, update.effective_chat.id))
+                connector.disconnect()
+                obj_dict = dict(obj_string)
+                # Turn into Object
+                # Class is Persistence
+                return dict(obj_dict)
+            except Exception as error:
+                print('Error in persistence.deserialzie(): ', error)
             
