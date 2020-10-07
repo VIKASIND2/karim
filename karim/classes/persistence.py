@@ -76,11 +76,11 @@ class Persistence(object):
         else:
             # Code Running on Heroku
             # Get Redis String
-            try:
-                obj_dict = connector.get("persistence:{}{}{}".format(method, update.effective_chat.id, update.effective_chat.id))
-                # Turn into Object
-                # Class is Persistence
-                return dict(obj_dict)
-            except Exception as error:
-                print('Error in persistence.deserialzie(): ', error)
+            #try:
+            obj_dict = connector.get("persistence:{}{}{}".format(method, update.effective_chat.id, update.effective_chat.id))
+            # Turn into Object
+            # Class is Persistence
+            return dict(obj_dict)
+            """ except Exception as error:
+                print('Error in persistence.deserialzie(): ', error) """
             
