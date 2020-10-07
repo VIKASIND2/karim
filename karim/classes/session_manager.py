@@ -60,7 +60,7 @@ class SessionManager(Persistence):
                 session = StringSession()
             else:
                 try:
-                    connector = redis.Redis(host=os.environ.get('REDIS_URL'), port=14909, db=0, decode_responses=False)
+                    connector = redis.from_url(os.environ.get("REDIS_URL"))
                     session_string = connector.get('session:{}'.format(self.user_id))
                     session = StringSession(session_string)
                 except Exception as error:
@@ -94,7 +94,7 @@ class SessionManager(Persistence):
             # Save session in database
             if LOCALHOST:
                 try:
-                    connector = redis.Redis(host=os.environ.get('REDIS_URL'), port=14909, db=0, decode_responses=False)
+                    connector = redis.from_url(os.environ.get("REDIS_URL"))
                     connector.set('session:{}'.format(self.user_id), string_session)
                 except Exception as error:
                     print('Error in session_manager.sign_in(): ', error)
@@ -160,7 +160,7 @@ class SessionManager(Persistence):
         else: 
             print('Should delete Redis Session...')
             try: 
-                connector = redis.Redis(host=os.environ.get('REDIS_URL'), port=14909, db=0, decode_responses=False)
+                connector = redis.from_url(os.environ.get("REDIS_URL"))
                 connector.delete('session:{}'.format(self.user_id))
             except Exception as error:
                 print('Error in session_manager.sign_out(): ', error)

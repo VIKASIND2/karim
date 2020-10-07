@@ -45,7 +45,7 @@ class Persistence(object):
         else:
             # CODE RUNNING ON SERVER
             try:
-                connector = redis.Redis(host=os.environ.get('REDIS_URL'), port=14909, db=0, decode_responses=False)
+                connector = redis.from_url(os.environ.get("REDIS_URL"))
                 connector.delete('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id))
             except Exception as error:
                 print('Error in persistence.discard(): ', error)
@@ -64,7 +64,7 @@ class Persistence(object):
                 if obj_dict.get(key) is None:
                     obj_dict[key] = -1
             try:
-                connector = redis.Redis(host=os.environ.get('REDIS_URL'), port=14909, db=0, decode_responses=False)
+                connector = redis.from_url(os.environ.get("REDIS_URL"))
                 connector.set('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id), str(obj_dict))
             except Exception as error:
                 print('Error in persistence.serialize(): ', error)
@@ -79,7 +79,7 @@ class Persistence(object):
             # Code Running on Heroku
             # Get Redis String
             try:
-                connector = redis.Redis(host=os.environ.get('REDIS_URL'), port=14909, db=0, decode_responses=False)
+                connector = redis.from_url(os.environ.get("REDIS_URL"))
                 obj_dict = connector.get("persistence:{}{}{}".format(method, update.effective_chat.id, update.effective_chat.id))
                 # Turn into Object
                 # Class is Persistence
