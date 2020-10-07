@@ -31,7 +31,7 @@ Follow the steps below to run the bot on your local machine. (These steps don't 
     }
     ```
 4. #### Run ngrok 
-    Open your command prompt and navigate to the directory where you saved the Ngrok file. Thank type: ```ngrok http 5000```
+    Open your command prompt and navigate to the directory where you saved the Ngrok file. Then type: ```ngrok http 5000```
 5. #### Run program
     With the command prompt navigate to the directory where you cloned the git repository and run the followinf commands:
     * ```python -m venv env```
