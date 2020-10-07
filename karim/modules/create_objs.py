@@ -22,9 +22,9 @@ def dict_to_obj(obj_dict, method):
                     shown_ids=None if obj_dict.get('shown_ids') == -1 else obj_dict.get('shown_ids'),
                     text=None if obj_dict.get('text') == -1 else obj_dict.get('text'),
                     rotate_size=None if obj_dict.get('rotate_size') == -1 else obj_dict.get('rotate_size'),
-                    first_index=None if obj_dict.get('first_index') == -1 else obj_dict.get('first_index'),
-                    last_index=None if obj_dict.get('last_index') == -1 else obj_dict.get('last_index'),
-                    page_index=None if obj_dict.get('page_index') == -1 else obj_dict.get('page_index'),
+                    first_index=obj_dict.get('first_index'),
+                    last_index=obj_dict.get('last_index'),
+                    page_index=obj_dict.get('page_index'),
                     pages=None if obj_dict.get('pages') == -1 else obj_dict.get('pages')
                 )
     elif method == Objects.SESSION_MANAGER:
