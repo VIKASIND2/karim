@@ -67,8 +67,9 @@ class Persistence(object):
                     obj_dict[key] = -1
             try:
                 connector = redis.from_url(os.environ.get('REDIS_URL'))
-                connector.set('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id), str(obj_dict))
-                print(str(obj_dict))
+                obj_string = json.dumps(obj_dict)
+                connector.set('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id), obj_string)
+                print('Serializng: ', obj_string)
                 connector.close()
             except Exception as error:
                 print('Error in persistence.serialize(): ', error)
@@ -86,13 +87,11 @@ class Persistence(object):
             connector = redis.from_url(os.environ.get('REDIS_URL'))
             obj_bytes = connector.get("persistence:{}{}{}".format(method, update.effective_chat.id, update.effective_chat.id))
             connector.close()
-            obj_string = obj_bytes.decode("UTF-8")
-            print(obj_string)
-            print(type(obj_string))
-            obj_dict = dict(obj_string)
+            obj_string = json.loads(obj_bytes)
+            #obj_bytes.decode("UTF-8")
             # Turn into Object
             # Class is Persistence
-            return obj_dict
+            return dict(obj_string)
             """ except Exception as error:
                 print('Error in persistence.deserialzie(): ', error) """
             
