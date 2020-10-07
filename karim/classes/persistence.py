@@ -45,7 +45,8 @@ class Persistence(object):
         else:
             # CODE RUNNING ON SERVER
             try:
-                redis_connector.delete('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id))
+                connector = redis.Redis(host=os.environ.get('REDIS_URL'), port=14909, db=0, decode_responses=False)
+                connector.delete('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id))
             except Exception as error:
                 print('Error in persistence.discard(): ', error)
 
@@ -63,7 +64,8 @@ class Persistence(object):
                 if obj_dict.get(key) is None:
                     obj_dict[key] = -1
             try:
-                redis_connector.set('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id), str(obj_dict))
+                connector = redis.Redis(host=os.environ.get('REDIS_URL'), port=14909, db=0, decode_responses=False)
+                connector.set('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id), str(obj_dict))
             except Exception as error:
                 print('Error in persistence.serialize(): ', error)
         return self
@@ -77,7 +79,8 @@ class Persistence(object):
             # Code Running on Heroku
             # Get Redis String
             try:
-                obj_dict = redis_connector.get("persistence:{}{}{}".format(method, update.effective_chat.id, update.effective_chat.id))
+                connector = redis.Redis(host=os.environ.get('REDIS_URL'), port=14909, db=0, decode_responses=False)
+                obj_dict = connector.get("persistence:{}{}{}".format(method, update.effective_chat.id, update.effective_chat.id))
                 # Turn into Object
                 # Class is Persistence
                 return dict(obj_dict)
