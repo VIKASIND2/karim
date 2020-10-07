@@ -63,7 +63,7 @@ class Persistence(object):
                 if obj_dict.get(key) is None:
                     obj_dict[key] = -1
             try:
-                connector.set('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id), str(obj_dict))
+                connector.hmset('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id), str(obj_dict))
             except Exception as error:
                 print('Error in persistence.serialize(): ', error)
         return self
@@ -77,7 +77,7 @@ class Persistence(object):
             # Code Running on Heroku
             # Get Redis String
             #try:
-            obj_dict = connector.get("persistence:{}{}{}".format(method, update.effective_chat.id, update.effective_chat.id))
+            obj_dict = connector.hgetall("persistence:{}{}{}".format(method, update.effective_chat.id, update.effective_chat.id))
             # Turn into Object
             # Class is Persistence
             return dict(obj_dict)
