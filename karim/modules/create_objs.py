@@ -5,7 +5,6 @@ from karim.classes.session_manager import SessionManager
 from karim.classes.persistence import Persistence
 
 def dict_to_obj(obj_dict, method):
-    print('CONVERTING DICT TO OBJ: ', obj_dict)
     if method == Objects.FORWARDER:
         obj = Forwarder(
                     method=None if obj_dict.get('method') == -1 else obj_dict.get('method'), 
@@ -22,7 +21,6 @@ def dict_to_obj(obj_dict, method):
                     group_titles=None if obj_dict.get('group_titles') == -1 else obj_dict.get('group_titles'),
                     shown_ids=None if obj_dict.get('shown_ids') == -1 else obj_dict.get('shown_ids'),
                     text=None if obj_dict.get('text') == -1 else obj_dict.get('text'),
-                    targets=None if obj_dict.get('targets') == -1 else obj_dict.get('targets'),
                     rotate_size=None if obj_dict.get('rotate_size') == -1 else obj_dict.get('rotate_size'),
                     first_index=None if obj_dict.get('first_index') == -1 else obj_dict.get('first_index'),
                     last_index=None if obj_dict.get('last_index') == -1 else obj_dict.get('last_index'),

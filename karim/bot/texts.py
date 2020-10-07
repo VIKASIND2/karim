@@ -37,7 +37,7 @@ cancel_forward_text = 'Forwarding Operation Cancelled. Your message has not been
 account_info = '<b>Account Info</b>\nYou are currently signed into the Telegram Client with the account @{} (+{})'
 no_connection = '<b>Client Connection</b>\nYou are currently not signed in with any account. The bot is currently not able to access the Telegram Client. To sign in, use /signin'
 problem_connecting = 'There was a problem in connecting to the client... Try again.'
-forward_successful = 'Forwrd successful! Your messages was sent successfully to {} users! {} users were not reached...'
+forward_successful = 'Forward successful! Your messages was sent successfully to {} users!'
 
 # MULTIPLE UTILITIES
 error_checking_connection = 'There was a problem in authenticating the client. Please try again or contact @davidwickerhf.'

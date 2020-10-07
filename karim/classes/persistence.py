@@ -1,8 +1,8 @@
 import json
+from logging import exception
 from karim import LOCALHOST, redis_connector
 from telegram import update
 from telethon.sessions import StringSession
-from telethon.tl.functions.phone import DiscardCallRequest
 import os, jsonpickle, redis
 
 def persistence_decorator(func):
@@ -44,14 +44,17 @@ class Persistence(object):
                 return self
         else:
             # CODE RUNNING ON SERVER
-            redis_connector.delete('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id))
+            try:
+                redis_connector.delete('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id))
+            except Exception as error:
+                print('Error in persistence.discard(): ', error)
 
     def serialize(self):
         if LOCALHOST:
             # CODE RUNNING LOCALLY
             obj_dict = self.__dict__
             with open("karim/bot/persistence/{}{}{}.json".format(self.method, self.user_id, self.chat_id), "w") as write_file:
-                json.dump(obj_dict, write_file, indent=4)
+                 json.dump(obj_dict, write_file, indent=4)
         else:
             # Code running on Heroku
             # Turn object into dict
@@ -59,9 +62,10 @@ class Persistence(object):
             for key in obj_dict.keys():
                 if obj_dict.get(key) is None:
                     obj_dict[key] = -1
-
-            print(obj_dict)
-            redis_connector.set('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id), str(obj_dict))
+            try:
+                redis_connector.set('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id), str(obj_dict))
+            except Exception as error:
+                print('Error in persistence.serialize(): ', error)
         return self
 
     def deserialize(method, update):
@@ -72,7 +76,11 @@ class Persistence(object):
         else:
             # Code Running on Heroku
             # Get Redis String
-            obj_dict = redis_connector.get("persistence:{}{}{}".format(method, update.effective_chat.id, update.effective_chat.id))
-            # Turn into Object
-            # Class is Persistence
-            return dict(obj_dict)
+            try:
+                obj_dict = redis_connector.get("persistence:{}{}{}".format(method, update.effective_chat.id, update.effective_chat.id))
+                # Turn into Object
+                # Class is Persistence
+                return dict(obj_dict)
+            except Exception as error:
+                print('Error in persistence.deserialzie(): ', error)
+            

@@ -1,3 +1,4 @@
+from logging import exception
 import jsonpickle
 from telethon import client
 from telethon.errors.rpcerrorlist import FirstNameInvalidError
@@ -23,7 +24,6 @@ class Forwarder(SessionManager):
         self.group_titles = group_titles
         self.shown_ids = shown_ids
         self.text = text
-        self.targets = targets
         self.rotate_size = rotate_size
         self.first_index = first_index
         self.last_index = self.first_index + self.rotate_size
@@ -157,43 +157,33 @@ class Forwarder(SessionManager):
         self.__set_shown(shown)
         return self.get_shown()
 
-    # GET PARTICIPANTS AND SEND MESSAGE
-    def send(self):
-        count = 0
-        fail = 0
-        client = self.create_client(self.user_id)
+    # GET PARTICIPANTS AND SEND MESSAG
+    def load_targets(self):
+        """Return a list of all members in a selection of chats
+        :return: return list of chat ids
+        :rtype: list<int>
+        """
+        targets = []
+        groups = []
         try:
-            # LOAD CHATS
-            client = self.connect(client)
-            groups = []
+            client = self.create_client(self.user_id)
+            client.connect()
             chats = client.get_dialogs()
             for chat in chats:
                 if str(chat.id) in self.get_selection():
                     groups.append(chat)
-            # LOAD & SCRAPE TARGETS
-            targets = self.__load_targets(client, groups)
-            # SEND MESSAGES
-            for target in targets:
-                try:
-                    client.send_message(target, self.text)
-                    count += 1
-                except:
-                    fail += 1
-                    continue
+            for group in groups:
+                members = self.__scrape_participants(group, client)
+                for member in members:
+                    if member.id not in targets:
+                        targets.append(member.id)
             client.disconnect()
-            return [count, fail]
-        except UnauthorizedError:
-            raise UnauthorizedError
-        
+            return  targets
+        except UnauthorizedError as unauth:
+            raise unauth
+        except Exception as exception:
+            print('Exception in Forwarder.load_targets(): ', exception.args)
 
-    def __load_targets(self, client, groups):
-        targets = []
-        for group in groups:
-            members = self.__scrape_participants(group, client)
-            for member in members:
-                if member.id not in targets:
-                    targets.append(member)
-        return  targets
 
     # Connects to Telegram API
     def __scrape_participants(self, target_group, client):

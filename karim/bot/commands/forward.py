@@ -2,6 +2,7 @@
 # TODO: Select Message
 # TODO: Retrieve Group Members
 # TODO: Send Message
+from logging import exception
 from threading import main_thread
 from jinja2.runtime import markup_join
 from telethon.errors.rpcbaseerrors import UnauthorizedError
@@ -171,11 +172,15 @@ def confirm(update, context):
         return ConversationHandler.END
     else:
         # Send Messages
-        count = forwarder.send()
-        """TESTING"""
-        for target in forwarder.targets:
-            context.bot.send_message(forwarder.text, chat_id=forwarder.chat_id, parse_mode=ParseMode.MARKDOWN_V2)
-        context.bot.edit_message_text(forward_successful.format(count[0], count[1]), chat_id=forwarder.chat_id, message_id=forwarder.message_id, parse_mode=ParseMode.HTML)
+        targets = forwarder.load_targets()
+        count = 0
+        for target in targets:
+            try:
+                context.bot.send_message(text=forwarder.text, chat_id=target, parse_mode=ParseMode.MARKDOWN_V2)
+                count += 1
+            except Exception as error:
+                print('Error in forward.confirm(): ', error)
+        context.bot.edit_message_text(forward_successful.format(count), chat_id=forwarder.chat_id, message_id=forwarder.message_id, parse_mode=ParseMode.HTML)
         forwarder.discard()
         return ConversationHandler.END
 

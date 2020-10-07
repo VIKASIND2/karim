@@ -1,3 +1,4 @@
+from math import e
 import redis
 from karim.classes.persistence import persistence_decorator
 from karim.bot.commands import *
@@ -58,8 +59,11 @@ class SessionManager(Persistence):
                 # New Login
                 session = StringSession()
             else:
-                session_string = redis_connector.get('session:{}'.format(self.user_id))
-                session = StringSession(session_string)
+                try:
+                    session_string = redis_connector.get('session:{}'.format(self.user_id))
+                    session = StringSession(session_string)
+                except Exception as error:
+                    print('Error in session_manager.create_client(): ', error)
         client = TelegramClient(session, api_id, api_hash, loop=loop)
         return client
 
@@ -87,7 +91,11 @@ class SessionManager(Persistence):
                 client.sign_in(phone=self.phone, password=self.password)
             string_session = client.session.save()
             # Save session in database
-            redis_connector.set('session:{}'.format(self.user_id), string_session)
+            if LOCALHOST:
+                try:
+                    redis_connector.set('session:{}'.format(self.user_id), string_session)
+                except Exception as error:
+                    print('Error in session_manager.sign_in(): ', error)
             result = client.is_user_authorized()
             client.disconnect()
             return result
@@ -102,7 +110,7 @@ class SessionManager(Persistence):
         except PasswordHashInvalidError as password_error:
             raise password_error
         except Exception as exception:
-            print(exception.args)
+            print('Exception when Signing In: ', exception.args)
             raise exception
 
     def check_connection(self, client=None):
@@ -149,5 +157,8 @@ class SessionManager(Persistence):
             except: pass 
         else: 
             print('Should delete Redis Session...')
-            redis_connector.delete('session:{}'.format(self.user_id))
+            try: 
+                redis_connector.delete('session:{}'.format(self.user_id))
+            except Exception as error:
+                print('Error in session_manager.sign_out(): ', error)
         return result 
