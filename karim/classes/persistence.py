@@ -81,14 +81,14 @@ class Persistence(object):
         else:
             # Code Running on Heroku
             # Get Redis String
-            try:
-                connector = redis.from_url(os.environ.get('REDIS_URL'))
-                obj_string = connector.get("persistence:{}{}{}".format(method, update.effective_chat.id, update.effective_chat.id))
-                connector.close()
-                obj_dict = dict(obj_string)
-                # Turn into Object
-                # Class is Persistence
-                return dict(obj_dict)
-            except Exception as error:
-                print('Error in persistence.deserialzie(): ', error)
+            #try:
+            connector = redis.from_url(os.environ.get('REDIS_URL'))
+            obj_string = connector.get("persistence:{}{}{}".format(method, update.effective_chat.id, update.effective_chat.id))
+            connector.close()
+            obj_dict = dict(obj_string)
+            # Turn into Object
+            # Class is Persistence
+            return obj_dict
+            """ except Exception as error:
+                print('Error in persistence.deserialzie(): ', error) """
             
