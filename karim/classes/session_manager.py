@@ -71,13 +71,18 @@ class SessionManager(Persistence):
         return client
 
     def request_code(self):
-        client = self.create_client(self.user_id)
-        client.connect()
-        sent_code: SentCode = client.send_code_request(self.phone)
-        self.phone_code_hash = sent_code.phone_code_hash
-        self.code_tries += 1
-        client.disconnect()
-        return None
+        try:
+            client = self.create_client(self.user_id)
+            client.connect()
+            sent_code: SentCode = client.send_code_request(self.phone)
+            self.phone_code_hash = sent_code.phone_code_hash
+            self.code_tries += 1
+            client.disconnect()
+            return sent_code
+        except Exception as error:
+            print('Error in session_manager.request_code(): ', error)
+            raise error
+
 
     def sign_in(self, client=None, password=False):
         """

@@ -91,6 +91,8 @@ class Persistence(object):
             #obj_bytes.decode("UTF-8")
             # Turn into Object
             # Class is Persistence
+            obj_dict = dict(obj_string)
+            print(type(obj_dict))
             return dict(obj_string)
             """ except Exception as error:
                 print('Error in persistence.deserialzie(): ', error) """
