@@ -4,8 +4,10 @@ from karim.bot.commands import *
 @run_async
 @send_typing_action
 def sign_out(update, context):
-    
-    manager = SessionManager(Persistence.SIGNOUT, chat_id=update.effective_chat.id, user_id=update.effective_chat.id, message_id=update.message.message_id)
+    try:
+        manager = SessionManager(Persistence.SIGNOUT, chat_id=update.effective_chat.id, user_id=update.effective_chat.id, message_id=update.message.message_id)
+    except AttributeError as error:
+        manager = SessionManager(Persistence.SIGNOUT, chat_id=update.effective_chat.id, user_id=update.effective_chat.id, message_id=update.callback_query.inline_message_id)
     """ except:
         manager = SessionManager(Persistence.SIGNOUT, chat_id=update.effective_chat.id, user_id=update.effective_chat.id, message_id=update.callback_query.inline_message_id) """
     result = manager.check_connection()

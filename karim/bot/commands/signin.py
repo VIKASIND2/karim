@@ -10,7 +10,11 @@ import re
 def client_sign_in(update, context):
     """Initializes the bot and sign into the Telegram Client. Walks the user through a wizard, asking to input Telegram phone number, password and security code to sign into the client."""
     # Check if user is already signed in
-    manager = SessionManager(Persistence.SIGNIN, chat_id=update.effective_chat.id, user_id=update.effective_chat.id, message_id=update.message.message_id)
+    try:
+        manager = SessionManager(Persistence.SIGNIN, chat_id=update.effective_chat.id, user_id=update.effective_chat.id, message_id=update.message.message_id)
+    except AttributeError as error:
+        manager = SessionManager(Persistence.SIGNIN, chat_id=update.effective_chat.id, user_id=update.effective_chat.id, message_id=update.callback_query.inline_message_id
+)
     result =  manager.check_connection()
     if result:
         # User is already authorised
@@ -35,7 +39,7 @@ def validNumber(phone_number):
     # 2) Then contains 7 or 8 or 9. 
     # 3) Then contains 9 digits 
     phone_number.strip()
-    if phone_number[0] is '+':
+    if phone_number[0] == '+':
         phone_number = phone_number[1:]
     Pattern = re.compile("(0/91)?[1-9][0-9]{9}") 
     return Pattern.match(phone_number) 
