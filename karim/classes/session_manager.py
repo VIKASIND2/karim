@@ -1,5 +1,6 @@
 from math import e
 import redis
+from telethon.sessions import string
 from karim.classes.persistence import persistence_decorator
 from karim.bot.commands import *
 import asyncio
@@ -9,6 +10,7 @@ from telethon.sessions import StringSession
 from telethon.tl.types.auth import SentCode
 from karim.secrets import secrets
 from karim import LOCALHOST
+from teleredis import RedisSession
 
 
 class SessionManager(Persistence):
@@ -55,19 +57,13 @@ class SessionManager(Persistence):
         if LOCALHOST:
             session = 'karim/bot/persistence/{}'.format(user_id)
         else:
-            if sign_in:
-                # New Login
-                session = StringSession()
-            else:
-                try:
-                    connector = redis.from_url(os.environ.get('REDIS_URL'))
-                    session_bytes = connector.get('session:{}'.format(self.user_id))
-                    connector.close()
-                    session_string = session_bytes.decode("UTF-8")
-                    session = StringSession(session_string)
-                except Exception as error:
-                    print('Error in session_manager.create_client(): ', error)
-                session = StringSession()
+            try:
+                connector = redis.from_url(os.environ.get('REDIS_URL'))
+                session = RedisSession('session:{}'.format(self.user_id), connector)
+                connector.close()
+            except Exception as error:
+                print('Error in session_manager.create_client(): ', error)
+                raise error
         client = TelegramClient(session, api_id, api_hash, loop=loop)
         return client
 
@@ -98,15 +94,7 @@ class SessionManager(Persistence):
                 client.sign_in(phone=self.phone, code=self.code, phone_code_hash=self.phone_code_hash)
             else:
                 client.sign_in(phone=self.phone, password=self.password)
-            string_session = client.session.save()
             # Save session in database
-            if LOCALHOST:
-                try:
-                    connector = redis.from_url(os.environ.get('REDIS_URL'))
-                    connector.set('session:{}'.format(self.user_id), string_session)
-                    connector.close()
-                except Exception as error:
-                    print('Error in session_manager.sign_in(): ', error)
             result = client.is_user_authorized()
             client.disconnect()
             return result
