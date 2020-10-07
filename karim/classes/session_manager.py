@@ -8,7 +8,7 @@ from telethon.errors.rpcerrorlist import PasswordHashInvalidError, PhoneCodeExpi
 from telethon.sessions import StringSession
 from telethon.tl.types.auth import SentCode
 from karim.secrets import secrets
-from karim import LOCALHOST, redis_connector
+from karim import LOCALHOST, connector
 
 
 class SessionManager(Persistence):
@@ -60,11 +60,11 @@ class SessionManager(Persistence):
                 session = StringSession()
             else:
                 try:
-                    connector = redis.from_url(os.environ.get("REDIS_URL"))
                     session_string = connector.get('session:{}'.format(self.user_id))
                     session = StringSession(session_string)
                 except Exception as error:
                     print('Error in session_manager.create_client(): ', error)
+                session = StringSession()
         client = TelegramClient(session, api_id, api_hash, loop=loop)
         return client
 
@@ -94,7 +94,6 @@ class SessionManager(Persistence):
             # Save session in database
             if LOCALHOST:
                 try:
-                    connector = redis.from_url(os.environ.get("REDIS_URL"))
                     connector.set('session:{}'.format(self.user_id), string_session)
                 except Exception as error:
                     print('Error in session_manager.sign_in(): ', error)
@@ -160,7 +159,6 @@ class SessionManager(Persistence):
         else: 
             print('Should delete Redis Session...')
             try: 
-                connector = redis.from_url(os.environ.get("REDIS_URL"))
                 connector.delete('session:{}'.format(self.user_id))
             except Exception as error:
                 print('Error in session_manager.sign_out(): ', error)

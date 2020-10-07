@@ -9,7 +9,7 @@ import redis
 
 # SET UP REDIS SESSION CONNECTOR
 LOCALHOST = True
-redis_connector = None
+connector = None
 if os.environ.get('PORT') in (None, ""):
     # Code running locally
     LOCALHOST = True
@@ -17,7 +17,7 @@ if os.environ.get('PORT') in (None, ""):
         os.makedirs('karim/bot/persistence')
 else:
     LOCALHOST = False
-    redis_connector = redis.Redis(host=os.environ.get('REDIS_URL'), port=14909, db=0, decode_responses=False)
+    connector = redis.from_url(os.environ.get("REDIS_URL"))
 
 # Initialize Bot
 from karim.bot import telebot
