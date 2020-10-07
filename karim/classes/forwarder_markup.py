@@ -65,10 +65,10 @@ class ForwarderMarkup():
         self.groups = forwarder.get_groups_dict()
         self.selected_div = symbols.PIN+'SELECTED GROUPS:'
         self.selected = self.__format_dicts(forwarder.get_selection(), Callbacks.UNSELECT)
-        self.shown_div = symbols.SEARCH+'SELECT BELOW [{}/{}]'.format(forwarder.page_index, forwarder.pages)
+        self.shown_div = '{}SELECT BELOW [{}/{}]'.format(symbols.SEARCH, forwarder.page_index, forwarder.pages)
         self.shown_selection = self.__format_dicts(forwarder.get_shown(), Callbacks.SELECT, forwarder.get_selection())
         self.arrows = {Callbacks.LEFT: '<', Callbacks.RIGHT: '>'}
-        self.options = {Callbacks.CANCEL: symbols.X+'Cancel', Callbacks.DONE: symbols.CHECK+'Done'}
+        self.options = {Callbacks.CANCEL: '{}Cancel'.format(symbols.X), Callbacks.DONE: '{}Done'.format(symbols.CHECK)}
         self.set_keyboard()
 
     def __format_dicts(self, groups, callback, selected=None):
@@ -76,7 +76,7 @@ class ForwarderMarkup():
         for group in groups:
             if callback is Callbacks.SELECT:
                 if int(group) in selected or str(group) in selected:
-                    updated_dict[callback+str(group)] = symbols.CHECK+self.groups[group]
+                    updated_dict[callback+str(group)] = '{}{}'.format(symbols.CHECK,self.groups[group])
                 else:
                     updated_dict[callback+str(group)] = self.groups[group]
             else:
