@@ -68,6 +68,7 @@ class Persistence(object):
             try:
                 connector = redis.from_url(os.environ.get('REDIS_URL'))
                 connector.set('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id), str(obj_dict))
+                print(str(obj_dict))
                 connector.close()
             except Exception as error:
                 print('Error in persistence.serialize(): ', error)
@@ -85,6 +86,8 @@ class Persistence(object):
             connector = redis.from_url(os.environ.get('REDIS_URL'))
             obj_string = connector.get("persistence:{}{}{}".format(method, update.effective_chat.id, update.effective_chat.id))
             connector.close()
+            print(obj_string)
+            print(type(obj_string))
             obj_dict = dict(obj_string)
             # Turn into Object
             # Class is Persistence
