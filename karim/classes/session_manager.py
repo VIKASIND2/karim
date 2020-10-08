@@ -84,19 +84,19 @@ class SessionManager(Persistence):
         Sign into the Telegram Client using the user's session file - tied thanks to the user id
         :returns: TelegramClient (if user has access) | PhoneCodeInvalidError (if security code is wrong)
         """
-        try:
-            if not client:
-                client = self.create_client(self.user_id, sign_in=True)
-            client.connect()
-            if not password:
-                client.sign_in(phone=self.phone, code=self.code, phone_code_hash=self.phone_code_hash)
-            else:
-                client.sign_in(phone=self.phone, password=self.password)
-            # Save session in database
-            result = client.is_user_authorized()
-            client.disconnect()
-            return result
-        except UnauthorizedError as unauthorized:
+        #try:
+        if not client:
+            client = self.create_client(self.user_id, sign_in=True)
+        client.connect()
+        if not password:
+            client.sign_in(phone=self.phone, code=self.code, phone_code_hash=self.phone_code_hash)
+        else:
+            client.sign_in(phone=self.phone, password=self.password)
+        # Save session in database
+        result = client.is_user_authorized()
+        client.disconnect()
+        return result
+        """ except UnauthorizedError as unauthorized:
             print('Exception when Signing In: ', unauthorized.args)
             raise unauthorized
         except PhoneCodeExpiredError as code_expired:
@@ -113,7 +113,7 @@ class SessionManager(Persistence):
             raise password_error
         except Exception as exception:
             print('Exception when Signing In: ', exception.args)
-            raise exception
+            raise exception """
 
     def check_connection(self, client=None):
         """
