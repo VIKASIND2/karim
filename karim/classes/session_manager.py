@@ -24,6 +24,9 @@ class SessionManager(Persistence):
         self.phone_code_hash = phone_code_hash
         self.code_tries = code_tries
 
+    def __str__(self):
+        return 'SessionManager({}, {}, {}, {})'.format(self.phone, self.password, self.phone_code_hash)
+
     @persistence_decorator
     def set_phone(self, phone):
         self.phone = phone.replace(' ', '')
