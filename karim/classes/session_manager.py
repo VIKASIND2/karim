@@ -68,7 +68,7 @@ class SessionManager(Persistence):
                 print('LOADING REDIS SESSION')
                 connector = redis.from_url(os.environ.get('REDIS_URL'))
                 session = RedisSession('session:{}'.format(self.user_id), connector)
-                print('REDIS SESSION: ', session)
+                print('REDIS SESSION: ', session.session_name)
                 connector.close()
             except Exception as error:
                 # No Session Error
