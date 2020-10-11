@@ -114,6 +114,7 @@ class SessionManager(Persistence):
                 session_string = client.session.save()
                 connector.set('session:{}'.format(self.user_id), session_string)
                 connector.close()
+                print('SIGNED IN WITH STRING: ', client.session)
             client.disconnect()
             return result
         except UnauthorizedError as unauthorized:
