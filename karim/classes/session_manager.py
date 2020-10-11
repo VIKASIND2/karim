@@ -86,6 +86,7 @@ class SessionManager(Persistence):
         client.connect()
         print('SENT CODE TO ', self.phone)
         sent_code: SentCode = client.send_code_request(self.phone, force_sms=True)
+        client.sign_in(phone=self.phone, phone_code_hash=self.phone_code_hash)
         print('SENT CODE REQUEST! ', sent_code)
         self.phone_code_hash = sent_code.phone_code_hash
         self.code_tries += 1
@@ -103,7 +104,8 @@ class SessionManager(Persistence):
                 client = self.create_client(self.user_id, sign_in=True)
             client.connect()
             if not password:
-                client.sign_in(phone=self.phone, phone_code_hash=self.phone_code_hash)
+                client.sign_in(phone=self.phone, code=self.code, phone_code_hash=self.phone_code_hash)
+
             else:
                 client.sign_in(phone=self.phone, password=self.password)
             # Save session in database
