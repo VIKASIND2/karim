@@ -5,7 +5,6 @@ from teleredis.teleredis import RedisSession
 
 from karim import LOCALHOST
 from telegram import update
-from telethon.sessions import StringSession
 import os, jsonpickle, redis
 
 def persistence_decorator(func):
@@ -48,9 +47,8 @@ class Persistence(object):
         else:
             # CODE RUNNING ON SERVER
             try:
-                connector: RedisSession = redis.from_url(os.environ.get('REDIS_URL'))
+                connector = redis.from_url(os.environ.get('REDIS_URL'))
                 connector.delete('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id))
-                connector.feed_session()
                 connector.close()
             except Exception as error:
                 print('Error in persistence.discard(): ', error)
@@ -73,7 +71,6 @@ class Persistence(object):
                 obj_string = json.dumps(obj_dict)
                 connector.set('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id), obj_string)
                 print('Serializng: ', obj_string)
-                connector.feed_session()
                 connector.close()
             except Exception as error:
                 print('Error in persistence.serialize(): ', error)

@@ -1,6 +1,7 @@
 from math import e
 import redis
-from telethon.sessions import string
+from telethon.network import connection
+from telethon.sessions import sessions, string
 from karim.classes.persistence import persistence_decorator
 from karim.bot.commands import *
 import asyncio
@@ -10,7 +11,6 @@ from telethon.sessions import StringSession
 from telethon.tl.types.auth import SentCode
 from karim.secrets import secrets
 from karim import LOCALHOST
-from teleredis import RedisSession
 
 
 class SessionManager(Persistence):
@@ -67,20 +67,20 @@ class SessionManager(Persistence):
                 # Falling Back to RedisSession
                 print('LOADING REDIS SESSION')
                 connector = redis.from_url(os.environ.get('REDIS_URL'))
-                session = RedisSession('session:{}'.format(self.user_id), connector)
-                print('REDIS SESSION: ', session.session_name)
-                if not sign_in:
-                    connector.close()
+                string = connector.get('session:{}'.format(self.user_id))
+                if string:
+                    # Session is stored in Redis
+                    session = StringSession(string)
+                else:
+                    session = StringSession()
+                connector.disconnect()
             except Exception as error:
                 # No Session Error
                 print('Error in session_manager.create_client(): ', error)
                 raise error
         client = TelegramClient(session, api_id, api_hash, loop=loop)
         print('TELEGRAM CLIENT WITH SESSION: ', client)
-        if not sign_in:
-            return client
-        else:
-            return (client, connector)
+        return client
 
     @persistence_decorator
     def request_code(self):
@@ -102,9 +102,7 @@ class SessionManager(Persistence):
         """
         try:
             if not client:
-                result = self.create_client(self.user_id, sign_in=True)
-                client = result[0]
-                connector = result[1]
+                client = self.create_client(self.user_id, sign_in=True)
             client.connect()
             if not password:
                 client.sign_in(phone=self.phone, phone_code_hash=self.phone_code_hash)
@@ -112,10 +110,12 @@ class SessionManager(Persistence):
                 client.sign_in(phone=self.phone, password=self.password)
             # Save session in database
             result = client.is_user_authorized()
-            if not client:
-                connector.feed_session()
+            # Save Session in Redis
+            if not LOCALHOST:
+                connector = redis.from_url(os.environ.get('REDIS_URL'))
+                session_string = client.session.save()
+                connector.set('session:{}'.format(self.user_id), session_string)
                 connector.close()
-
             client.disconnect()
             return result
         except UnauthorizedError as unauthorized:
@@ -158,7 +158,7 @@ class SessionManager(Persistence):
         :returns: TelegramClient (if user has access) | UnauthorizedError if user does not have access | Exception if an error occured
         """
         if not client:
-                client = self.create_client(self.user_id)
+            client = self.create_client(self.user_id)
         client.connect()
         result = client.is_user_authorized()
         if not result:
@@ -184,7 +184,6 @@ class SessionManager(Persistence):
             try: 
                 connector = redis.from_url('REDIS_URL')
                 connector.delete('session:{}'.format(self.user_id))
-                connector.feed_session()
                 connector.close()
             except Exception as error:
                 print('Error in session_manager.sign_out(): ', error)
