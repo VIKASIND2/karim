@@ -8,8 +8,6 @@ def sign_out(update, context):
         manager = SessionManager(Persistence.SIGNOUT, chat_id=update.effective_chat.id, user_id=update.effective_chat.id, message_id=update.message.message_id)
     except AttributeError as error:
         manager = SessionManager(Persistence.SIGNOUT, chat_id=update.effective_chat.id, user_id=update.effective_chat.id, message_id=update.callback_query.inline_message_id)
-    """ except:
-        manager = SessionManager(Persistence.SIGNOUT, chat_id=update.effective_chat.id, user_id=update.effective_chat.id, message_id=update.callback_query.inline_message_id) """
     result = manager.check_connection()
     if result:
         # User is logged in
@@ -23,6 +21,8 @@ def sign_out(update, context):
         return LogOutStates.CONFIRM
     elif not result:
         # User is not logged in
+        try:
+            manager.sign_out()
         update.effective_chat.send_message(not_signed_in, parse_mode=ParseMode.HTML)
         manager.discard()
         return ConversationHandler.END
