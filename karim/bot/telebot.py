@@ -6,12 +6,8 @@ from karim.bot.commands.account import *
 from karim.classes.callbacks import *
 
 
-def setup(telebot):
-    update_queue = Queue()
-    job_queue = JobQueue()
-    dp = Dispatcher(bot=telebot, update_queue=update_queue,
-                    use_context=True, job_queue=job_queue)
-    job_queue.set_dispatcher(dp)
+def setup(updater):
+    dp = updater.dispatcher
 
     start_handler = ConversationHandler(
         entry_points=[CommandHandler('start', client_sign_in), CommandHandler('signin', client_sign_in), CallbackQueryHandler(client_sign_in, pattern=Callbacks.LOGIN)],
@@ -46,8 +42,3 @@ def setup(telebot):
     dp.add_handler(start_handler)
     dp.add_handler(forwarder_handler)
     dp.add_error_handler(error)
-
-    thread = Thread(target=dp.start, name='dispatcher')
-    thread.start()
-
-    return update_queue

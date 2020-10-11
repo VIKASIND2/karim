@@ -24,7 +24,10 @@ def client_sign_in(update, context):
     elif not result:
         # Request Phone Number Input from user
         markup = CreateMarkup({Callbacks.CANCEL: 'Cancel'}).create_markup()
-        message = update.effective_chat.send_message(request_phone_text, parse_mode = ParseMode.HTML, reply_markup = markup)
+        try:
+            message = update.callback_query.edit_message_text(request_phone_text, parse_mode=ParseMode.HTML, reply_markup=markup)
+        except:
+            message = update.effective_chat.send_message(request_phone_text, parse_mode = ParseMode.HTML, reply_markup = markup)
         manager.set_message(message.message_id)
         return StartStates.INPUT_PHONE
     else:

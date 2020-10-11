@@ -27,6 +27,9 @@ class SessionManager(Persistence):
     def __str__(self):
         return 'SessionManager({}, {}, {}, {})'.format(self.phone, self.password, self.phone_code_hash)
 
+    def __repr__(self):
+        return 'SessionManager({}, {}, {}, {})'.format(self.phone, self.password, self.phone_code_hash)
+
     @persistence_decorator
     def set_phone(self, phone):
         self.phone = phone.replace(' ', '')
@@ -44,16 +47,9 @@ class SessionManager(Persistence):
 
     def discard(self):
         super().discard()
-        try:
-            loop = asyncio.get_event_loop()
-            loop.close()
-        except:
-            pass
 
     def create_client(self, user_id, sign_in=False):
         """Creates and returns a TelegramClient"""
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
         api_id = secrets.get_var('API_ID')
         api_hash = secrets.get_var('API_HASH')
 
@@ -61,13 +57,15 @@ class SessionManager(Persistence):
             session = 'karim/bot/persistence/{}'.format(user_id)
         else:
             try:
+                # Falling Back to RedisSession
                 connector = redis.from_url(os.environ.get('REDIS_URL'))
                 session = RedisSession('session:{}'.format(self.user_id), connector)
                 connector.close()
             except Exception as error:
+                # No Session Error
                 print('Error in session_manager.create_client(): ', error)
                 raise error
-        client = TelegramClient(session, api_id, api_hash, loop=loop)
+        client = TelegramClient(session, api_id, api_hash)
         return client
 
     @persistence_decorator
@@ -87,19 +85,19 @@ class SessionManager(Persistence):
         Sign into the Telegram Client using the user's session file - tied thanks to the user id
         :returns: TelegramClient (if user has access) | PhoneCodeInvalidError (if security code is wrong)
         """
-        #try:
-        if not client:
-            client = self.create_client(self.user_id, sign_in=True)
-        client.connect()
-        if not password:
-            client.sign_in(phone=self.phone, code=self.code, phone_code_hash=self.phone_code_hash)
-        else:
-            client.sign_in(phone=self.phone, password=self.password)
-        # Save session in database
-        result = client.is_user_authorized()
-        client.disconnect()
-        return result
-        """ except UnauthorizedError as unauthorized:
+        try:
+            if not client:
+                client = self.create_client(self.user_id, sign_in=True)
+            client.connect()
+            if not password:
+                client.sign_in(phone=self.phone, code=self.code, phone_code_hash=self.phone_code_hash)
+            else:
+                client.sign_in(phone=self.phone, password=self.password)
+            # Save session in database
+            result = client.is_user_authorized()
+            client.disconnect()
+            return result
+        except UnauthorizedError as unauthorized:
             print('Exception when Signing In: ', unauthorized.args)
             raise unauthorized
         except PhoneCodeExpiredError as code_expired:
@@ -116,7 +114,7 @@ class SessionManager(Persistence):
             raise password_error
         except Exception as exception:
             print('Exception when Signing In: ', exception.args)
-            raise exception """
+            raise exception
 
     def check_connection(self, client=None):
         """

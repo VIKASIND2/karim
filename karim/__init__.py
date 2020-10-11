@@ -1,11 +1,12 @@
 import os
 import telegram
 from flask import Flask
+from telegram import base
+from telegram.ext.updater import Updater
 from telegram.utils.request import Request
+import telethon
 from karim.secrets import secrets
-from telegram.error import RetryAfter
-import time
-import redis
+
 
 # SET UP REDIS SESSION CONNECTOR
 LOCALHOST = True
@@ -22,17 +23,19 @@ else:
 from karim.bot import telebot
 BOT_TOKEN = secrets.get_var('BOT_TOKEN')
 URL = secrets.get_var('SERVER_APP_DOMAIN')
+PORT = int(os.environ.get('PORT', '8443'))
 request = Request(con_pool_size=8)
-bot = telegram.Bot(token=BOT_TOKEN, request=request)
-update_queue = telebot.setup(bot)
-
+updater = Updater(BOT_TOKEN, use_context=True)
+telebot.setup(updater)
 # Setup Telegram Webhook
-try:
-    s = bot.setWebhook('{URL}/{HOOK}'.format(URL=URL, HOOK=BOT_TOKEN))
-except RetryAfter:
-    time.sleep(4)
-    s = bot.setWebhook('{URL}/{HOOK}'.format(URL=URL, HOOK=BOT_TOKEN))
-
+print('STARTING WEBHOOK')
+updater.start_webhook(listen="0.0.0.0",
+                      port=PORT,
+                      url_path=BOT_TOKEN)
+print('WEBHOOK STARTED - SETTING UP WEBHOOK')
+updater.bot.set_webhook('{URL}/{HOOK}'.format(URL=URL, HOOK=BOT_TOKEN))
+print('WEBHOOK SET UP CORRECTLY')
+updater.idle()
 
 # Initialize Flask App
 app = Flask(__name__)
