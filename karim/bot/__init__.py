@@ -15,10 +15,7 @@ import logging
 import os
 import html
 import pickle
-
 from karim.secrets import secrets
-from karim import bot
-
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
