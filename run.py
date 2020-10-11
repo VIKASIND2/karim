@@ -29,6 +29,6 @@ if __name__ == '__main__':
                         port=PORT,
                         url_path=BOT_TOKEN)
     print('WEBHOOK STARTED - SETTING UP WEBHOOK')
-    updater.bot.setWebhook('{URL}/{HOOK}'.format(URL=URL, HOOK=BOT_TOKEN))
+    updater.bot.set_webhook('{URL}/{HOOK}'.format(URL=URL, HOOK=BOT_TOKEN))
     print('WEBHOOK SET UP CORRECTLY')
     updater.idle()
