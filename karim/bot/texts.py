@@ -1,9 +1,9 @@
 import emoji
 class symbols:
-    CHECK = emoji.emojize(':white_check_mark:')
-    X = emoji.emojize(':x:')
+    CHECK = '✅' #emoji.emojize(':white_check_mark:')
+    X = '❌' #emoji.emojize(':x:')
     PIN = emoji.emojize(':pushpin:')
-    SEARCH = emoji.emojize(':mag_right:')
+    SEARCH = '🔎' #emoji.emojize(':mag_right:')
 
 
 # Help Command
