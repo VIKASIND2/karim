@@ -69,14 +69,18 @@ class SessionManager(Persistence):
                 connector = redis.from_url(os.environ.get('REDIS_URL'))
                 session = RedisSession('session:{}'.format(self.user_id), connector)
                 print('REDIS SESSION: ', session.session_name)
-                connector.close()
+                if not sign_in:
+                    connector.close()
             except Exception as error:
                 # No Session Error
                 print('Error in session_manager.create_client(): ', error)
                 raise error
         client = TelegramClient(session, api_id, api_hash, loop=loop)
         print('TELEGRAM CLIENT WITH SESSION: ', client)
-        return client
+        if not sign_in:
+            return client
+        else:
+            return (client, connector)
 
     @persistence_decorator
     def request_code(self):
@@ -98,7 +102,9 @@ class SessionManager(Persistence):
         """
         try:
             if not client:
-                client = self.create_client(self.user_id, sign_in=True)
+                result = self.create_client(self.user_id, sign_in=True)
+                client = result[0]
+                connector = result[1]
             client.connect()
             if not password:
                 client.sign_in(phone=self.phone, phone_code_hash=self.phone_code_hash)
@@ -106,6 +112,10 @@ class SessionManager(Persistence):
                 client.sign_in(phone=self.phone, password=self.password)
             # Save session in database
             result = client.is_user_authorized()
+            if not client:
+                connector.feed_session()
+                connector.close()
+
             client.disconnect()
             return result
         except UnauthorizedError as unauthorized:
@@ -174,6 +184,7 @@ class SessionManager(Persistence):
             try: 
                 connector = redis.from_url('REDIS_URL')
                 connector.delete('session:{}'.format(self.user_id))
+                connector.feed_session()
                 connector.close()
             except Exception as error:
                 print('Error in session_manager.sign_out(): ', error)
