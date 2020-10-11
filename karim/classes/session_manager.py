@@ -79,6 +79,7 @@ class SessionManager(Persistence):
     def request_code(self):
         client = self.create_client(self.user_id)
         client.connect()
+        print('SENT CODE TO ', self.phone)
         sent_code: SentCode = client.send_code_request(self.phone)
         print('SENT CODE REQUEST! ', sent_code)
         self.phone_code_hash = sent_code.phone_code_hash
