@@ -23,6 +23,8 @@ def sign_out(update, context):
         # User is not logged in
         try:
             manager.sign_out()
+        except:
+            pass
         update.effective_chat.send_message(not_signed_in, parse_mode=ParseMode.HTML)
         manager.discard()
         return ConversationHandler.END
