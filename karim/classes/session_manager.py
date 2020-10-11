@@ -105,7 +105,7 @@ class SessionManager(Persistence):
                 client = self.create_client(self.user_id, sign_in=True)
             client.connect()
             if not password:
-                client.sign_in(phone=self.phone, code=self.code, phone_code_hash=self.phone_code_hash)
+                client.sign_in(phone=self.phone, phone_code_hash=self.phone_code_hash)
 
             else:
                 client.sign_in(phone=self.phone, password=self.password)

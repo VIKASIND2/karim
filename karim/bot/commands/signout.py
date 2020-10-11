@@ -1,4 +1,3 @@
-from operator import methodcaller
 from karim.bot.commands import *
 
 @run_async
