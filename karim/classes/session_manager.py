@@ -1,7 +1,4 @@
-from math import e
 import redis
-from telethon.network import connection
-from telethon.sessions import sessions, string
 from karim.classes.persistence import persistence_decorator
 from karim.bot.commands import *
 import asyncio
