@@ -64,11 +64,12 @@ class SessionManager(Persistence):
                 # Falling Back to RedisSession
                 print('LOADING REDIS SESSION')
                 connector = redis.from_url(os.environ.get('REDIS_URL'))
-                string = connector.get('session:{}'.format(self.user_id)).decode("utf-8") 
+                string = connector.get('session:{}'.format(self.user_id))
                 print('SESSION STRING: ', string)
                 if string:
                     # Session is stored in Redis
-                    session = StringSession(string)
+                    decoded_string = string.decode("utf-8") 
+                    session = StringSession(decoded_string)
                 else:
                     session = StringSession()
                 connector.close()
