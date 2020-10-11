@@ -184,7 +184,7 @@ class SessionManager(Persistence):
         else: 
             print('Should delete Redis Session...')
             try: 
-                connector = redis.from_url('REDIS_URL')
+                connector = redis.from_url(os.environ.get('REDIS_URL'))
                 connector.delete('session:{}'.format(self.user_id))
                 connector.close()
             except Exception as error:
