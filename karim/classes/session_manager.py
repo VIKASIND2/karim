@@ -64,7 +64,7 @@ class SessionManager(Persistence):
                 # Falling Back to RedisSession
                 print('LOADING REDIS SESSION')
                 connector = redis.from_url(os.environ.get('REDIS_URL'))
-                string = connector.get('session:{}'.format(self.user_id))
+                string = connector.get('session:{}'.format(self.user_id)).decode("utf-8") 
                 print('SESSION STRING: ', string)
                 if string:
                     # Session is stored in Redis
