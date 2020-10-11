@@ -47,9 +47,16 @@ class SessionManager(Persistence):
 
     def discard(self):
         super().discard()
+        try:
+            loop = asyncio.get_event_loop()
+            loop.close()
+        except:
+            pass
 
     def create_client(self, user_id, sign_in=False):
         """Creates and returns a TelegramClient"""
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
         api_id = secrets.get_var('API_ID')
         api_hash = secrets.get_var('API_HASH')
 
@@ -65,7 +72,7 @@ class SessionManager(Persistence):
                 # No Session Error
                 print('Error in session_manager.create_client(): ', error)
                 raise error
-        client = TelegramClient(session, api_id, api_hash)
+        client = TelegramClient(session, api_id, api_hash, loop=loop)
         return client
 
     @persistence_decorator
