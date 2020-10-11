@@ -65,14 +65,17 @@ class SessionManager(Persistence):
         else:
             try:
                 # Falling Back to RedisSession
+                print('LOADING REDIS SESSION')
                 connector = redis.from_url(os.environ.get('REDIS_URL'))
                 session = RedisSession('session:{}'.format(self.user_id), connector)
+                print('REDIS SESSION: ', session)
                 connector.close()
             except Exception as error:
                 # No Session Error
                 print('Error in session_manager.create_client(): ', error)
                 raise error
         client = TelegramClient(session, api_id, api_hash, loop=loop)
+        print('TELEGRAM CLIENT WITH SESSION: ', client)
         return client
 
     @persistence_decorator
