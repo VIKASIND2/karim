@@ -70,7 +70,7 @@ class SessionManager(Persistence):
                     session = StringSession(string)
                 else:
                     session = StringSession()
-                connector.disconnect()
+                connector.close()
             except Exception as error:
                 # No Session Error
                 print('Error in session_manager.create_client(): ', error)
