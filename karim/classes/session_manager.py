@@ -87,7 +87,7 @@ class SessionManager(Persistence):
         client.connect()
         print('SENT CODE TO ', self.phone)
         sent_code: SentCode = client.send_code_request(self.phone, force_sms=True)
-        sent_code = client.sign_in(phone=self.phone, phone_code_hash=self.phone_code_hash)
+        client.sign_in(phone=self.phone, phone_code_hash=self.phone_code_hash)
         print('')
         print('SENT CODE REQUEST! ', sent_code)
         self.phone_code_hash = sent_code.phone_code_hash
