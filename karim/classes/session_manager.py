@@ -64,7 +64,7 @@ class SessionManager(Persistence):
         # proxy=(socks.SOCKS5, '127.0.0.1', 4444)
 
         if LOCALHOST:
-            session = 'karim/bot/persistence/{}'.format(user_id)
+            session = 'karim/bot/persistence/{}'.format(self.user_id)
         else:
             try:
                 # Falling Back to RedisSession
@@ -92,26 +92,26 @@ class SessionManager(Persistence):
         return client
 
     @persistence_decorator
-    def request_code(self, request_again=False):
+    def request_code(self):
         client = self.create_client()
         client.connect()
         print('SENT CODE TO PHONE')
-        if not request_again:
-            try:
-                sent_code = client(functions.auth.SendCodeRequest(phone_number=self.phone, api_id=int(secrets.get_var('API_ID')), api_hash=secrets.get_var('API_HASH'), settings=types.CodeSettings(allow_flashcall=True, current_number=True, allow_app_hash=True)))
-            except PhoneNumberFloodError as error:
-                print('Error in session_manager.request_code(): ', error)
-                raise error
-            except PhonePasswordFloodError as error:
-                print('Error in session_manager.request_code(): ', error)
-                raise error
-            except PhonePasswordProtectedError as error:
-                print('Error in session_manager.request_code(): ', error)
-                raise error
-            except Exception as error:
-                print('Error in session_manager.request_code(): ', error)
-                raise error
-        else:
+        #if not request_again:
+        try:
+            sent_code = client(functions.auth.SendCodeRequest(phone_number=self.phone, api_id=int(secrets.get_var('API_ID')), api_hash=secrets.get_var('API_HASH'), settings=types.CodeSettings(allow_flashcall=True, current_number=True, allow_app_hash=True)))
+        except PhoneNumberFloodError as error:
+            print('Error in session_manager.request_code(): ', error)
+            raise error
+        except PhonePasswordFloodError as error:
+            print('Error in session_manager.request_code(): ', error)
+            raise error
+        except PhonePasswordProtectedError as error:
+            print('Error in session_manager.request_code(): ', error)
+            raise error
+        except Exception as error:
+            print('Error in session_manager.request_code(): ', error)
+            raise error
+        """ else:
             try:
                 sent_code = client(ResendCodeRequest(self.phone, self.phone_code_hash))
             except PhoneNumberInvalidError as error:
@@ -119,7 +119,7 @@ class SessionManager(Persistence):
                 raise error
             except Exception as error:
                 print('Error in session_manager.request_code(): ', error)
-                raise error
+                raise error """
         print('SENT CODE REQUEST!')
         self.phone_code_hash = sent_code.phone_code_hash
         self.code_tries += 1

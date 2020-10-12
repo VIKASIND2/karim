@@ -182,7 +182,7 @@ def cancel_start(update, context, include_message=True):
 def manage_code_request(update, context, text, manager: SessionManager, markup=None, try_again=False):
     # SEND AND REQUEST SECURITY CODE
     try:
-        manager.request_code(request_again=try_again)
+        manager.request_code()
         # Request Security Code Input
         if markup is not None:
             reply_markup = markup
