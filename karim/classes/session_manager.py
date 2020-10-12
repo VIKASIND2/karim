@@ -1,13 +1,17 @@
+from telethon.tl.functions.auth import CancelCodeRequest, ResendCodeRequest
 from karim.classes.persistence import persistence_decorator
 from karim.bot.commands import *
-import asyncio, redis, socks
-from telethon.sync import TelegramClient
-from telethon import connection
-from telethon.errors.rpcerrorlist import PasswordHashInvalidError, PhoneCodeExpiredError, PhoneCodeInvalidError, FloodWaitError, PhoneNumberInvalidError, SessionPasswordNeededError, UnauthorizedError
-from telethon.sessions import StringSession
-from telethon.tl.types.auth import SentCode
 from karim.secrets import secrets
 from karim import LOCALHOST
+
+import asyncio, redis, socks
+
+from telethon.sync import TelegramClient
+from telethon import connection
+from telethon.errors.rpcerrorlist import *
+from telethon import functions, types
+from telethon.sessions import StringSession
+from telethon.tl.types.auth import SentCode
 
 
 class SessionManager(Persistence):
@@ -50,7 +54,7 @@ class SessionManager(Persistence):
         except:
             pass
 
-    def create_client(self, user_id, sign_in=False):
+    def create_client(self):
         """Creates and returns a TelegramClient"""
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
@@ -89,21 +93,51 @@ class SessionManager(Persistence):
 
     @persistence_decorator
     def request_code(self, request_again=False):
-        client = self.create_client(self.user_id)
+        client = self.create_client()
         client.connect()
         print('SENT CODE TO PHONE')
         if not request_again:
-            if self.phone_code_hash not in (-1, None):
-                sent_code = client.sign_in(phone=self.phone, phone_code_hash=self.phone_code_hash)
-            else:
-                sent_code = client.sign_in(phone=self.phone)
+            try:
+                sent_code = client(functions.auth.SendCodeRequest(phone_number=self.phone, api_id=secrets.get_var('API_ID'), api_hash=secrets.get_var('API_HASH'), settings=types.CodeSettings(allow_flashcall=True, current_number=True, allow_app_hash=True)))
+            except PhoneNumberFloodError as error:
+                print('Error in session_manager.request_code(): ', error)
+                raise error
+            except PhonePasswordFloodError as error:
+                print('Error in session_manager.request_code(): ', error)
+                raise error
+            except PhonePasswordProtectedError as error:
+                print('Error in session_manager.request_code(): ', error)
+                raise error
+            except Exception as error:
+                print('Error in session_manager.request_code(): ', error)
+                raise error
         else:
-            sent_code = client.send_code_request(self.phone, force_sms=True)
+            try:
+                sent_code = client(ResendCodeRequest(self.phone, self.phone_code_hash))
+            except PhoneNumberInvalidError as error:
+                print('Error in session_manager.request_code(): ', error)
+                raise error
+            except Exception as error:
+                print('Error in session_manager.request_code(): ', error)
+                raise error
         print('SENT CODE REQUEST!')
         self.phone_code_hash = sent_code.phone_code_hash
         self.code_tries += 1
         client.disconnect()
         return sent_code
+
+
+    def cancel_code_request(self, client=None):
+        if not client:
+            client = self.create_client()
+        try:
+            client(CancelCodeRequest(self.phone, self.phone_code_hash))
+        except PhoneNumberInvalidError as error:
+            print('Error in session_manager.cancel_code_request(): ', error)
+            raise error
+        except Exception as error:
+            print('Error in session_manager.cancel_code_request(): ', error)
+            raise error
 
 
     def sign_in(self, client=None, password=False):
@@ -113,7 +147,7 @@ class SessionManager(Persistence):
         """
         try:
             if not client:
-                client = self.create_client(self.user_id, sign_in=True)
+                client = self.create_client()
             client.connect()
             if not password:
                 client.sign_in(phone=self.phone, code=self.code, phone_code_hash=self.phone_code_hash)
@@ -157,7 +191,7 @@ class SessionManager(Persistence):
         """
         try:
             if not client:
-                client = self.create_client(self.user_id)
+                client = self.create_client()
                 client.connect()
                 result = client.is_user_authorized()
                 client.disconnect()
@@ -172,7 +206,7 @@ class SessionManager(Persistence):
         :returns: TelegramClient (if user has access) | UnauthorizedError if user does not have access | Exception if an error occured
         """
         if not client:
-            client = self.create_client(self.user_id)
+            client = self.create_client()
         client.connect()
         result = client.is_user_authorized()
         if not result:
@@ -185,7 +219,7 @@ class SessionManager(Persistence):
 
     def sign_out(self, client=None):
         if not client:
-            client = self.create_client(self.user_id)
+            client = self.create_client()
             client.connect()
         result = client.log_out()
         client.disconnect()
