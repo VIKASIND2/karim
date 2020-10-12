@@ -159,8 +159,9 @@ class SessionManager(Persistence):
                 result = client.is_user_authorized()
                 client.disconnect()
                 return result
-        except: 
-            return Exception
+        except Exception as error: 
+            print('Error in checking the connection: ', error.args)
+            return error
         
     def connect(self, client=None):
         """
