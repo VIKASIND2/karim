@@ -197,12 +197,18 @@ def manage_code_request(update, context, text, manager: SessionManager, markup=N
         print('Error in singin.manage_code_request(): ', error)
         # CODE SENT TOO MANY TIMES
         # Ask to input last sent code
-        update.message.reply_text(floodwaiterror_text, parse_mode=ParseMode.HTML)
+        try:
+            update.message.reply_text(floodwaiterror_text, parse_mode=ParseMode.HTML)
+        except:
+            update.callback_query.edit_message_text(floodwaiterror_text, parse_mode=ParseMode.HTML)
         return StartStates.INPUT_CODE
 
     except Exception as error:
         print('Error in singin.manage_code_request(): ', error)
         # CODE REQUEST FAILED
-        update.message.reply_text(requestcodefailed_text, parse_mode=ParseMode.HTML)
+        try:
+            update.message.reply_text(requestcodefailed_text, parse_mode=ParseMode.HTML)
+        except:
+            update.callback_query.edit_message_text(requestcodefailed_text, parse_mode=ParseMode.HTML)
         cancel_start(update, context)
         return ConversationHandler.END
