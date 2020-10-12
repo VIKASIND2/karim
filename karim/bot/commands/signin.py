@@ -189,7 +189,9 @@ def manage_code_request(update, context, text, manager: SessionManager, markup=N
         try:
             message = update.message.reply_text(text, reply_markup=reply_markup, parse_mode=ParseMode.HTML)
         except:
-            message = update.callback_query.edit_message_text(text=text, reply_markup=reply_markup, parse_mode=ParseMode.HTML)
+            try:
+                message = update.callback_query.edit_message_text(text=text, reply_markup=reply_markup, parse_mode=ParseMode.HTML)
+            except: pass
         manager.set_message(message.message_id)
         return StartStates.INPUT_CODE
 
