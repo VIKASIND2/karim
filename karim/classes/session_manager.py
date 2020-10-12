@@ -3,6 +3,7 @@ from karim.classes.persistence import persistence_decorator
 from karim.bot.commands import *
 import asyncio
 from telethon.sync import TelegramClient
+from telethon import connection
 from telethon.errors.rpcerrorlist import PasswordHashInvalidError, PhoneCodeExpiredError, PhoneCodeInvalidError, FloodWaitError, PhoneNumberInvalidError, SessionPasswordNeededError, UnauthorizedError
 from telethon.sessions import StringSession
 from telethon.tl.types.auth import SentCode
@@ -56,6 +57,8 @@ class SessionManager(Persistence):
         asyncio.set_event_loop(loop)
         api_id = secrets.get_var('API_ID')
         api_hash = secrets.get_var('API_HASH')
+        client_connection = connection.ConnectionTcpMTProxyRandomizedIntermediate
+        proxy=('mtproxy.example.com', 2002, 'secret')
 
         if LOCALHOST:
             session = 'karim/bot/persistence/{}'.format(user_id)
@@ -77,7 +80,7 @@ class SessionManager(Persistence):
                 # No Session Error
                 print('Error in session_manager.create_client(): ', error)
                 raise error
-        client = TelegramClient(session, api_id, api_hash, loop=loop)
+        client = TelegramClient(session, api_id, api_hash, loop=loop, connection=client_connection, proxy=proxy)
         print('TELEGRAM CLIENT WITH SESSION CREATED')
         return client
 
