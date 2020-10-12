@@ -81,14 +81,14 @@ def input_code(update, context):
         # Another user tried to enter the conversation
         print('FAILED ATTEMPT AT PERSISTENCE')
         return
+    markup = CreateMarkup({Callbacks.CANCEL: 'Cancel', Callbacks.REQUEST_CODE: 'Resend Code'}).create_markup()
     if update.callback_query is not None:
         if update.callback_query.data == Callbacks.REQUEST_CODE:
-            return manage_code_request(update, context, request_code_text, manager)
+            return manage_code_request(update, context, request_code_text, manager, markup )
         elif update.callback_query == Callbacks.CANCEL:
             return cancel_start(update, context)
 
     code = update.message.text
-    markup = CreateMarkup({Callbacks.CANCEL: 'Cancel', Callbacks.REQUEST_CODE: 'Resend Code'}).create_markup()
     manager.set_code(code)
     # ATTEMPT SIGN IN (No Password)
     try:
@@ -186,7 +186,10 @@ def manage_code_request(update, context, text, manager: SessionManager, markup=N
             reply_markup = markup
         else:
             reply_markup = CreateMarkup({Callbacks.CANCEL: 'Cancel'}).create_markup()
-        message = update.message.reply_text(text, reply_markup=reply_markup, parse_mode=ParseMode.HTML)
+        try:
+            message = update.message.reply_text(text, reply_markup=reply_markup, parse_mode=ParseMode.HTML)
+        except:
+            message = update.callback_query.edit_message_text(text=text, reply_markup=reply_markup, parse_mode=ParseMode.HTML)
         manager.set_message(message.message_id)
         return StartStates.INPUT_CODE
 
