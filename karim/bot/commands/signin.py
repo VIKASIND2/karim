@@ -17,7 +17,7 @@ def client_sign_in(update, context):
 )
     result =  manager.check_connection()
     if result:
-        # User is already authorised
+        # User is authorised
         message = update.effective_chat.send_message(client_already_signed_in, parse_mode = ParseMode.HTML)
         manager.discard()
         return ConversationHandler.END
@@ -59,7 +59,7 @@ def input_phone(update, context):
         print('FAILED ATTEMPT AT PERSISTENCE')
         return
     phone = update.message.text
-    markup = CreateMarkup({Callbacks.CANCEL: 'Cancel'}).create_markup()
+    markup = CreateMarkup({Callbacks.CANCEL: 'Cancel', Callbacks.REQUEST_CODE: 'Resend Code'}).create_markup()
     if not validNumber(phone):
         # Phone number is not valid, try again
         message = update.message.reply_text(phone_not_valid, reply_markup=markup, parse_mode=ParseMode.HTML)
@@ -81,6 +81,9 @@ def input_code(update, context):
         # Another user tried to enter the conversation
         print('FAILED ATTEMPT AT PERSISTENCE')
         return
+    if update.callback_query is not None:
+        return manage_code_request(update, context, request_code_text, manager)
+
     code = update.message.text
     markup = CreateMarkup({Callbacks.CANCEL: 'Cancel'}).create_markup()
     manager.set_code(code)

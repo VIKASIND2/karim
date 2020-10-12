@@ -10,6 +10,7 @@ class Callbacks:
     SELECT = 'SELECT'
     UNSELECT = 'UNSELECT'
     CONFIRM = 'CONFIRM'
+    REQUEST_CODE = 'REQUEST_CODE'
 
 
 class StartStates:
