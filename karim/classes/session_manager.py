@@ -98,7 +98,7 @@ class SessionManager(Persistence):
         print('SENT CODE TO PHONE')
         if not request_again:
             try:
-                sent_code = client(functions.auth.SendCodeRequest(phone_number=self.phone, api_id=secrets.get_var('API_ID'), api_hash=secrets.get_var('API_HASH'), settings=types.CodeSettings(allow_flashcall=True, current_number=True, allow_app_hash=True)))
+                sent_code = client(functions.auth.SendCodeRequest(phone_number=self.phone, api_id=int(secrets.get_var('API_ID')), api_hash=secrets.get_var('API_HASH'), settings=types.CodeSettings(allow_flashcall=True, current_number=True, allow_app_hash=True)))
             except PhoneNumberFloodError as error:
                 print('Error in session_manager.request_code(): ', error)
                 raise error
