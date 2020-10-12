@@ -65,7 +65,7 @@ class SessionManager(Persistence):
                 print('LOADING REDIS SESSION')
                 connector = redis.from_url(os.environ.get('REDIS_URL'))
                 string = connector.get('session:{}'.format(self.user_id))
-                print('SESSION STRING: ', string)
+                print('SESSION STRING OUTPUTTED')
                 if string:
                     # Session is stored in Redis
                     decoded_string = string.decode("utf-8") 
@@ -78,19 +78,19 @@ class SessionManager(Persistence):
                 print('Error in session_manager.create_client(): ', error)
                 raise error
         client = TelegramClient(session, api_id, api_hash, loop=loop)
-        print('TELEGRAM CLIENT WITH SESSION: ', client)
+        print('TELEGRAM CLIENT WITH SESSION CREATED')
         return client
 
     @persistence_decorator
     def request_code(self):
         client = self.create_client(self.user_id)
         client.connect()
-        print('SENT CODE TO ', self.phone)
+        print('SENT CODE TO PHONE')
         if self.phone_code_hash not in (-1, None):
             sent_code = client.sign_in(phone=self.phone, phone_code_hash=self.phone_code_hash)
         else:
             sent_code = client.sign_in(phone=self.phone)
-        print('SENT CODE REQUEST! ', sent_code)
+        print('SENT CODE REQUEST!')
         self.phone_code_hash = sent_code.phone_code_hash
         self.code_tries += 1
         client.disconnect()

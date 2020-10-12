@@ -56,7 +56,7 @@ def input_phone(update, context):
     manager = dict_to_obj(Persistence.deserialize(Persistence.SIGNIN, update), method=Objects.SESSION_MANAGER)
     if not manager:
         # Another user tried to enter the conversation
-        print('FAILED ATTEMPT AT PERSISTENCE ', manager)
+        print('FAILED ATTEMPT AT PERSISTENCE')
         return
     phone = update.message.text
     markup = CreateMarkup({Callbacks.CANCEL: 'Cancel'}).create_markup()
@@ -79,7 +79,7 @@ def input_code(update, context):
     manager: SessionManager = dict_to_obj(Persistence.deserialize(Persistence.SIGNIN, update), method=Objects.SESSION_MANAGER)
     if not manager:
         # Another user tried to enter the conversation
-        print('FAILED ATTEMPT AT PERSISTENCE ', manager)
+        print('FAILED ATTEMPT AT PERSISTENCE')
         return
     code = update.message.text
     markup = CreateMarkup({Callbacks.CANCEL: 'Cancel'}).create_markup()

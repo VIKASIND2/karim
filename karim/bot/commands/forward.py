@@ -97,13 +97,10 @@ def select_group(update, context):
 
     elif data == Callbacks.DONE:
         # TODO DONE
-        print('Done')
         markup = CreateMarkup({Callbacks.CONFIRM: 'Confirm', Callbacks.CANCEL: 'Cancel'}).create_markup()
         text = ''
         groups = forwarder.get_groups_dict()
-        print(groups)
         for group_id in forwarder.get_selection():
-            print('GET ', group_id)
             text += '\n- {}'.format(groups.get(int(group_id)))
         context.bot.delete_message(forwarder.chat_id, forwarder.message_id)
         message = update.effective_chat.send_message(confirm_forwarding.format(text), reply_markup=markup, parse_mode=ParseMode.HTML)
@@ -177,9 +174,10 @@ def confirm(update, context):
         count = 0
         for target in targets:
             try:
-                context.bot.send_queued_message(text=forwarder.text, chat_id=target, parse_mode=ParseMode.MARKDOWN_V2)
-                count += 1
-                update.callback_query.edit_message_text(text=sending_messages_text.format(count))
+                if target not in (context.bot.id,):
+                    context.bot.send_queued_message(text=forwarder.text, chat_id=target, parse_mode=ParseMode.MARKDOWN_V2)
+                    count += 1
+                    update.callback_query.edit_message_text(text=sending_messages_text.format(count))
             except Exception as error:
                 print('Error in forward.confirm(): ', error)
         context.bot.edit_message_text(forward_successful.format(count), chat_id=forwarder.chat_id, message_id=forwarder.message_id, parse_mode=ParseMode.HTML)

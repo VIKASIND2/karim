@@ -15,10 +15,8 @@ def get_var(key="", parent="", default="", value=""):
             variables = json.load(variables_file)
         if value != "":
             if value in variables.values():
-                print("Value {} is in secrets.json".format(value))
                 return True
             else:
-                print("Value {} is NOT in secrets.json".format(value))
                 return False
 
         elif parent == "":
@@ -52,4 +50,3 @@ def set_var(key, value):
 
     with open('karim/secrets/secrets.json', 'w') as output_file:
         json.dump(variables, output_file)
-    print("SETTINGS: Set variable ", key)

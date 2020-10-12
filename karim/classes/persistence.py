@@ -70,7 +70,7 @@ class Persistence(object):
                 connector = redis.from_url(os.environ.get('REDIS_URL'))
                 obj_string = json.dumps(obj_dict)
                 connector.set('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id), obj_string)
-                print('Serializng: ', obj_string)
+                print('Serializing')
                 connector.close()
             except Exception as error:
                 print('Error in persistence.serialize(): ', error)
@@ -92,7 +92,7 @@ class Persistence(object):
                 # Turn into Object
                 # Class is Persistence
                 obj_dict = dict(obj_string)
-                print('Deserialized: ', obj_dict)
+                print('Deserialized object')
                 return obj_string
             except Exception as error:
                 print('Error in persistence.deserialzie(): ', error)
