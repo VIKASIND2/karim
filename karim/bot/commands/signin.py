@@ -82,7 +82,10 @@ def input_code(update, context):
         print('FAILED ATTEMPT AT PERSISTENCE')
         return
     if update.callback_query is not None:
-        return manage_code_request(update, context, request_code_text, manager)
+        if update.callback_query.data == Callbacks.REQUEST_CODE:
+            return manage_code_request(update, context, request_code_text, manager)
+        elif update.callback_query == Callbacks.CANCEL:
+            return cancel_start(update, context)
 
     code = update.message.text
     markup = CreateMarkup({Callbacks.CANCEL: 'Cancel', Callbacks.REQUEST_CODE: 'Resend Code'}).create_markup()

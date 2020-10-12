@@ -14,7 +14,7 @@ def setup(updater):
         states={
             StartStates.INPUT_PHONE: [MessageHandler(Filters.text, input_phone)],
             StartStates.INPUT_PASSWORD: [MessageHandler(Filters.text, input_password)],
-            StartStates.INPUT_CODE: [MessageHandler(Filters.text, input_code)]
+            StartStates.INPUT_CODE: [MessageHandler(Filters.text, input_code), CallbackQueryHandler(input_code, pattern=Callbacks.REQUEST_CODE)]
         },
         fallbacks=[CallbackQueryHandler(cancel_start)]
     )
