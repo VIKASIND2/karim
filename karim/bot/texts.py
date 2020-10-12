@@ -40,6 +40,7 @@ send_message_to_forward = 'Send below the message you would like to forward:'
 select_group_text = 'Select below the groups you wish to forward your message to. The bot will then forward your messages to all the users in such group'
 confirm_forwarding = '<b>Are you sure you want to send the message above to all the chat members of the following groups?</b> {}'
 cancel_forward_text = 'Forwarding Operation Cancelled. Your message has not been sent to any group.'
+sending_messages_text = 'Sending Messages... Sent to {} users so far...'
 
 # ACCOUNT INFO COMMAND
 account_info = '<b>Account Info</b>\nYou are currently signed into the Telegram Client with the account @{} (+{})'

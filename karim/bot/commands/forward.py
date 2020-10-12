@@ -2,6 +2,7 @@
 # TODO: Select Message
 # TODO: Retrieve Group Members
 # TODO: Send Message
+from inspect import Arguments
 from logging import exception
 from threading import main_thread
 from jinja2.runtime import markup_join
@@ -176,8 +177,9 @@ def confirm(update, context):
         count = 0
         for target in targets:
             try:
-                context.bot.send_message(text=forwarder.text, chat_id=target, parse_mode=ParseMode.MARKDOWN_V2)
+                context.bot.send_queued_message(text=forwarder.text, chat_id=target, parse_mode=ParseMode.MARKDOWN_V2)
                 count += 1
+                update.callback_query.edit_message_text(text=sending_messages_text.format(count))
             except Exception as error:
                 print('Error in forward.confirm(): ', error)
         context.bot.edit_message_text(forward_successful.format(count), chat_id=forwarder.chat_id, message_id=forwarder.message_id, parse_mode=ParseMode.HTML)
