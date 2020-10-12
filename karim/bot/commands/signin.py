@@ -69,7 +69,7 @@ def input_phone(update, context):
     manager.set_phone(phone)
 
     # REQUEST CODE & MANAGE ERRORS
-    return manage_code_request(update, context, request_code_text, manager)
+    return manage_code_request(update, context, request_code_text, manager, markup)
     
 
 @run_async
@@ -174,13 +174,16 @@ def cancel_start(update, context, include_message=True):
     return ConversationHandler.END
 
 
-def manage_code_request(update, context, text, manager: SessionManager):
+def manage_code_request(update, context, text, manager: SessionManager, markup=None):
     # SEND AND REQUEST SECURITY CODE
-    markup = CreateMarkup({Callbacks.CANCEL: 'Cancel'}).create_markup()
     try:
         manager.request_code()
         # Request Security Code Input
-        message = update.message.reply_text(text, reply_markup=markup, parse_mode=ParseMode.HTML)
+        if markup is not None:
+            reply_markup = markup
+        else:
+            reply_markup = CreateMarkup({Callbacks.CANCEL: 'Cancel'}).create_markup()
+        message = update.message.reply_text(text, reply_markup=reply_markup, parse_mode=ParseMode.HTML)
         manager.set_message(message.message_id)
         return StartStates.INPUT_CODE
 
