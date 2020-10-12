@@ -57,7 +57,7 @@ class SessionManager(Persistence):
         api_id = secrets.get_var('API_ID')
         api_hash = secrets.get_var('API_HASH')
         # TODO
-        proxy=(socks.SOCKS5, '127.0.0.1', 4444)
+        # proxy=(socks.SOCKS5, '127.0.0.1', 4444)
 
         if LOCALHOST:
             session = 'karim/bot/persistence/{}'.format(user_id)
@@ -80,7 +80,7 @@ class SessionManager(Persistence):
                 print('Error in session_manager.create_client(): ', error)
                 raise error
         try:
-            client = TelegramClient(session, api_id, api_hash, loop=loop, proxy=proxy)
+            client = TelegramClient(session, api_id, api_hash, loop=loop) #proxy = proxy
         except Exception as error:
             print('Error in session_manager.create_client(): ', error)
             raise error
