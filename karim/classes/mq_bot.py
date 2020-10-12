@@ -15,7 +15,7 @@ class MQBot(telegram.bot.Bot):
             pass
 
     @mq.queuedmessage
-    def send__queued_message(self, *args, **kwargs):
+    def send_queued_message(self, *args, **kwargs):
         '''Wrapped method would accept new `queued` and `isgroup`
         OPTIONAL arguments'''
         return super(MQBot, self).send_message(*args, **kwargs)
