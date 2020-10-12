@@ -1,5 +1,6 @@
 # Karim
 This Telegram Bot can connect to the Telegram Client with the user's credentials in order to access the client's functionalities. The bot can forward a select message to all the chat members in a selection of group chats or channels.
+The bot is running on Heroku. 
 
 ## Bot Commands
 Currently, the bot will be able to respond to the following commands:
@@ -10,6 +11,20 @@ Currently, the bot will be able to respond to the following commands:
     * ```password``` -> In case the user has set a 2-steps-verification password, this will be required to sign in correctly.
 - ```/signout``` -> Signs out of the Telegram Client and deletes the session.
 - ```/forward``` -> Allows the user to forward a message to all the chat members present in a selection of group chats, via the user's own account.
+
+## Use the Bot
+- Create a Heroku Account
+- Contact me (@davidwickerhf) and send me your Heroku Email (the email adress you used to create the Heroku account)
+    - I will transfer the bot to your account
+- Upgrade Heroku Plan
+    - The bot is running on a free version of Heroku:
+        - Persistence won't work for longer than 30 minutes
+        - The Bot is designed to not require a paid Heroku Plan
+        - To use the bot, you will need to Sign In (with ```/signin```) every 30 minutes
+    - By upgrading your Heroku Plan, the bot will be able to persist and the Telegram Client Sessions will be saved in a database (so you won't have to sign in multiple times)
+- Start the Bot
+    - Write /start to @KarimLumanBot to start using the bot
+- Read the command reference doc: [Bot Commands]()
 
 ## Running the Bot Locally
 The bot is built on a Flask Python server in order to be compatible for upload to an online server (such as Heroku)
