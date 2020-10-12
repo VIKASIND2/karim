@@ -85,7 +85,7 @@ def input_code(update, context):
         return manage_code_request(update, context, request_code_text, manager)
 
     code = update.message.text
-    markup = CreateMarkup({Callbacks.CANCEL: 'Cancel'}).create_markup()
+    markup = CreateMarkup({Callbacks.CANCEL: 'Cancel', Callbacks.REQUEST_CODE: 'Resend Code'}).create_markup()
     manager.set_code(code)
     # ATTEMPT SIGN IN (No Password)
     try:
@@ -104,7 +104,7 @@ def input_code(update, context):
     except PhoneCodeExpiredError:
         print('Code Expired')
         # CODE EXPIRED; SEND CODE AGAIN
-        return manage_code_request(update, context, code_expired, manager)
+        return manage_code_request(update, context, code_expired, manager, markup)
 
     except SessionPasswordNeededError:
         # REQUEST PASSWORD
