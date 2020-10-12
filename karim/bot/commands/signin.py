@@ -84,8 +84,10 @@ def input_code(update, context):
     markup = CreateMarkup({Callbacks.CANCEL: 'Cancel', Callbacks.REQUEST_CODE: 'Resend Code'}).create_markup()
     if update.callback_query is not None:
         if update.callback_query.data == Callbacks.REQUEST_CODE:
-            return manage_code_request(update, context, request_code_text, manager, markup )
+            update.callback_query.answer()
+            return manage_code_request(update, context, resend_code_text, manager, markup, try_again=True)
         elif update.callback_query == Callbacks.CANCEL:
+            update.callback_query.answer()
             return cancel_start(update, context)
 
     code = update.message.text
@@ -177,10 +179,10 @@ def cancel_start(update, context, include_message=True):
     return ConversationHandler.END
 
 
-def manage_code_request(update, context, text, manager: SessionManager, markup=None):
+def manage_code_request(update, context, text, manager: SessionManager, markup=None, try_again=False):
     # SEND AND REQUEST SECURITY CODE
     try:
-        manager.request_code()
+        manager.request_code(request_again=try_again)
         # Request Security Code Input
         if markup is not None:
             reply_markup = markup

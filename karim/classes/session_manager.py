@@ -82,14 +82,17 @@ class SessionManager(Persistence):
         return client
 
     @persistence_decorator
-    def request_code(self):
+    def request_code(self, request_again=False):
         client = self.create_client(self.user_id)
         client.connect()
         print('SENT CODE TO PHONE')
-        if self.phone_code_hash not in (-1, None):
-            sent_code = client.sign_in(phone=self.phone, phone_code_hash=self.phone_code_hash)
+        if not request_again:
+            if self.phone_code_hash not in (-1, None):
+                sent_code = client.sign_in(phone=self.phone, phone_code_hash=self.phone_code_hash)
+            else:
+                sent_code = client.sign_in(phone=self.phone)
         else:
-            sent_code = client.sign_in(phone=self.phone)
+            sent_code = client.send_code_request(self.phone, force_sms=True)
         print('SENT CODE REQUEST!')
         self.phone_code_hash = sent_code.phone_code_hash
         self.code_tries += 1

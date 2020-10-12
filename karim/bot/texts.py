@@ -15,6 +15,7 @@ request_login_text = 'You will be asked your Telegram credentials, which will be
 request_phone_text = 'Please enter below your Telegram phone number'
 phone_not_valid = 'The phone number you entered is not valid. Make sure to send a valid phone number in the format: \n<code>+49 123 123 1234</code>'
 request_code_text = 'You should now have received a security code from Telegram. Enter it below <i>making sure you insert dots (\'.\') between the digits of the code: <code>1.2.3.4.5</code> - otherwise the code will expire</i>'
+resend_code_text = 'The code has been sent again via SMS to your phone number. Please check your incoming SMSs. You might receive a call from Telegram which will dictate the security code to you. Please input such code below in the following format: <code>1.2.3.4.5</code>'
 client_signing_successful = 'You were able to sign into the Telegram Client successfully! You are now able to use this bot\'s features and commands. Type /help for a list of available commands.'
 # SendCodeRequest Errors
 request_password_text = 'Please enter below your Telegram password'
