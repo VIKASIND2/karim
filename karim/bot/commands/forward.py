@@ -2,6 +2,7 @@ import telethon
 from telethon.errors.rpcbaseerrors import UnauthorizedError
 from telethon.errors.rpcerrorlist import PeerFloodError
 from karim.bot.commands import *
+from karim import queue
 import time
 
 @run_async
@@ -169,69 +170,13 @@ def confirm(update, context):
     else:
         # Send Messages
         context.bot.edit_message_text(sending_messages_text, parse_mode=ParseMode.HTML, chat_id=update.effective_chat.id, message_id=forwarder.message_id)
-        client = forwarder.create_client()
-        client.connect()
-        targets = forwarder.load_targets(client)
-        success = 0
-        count = 0
-        mtargets = []
-        secs = 15
-        for target in targets:
-            """try:
-                if target not in (context.bot.id,):
-                    print('Sending message to ', target) # TODO
-                    count += 1
-                    context.bot.send_queued_message(text=forwarder.text, chat_id=target, parse_mode=ParseMode.MARKDOWN_V2)
-            except Exception as error:
-                print('Sending message as user bot: ', error) """
-            if target not in (context.bot.id,):
-                if count <= 15 and targets.index(target) <= len(targets)-1:
-                    print('Appending {} to mtargets...'.format(target))
-                    mtargets.append(target)
-                else:
-                    result = send_bulk(mtargets, success, count, update, context, forwarder, client, secs)
-                    if not result:
-                        continue
-                    elif result is Exception:
-                        client.disconnect()
-                        forwarder.discard()
-                        return ConversationHandler.END
-                    else:
-                        success = result[0]
-                        count = result[1]
-        result = send_bulk(mtargets, success, count, update, context, forwarder, client, secs)
-        client.disconnect()
+        result = queue.enqueue(forwarder.send_messages_request, update, context)
         if result not in (None, Exception,):
-            context.bot.edit_message_text(forward_successful.format(success), chat_id=forwarder.chat_id, message_id=forwarder.message_id, parse_mode=ParseMode.HTML)
+            context.bot.edit_message_text(forward_successful.format(result), chat_id=forwarder.chat_id, message_id=forwarder.message_id, parse_mode=ParseMode.HTML)
         forwarder.discard()
         return ConversationHandler.END
 
-def send_bulk(mtargets, success, count, update, context, forwarder, client, secs):
-    try:
-        print('Attempting sending messages...')
-        forwarder.send_messages(mtargets, client, context)
-        print('First batch sent!')
-        mtargets = []
-        count = 0
-        success += 16
-        print('Sending message as User')
-        count += 1
-        update.callback_query.edit_message_text(text=sending_messages_text.format(success, secs))
-        time.sleep(secs)
-        return (success, count)
 
-    except PeerFloodError as error:
-        print('Message queue flood reached. Waiting 60 seconds. Error: ', error)
-        context.bot.report_error(error)
-        update.callback_query.edit_message_text(text=flood_limit_reached.format(success))
-        time.sleep(120)
-        return None
-
-    except Exception as error:
-        print('Fatal Error in forward.confirm(): ', error)
-        update.callback_query.edit_message_text(text=error_sending_messages.format(success))
-        context.bot.report_error(error)
-        return error
 
 
 

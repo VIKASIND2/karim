@@ -22,9 +22,9 @@ class MQBot(telegram.bot.Bot):
         return super(MQBot, self).send_message(*args, **kwargs)
 
     def report_error(self, error):
-        string = secrets.get_var('DEVS').replace('[', '')
+        string = str(secrets.get_var('DEVS')).replace('[', '')
         string = string.replace(']', '')
         string = string.replace(' ', '')
-        devs = list(secrets.get_var('DEVS').split(','))
+        devs = list(string.split(','))
         for dev in devs:
-            self.send_message(chat_id=dev, text='There was an error with the Karim Luman bot: {}'.format(error))
+            self.send_message(chat_id=int(dev), text='There was an error with the Karim Luman bot: {}'.format(error))

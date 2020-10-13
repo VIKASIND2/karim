@@ -1,4 +1,7 @@
 import os
+import queue
+from rq import Queue
+from karim.modules.worker import conn
 
 LOCALHOST = True
 if os.environ.get('PORT') in (None, ""):
@@ -8,3 +11,5 @@ if os.environ.get('PORT') in (None, ""):
         os.makedirs('karim/bot/persistence')
 else:
     LOCALHOST = False
+    queue = Queue(connection=conn)
+
