@@ -15,7 +15,7 @@ import math
 
 class Forwarder(SessionManager):
     """Manages requests to the TelegramClient regarding the steps to scrape data from the Telegram API"""
-    def __init__(self, method, chat_id, user_id, message_id, phone=None, password=None, code=None, phone_code_hash=None, code_tries=0, selected_ids=[], group_ids=None, group_titles=None, shown_ids=[], text=None, targets=[], rotate_size=6, first_index=0, last_index=None, page_index=1, pages=None, telethon_text=None):
+    def __init__(self, method, chat_id, user_id, message_id, phone=None, password=None, code=None, phone_code_hash=None, code_tries=0, selected_ids=[], group_ids=None, group_titles=None, shown_ids=[], text=None, targets=[], rotate_size=6, first_index=0, last_index=None, page_index=1, pages=None, telethon_text=None, telethon_mid=None):
         """
         groups: List of Dictionaries {id: title}
         selected_ids: Dictionary(id: title)
@@ -35,6 +35,7 @@ class Forwarder(SessionManager):
         if last_index == None:
             self.last_index = self.first_index + self.rotate_size
         self.telethon_text = telethon_text
+        self.telethon_mid = telethon_mid
 
 
     def get_selection(self):
@@ -126,6 +127,10 @@ class Forwarder(SessionManager):
     def set_text(self, text):
         self.text = text
         return self.text
+
+    def set_telethon_mid(self, message_id):
+        self.telethon_mid = message_id
+        return self.telethon_mid
 
     # MANAGE MARKUP ROTATION AND SELECTIONS
     @persistence_decorator
