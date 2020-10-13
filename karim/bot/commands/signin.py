@@ -9,6 +9,7 @@ import re
 @send_typing_action
 def client_sign_in(update, context):
     """Initializes the bot and sign into the Telegram Client. Walks the user through a wizard, asking to input Telegram phone number, password and security code to sign into the client."""
+    print('ID: ', update.effective_user.id)
     if not check_auth(update, context):
         return ConversationHandler.END
     # Check if user is already signed in

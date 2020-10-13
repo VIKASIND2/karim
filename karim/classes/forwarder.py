@@ -2,11 +2,11 @@ from logging import exception
 import jsonpickle
 from telethon import client
 import telethon
-from telethon.errors.rpcerrorlist import FirstNameInvalidError
+from telethon.errors.rpcerrorlist import FirstNameInvalidError, PeerFloodError
 from telethon import utils
 
 from karim.classes.persistence import persistence_decorator
-from telethon.tl.functions.messages import GetDialogsRequest
+from telethon.tl.functions.messages import *
 from telethon.tl.types import InputPeerEmpty
 from telethon.errors.rpcbaseerrors import UnauthorizedError
 from karim.bot.commands import *
@@ -232,6 +232,21 @@ class Forwarder(SessionManager):
             client.send_message(target, self.telethon_text)
         except Exception as error:
             print('Error in sending message ', error)
+            raise error
+
+    def send_messages(self, targets, client=None, context=None):
+        if not client:
+            client = self.create_client()
+            client.connect()
+        try:
+            request = []
+            for target in targets:
+                request.append(SendMessageRequest(peer=target, message=self.telethon_text))
+            client(request)
+        except PeerFloodError as error:
+            raise error
+        except Exception as error:
+            print('Error in sending bulk messages - forwarder.send_messages(): ', error)
             raise error
 
 

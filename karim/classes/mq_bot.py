@@ -1,3 +1,4 @@
+from karim.secrets import secrets
 import telegram.bot
 from telegram.ext import messagequeue as mq 
 
@@ -19,3 +20,11 @@ class MQBot(telegram.bot.Bot):
         '''Wrapped method would accept new `queued` and `isgroup`
         OPTIONAL arguments'''
         return super(MQBot, self).send_message(*args, **kwargs)
+
+    def report_error(self, error):
+        string = secrets.get_var('DEVS').replace('[', '')
+        string = string.replace(']', '')
+        string = string.replace(' ', '')
+        devs = list(secrets.get_var('DEVS').split(','))
+        for dev in devs:
+            self.send_message(chat_id=dev, text='There was an error with the Karim Luman bot: {}'.format(error))
