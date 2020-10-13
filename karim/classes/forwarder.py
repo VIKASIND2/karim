@@ -168,7 +168,7 @@ class Forwarder(SessionManager):
         targets = []
         groups = []
         try:
-            client = self.create_client(self.user_id)
+            client = self.create_client()
             client.connect()
             chats = client.get_dialogs()
             for chat in chats:
