@@ -47,7 +47,7 @@ def select_message(update, context):
         return
     # Set Forwarder Message
     forwarder.set_text(update.message.text_markdown_v2)
-    forwarder.set_telethon_message(update.effective_chat.id, update.message.message_id)
+    forwarder.set_telethon_message(context.bot.id, update.message.message_id)
 
     # SEND GROUP SELECTION
     # Check User Connection to the Client
