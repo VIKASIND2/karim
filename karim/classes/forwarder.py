@@ -68,10 +68,10 @@ class Forwarder(SessionManager):
             client = self.create_client()
             client.connect()
         messages = client.get_messages(bot, limit=4, from_user=self.user_id)
-        print('Messages size: ', len(messages))
+        print('Messages size: ', len(messages), ' ', message_id)
         message = None
         for message in messages:
-            print('Message: ', message.text)
+            print('Message: ', message.text, ' ', message.id)
             if message.id == message_id:
                 message = message
                 break
