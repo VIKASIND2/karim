@@ -176,6 +176,7 @@ class Forwarder(SessionManager):
                     groups.append(chat)
             for group in groups:
                 members = self.__scrape_participants(group, client)
+                print('Members: ', members)
                 for member in members:
                     if member.id not in targets:
                         targets.append(member.id)
