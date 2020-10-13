@@ -62,10 +62,12 @@ class Forwarder(SessionManager):
         return self.targets.copy()
 
     def set_telethon_message(self, chat_id, message_id, client=None):
+        print('forwarder.set_telethon_message()')
         if not client:
             client = self.create_client()
             client.connect()
         messages = client.iter_messages(chat_id, 4, from_user=self.user_id)
+        print('Messages size: ', len(messages))
         message = None
         for message in messages:
             print('Message: ', message.text)
