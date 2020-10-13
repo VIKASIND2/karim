@@ -180,6 +180,7 @@ class Forwarder(SessionManager):
                     if member.id not in targets:
                         targets.append(member.id)
             client.disconnect()
+            print('Targets: ', targets)
             return  targets
         except UnauthorizedError as unauth:
             raise unauth
