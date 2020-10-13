@@ -1,4 +1,4 @@
-from telethon.tl.functions.auth import CancelCodeRequest, ResendCodeRequest
+from telethon.tl.functions.auth import CancelCodeRequest
 from karim.classes.persistence import persistence_decorator
 from karim.bot.commands import *
 from karim.secrets import secrets
