@@ -2,6 +2,8 @@ from logging import exception
 import jsonpickle
 from telethon import client
 from telethon.errors.rpcerrorlist import FirstNameInvalidError
+from telethon import utils
+
 from karim.classes.persistence import persistence_decorator
 from telethon.tl.functions.messages import GetDialogsRequest
 from telethon.tl.types import InputPeerEmpty
@@ -33,7 +35,6 @@ class Forwarder(SessionManager):
             self.last_index = self.first_index + self.rotate_size
 
 
-
     def get_selection(self):
         """Return list()"""
         return self.selected_ids.copy()
@@ -57,6 +58,15 @@ class Forwarder(SessionManager):
     def get_targets(self):
         """Return list()"""
         return self.targets.copy()
+
+    def set_telethon_message(self, client, id):
+        if not client:
+            client = self.create_client()
+            client.connect()
+        
+        message = utils.get_message_id(id)
+        self.telethon_text = message.text
+        return message  
 
     # Connects to Telegram API
     def scrape_dialogues(self, last_date=None, chunk_size=200):
@@ -160,7 +170,7 @@ class Forwarder(SessionManager):
         return self.get_shown()
 
     # GET PARTICIPANTS AND SEND MESSAG
-    def load_targets(self):
+    def load_targets(self, client=None):
         """Return a list of all members in a selection of chats
         :return: return list of chat ids
         :rtype: list<int>
@@ -168,8 +178,9 @@ class Forwarder(SessionManager):
         targets = []
         groups = []
         try:
-            client = self.create_client()
-            client.connect()
+            if not client:
+                client = self.create_client()
+                client.connect()
             chats = client.get_dialogs()
             for chat in chats:
                 if str(chat.id) in self.get_selection():
@@ -188,7 +199,6 @@ class Forwarder(SessionManager):
         except Exception as exception:
             print('Exception in Forwarder.load_targets(): ', exception.args)
 
-
     # Connects to Telegram API
     def __scrape_participants(self, target_group, client):
         """
@@ -200,7 +210,16 @@ class Forwarder(SessionManager):
         except UnauthorizedError as error:
             print('Error in retrievig participants: ', error)
             raise UnauthorizedError
-            
+
+    def send_message(self, target, client: TelegramClient=None):
+        if not client:
+            client = self.create_client()
+            client.connect()
+        try:
+            client.send_message(target, self.telethon_text)
+        except Exception as error:
+            print('Error in sending message ', error)
+            raise error
 
 
             

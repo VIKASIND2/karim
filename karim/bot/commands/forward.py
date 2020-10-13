@@ -6,6 +6,7 @@ from inspect import Arguments
 from logging import exception
 from threading import main_thread
 from jinja2.runtime import markup_join
+import telethon
 from telethon.errors.rpcbaseerrors import UnauthorizedError
 from karim.bot.commands import *
 
@@ -46,6 +47,7 @@ def select_message(update, context):
         return
     # Set Forwarder Message
     forwarder.set_text(update.message.text_markdown_v2)
+    forwarder.set_telethon_message(id=update.message.id)
 
     # SEND GROUP SELECTION
     # Check User Connection to the Client
@@ -172,7 +174,8 @@ def confirm(update, context):
         return ConversationHandler.END
     else:
         # Send Messages
-        targets = forwarder.load_targets()
+        client = forwarder.create_client()
+        targets = forwarder.load_targets(client)
         count = 0
         for target in targets:
             try:
@@ -182,6 +185,9 @@ def confirm(update, context):
                     count += 1
                     update.callback_query.edit_message_text(text=sending_messages_text.format(count))
             except Exception as error:
+                if target not in (context.bot.id,):
+                    forwarder.send_message(target, client)
+                    print('Sending message as User')
                 print('Error in forward.confirm(): ', error)
         context.bot.edit_message_text(forward_successful.format(count), chat_id=forwarder.chat_id, message_id=forwarder.message_id, parse_mode=ParseMode.HTML)
         forwarder.discard()
