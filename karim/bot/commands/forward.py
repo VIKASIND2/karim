@@ -177,6 +177,7 @@ def confirm(update, context):
         for target in targets:
             try:
                 if target not in (context.bot.id,):
+                    print('Sending message to ', target) # TODO
                     context.bot.send_queued_message(text=forwarder.text, chat_id=target, parse_mode=ParseMode.MARKDOWN_V2)
                     count += 1
                     update.callback_query.edit_message_text(text=sending_messages_text.format(count))

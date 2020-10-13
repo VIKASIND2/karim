@@ -197,7 +197,8 @@ class Forwarder(SessionManager):
         try:
             all_participants = client.get_participants(target_group, aggressive=True)
             return all_participants
-        except UnauthorizedError:
+        except UnauthorizedError as error:
+            print('Error in retrievig participants: ', error)
             raise UnauthorizedError
             
 
