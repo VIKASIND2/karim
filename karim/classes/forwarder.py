@@ -59,13 +59,20 @@ class Forwarder(SessionManager):
         """Return list()"""
         return self.targets.copy()
 
-    def set_telethon_message(self, id, client=None):
+    def set_telethon_message(self, chat_id, message_id, client=None):
         if not client:
             client = self.create_client()
             client.connect()
-        
-        message = utils.get_message_id(id)
-        self.telethon_text = message.text
+        messages = client.iter_messages(chat_id, 4, from_user=self.user_id)
+        message = None
+        for message in messages:
+            if message.id == message_id:
+                message = message
+                break
+        try:
+            self.telethon_text = message.text
+        except:
+            print('Message is None')
         return message  
 
     # Connects to Telegram API
