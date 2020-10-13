@@ -189,16 +189,20 @@ def confirm(update, context):
                     print('Appending {} to mtargets...'.format(target))
                     mtargets.append(target)
                 else:
-                    result = send_bulk(mtargets, success, count, update, context)
+                    result = send_bulk(mtargets, success, count, update, context, forwarder, client, secs)
                     if not result:
                         continue
+                    elif result is Exception:
+                        client.disconnect()
+                        forwarder.discard()
+                        return ConversationHandler.END
                     else:
                         success = result[0]
                         count = result[1]
-
-
+        result = send_bulk(mtargets, success, count, update, context, forwarder, client, secs)
         client.disconnect()
-        context.bot.edit_message_text(forward_successful.format(success), chat_id=forwarder.chat_id, message_id=forwarder.message_id, parse_mode=ParseMode.HTML)
+        if result not in (None, Exception,):
+            context.bot.edit_message_text(forward_successful.format(success), chat_id=forwarder.chat_id, message_id=forwarder.message_id, parse_mode=ParseMode.HTML)
         forwarder.discard()
         return ConversationHandler.END
 
@@ -227,7 +231,7 @@ def send_bulk(mtargets, success, count, update, context, forwarder, client, secs
         print('Fatal Error in forward.confirm(): ', error)
         update.callback_query.edit_message_text(text=error_sending_messages.format(success))
         context.bot.report_error(error)
-        return None
+        return error
 
 
 
