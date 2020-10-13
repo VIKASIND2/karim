@@ -1,8 +1,4 @@
 import json
-from logging import exception
-
-from teleredis.teleredis import RedisSession
-
 from karim import LOCALHOST
 from telegram import update
 import os, jsonpickle, redis
