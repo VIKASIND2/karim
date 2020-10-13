@@ -198,7 +198,8 @@ class Forwarder(SessionManager):
                 for member in members:
                     if member.id not in targets:
                         targets.append(member.id)
-            client.disconnect()
+            if not client:
+                client.disconnect()
             print('Targets: ', targets)
             return  targets
         except UnauthorizedError as unauth:

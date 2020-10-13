@@ -190,6 +190,7 @@ def confirm(update, context):
                     forwarder.send_message(target, client)
                     print('Sending message as User')
                 print('Error in forward.confirm(): ', error)
+        client.disconnect()
         context.bot.edit_message_text(forward_successful.format(count), chat_id=forwarder.chat_id, message_id=forwarder.message_id, parse_mode=ParseMode.HTML)
         forwarder.discard()
         return ConversationHandler.END
