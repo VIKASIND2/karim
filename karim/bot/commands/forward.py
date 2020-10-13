@@ -175,6 +175,7 @@ def confirm(update, context):
     else:
         # Send Messages
         client = forwarder.create_client()
+        client.connect()
         targets = forwarder.load_targets(client)
         count = 0
         for target in targets:
