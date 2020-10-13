@@ -184,12 +184,14 @@ def confirm(update, context):
                     context.bot.send_queued_message(text=forwarder.text, chat_id=target, parse_mode=ParseMode.MARKDOWN_V2)
             except Exception as error:
                 print('Sending message as user bot: ', error) """
-            try:
-                if target not in (context.bot.id,):
-                    if count <= 15:
-                        mtargets.append(target)
-                    else:
+            if target not in (context.bot.id,):
+                if count <= 15 and targets.index(target) <= len(targets)-1:
+                    mtargets.append(target)
+                else:
+                    try:
+                        print('Attempting sending messages...')
                         forwarder.send_messages(mtargets, client, context)
+                        print('First batch sent!')
                         mtargets = []
                         count = 0
                         success += 16
@@ -197,16 +199,15 @@ def confirm(update, context):
                         count += 1
                         update.callback_query.edit_message_text(text=sending_messages_text.format(success, secs))
                         time.sleep(secs)
-
-            except PeerFloodError as error:
-                print('Message queue flood reached. Waiting 60 seconds. Error: ', error)
-                context.bot.report_error(error)
-                update.callback_query.edit_message_text(text=flood_limit_reached.format(success))
-                time.sleep(120)
-            except Exception as error:
-                print('Fatal Error in forward.confirm(): ', error)
-                update.callback_query.edit_message_text(text=error_sending_messages.format(success))
-                context.bot.report_error(error)
+                    except PeerFloodError as error:
+                        print('Message queue flood reached. Waiting 60 seconds. Error: ', error)
+                        context.bot.report_error(error)
+                        update.callback_query.edit_message_text(text=flood_limit_reached.format(success))
+                        time.sleep(120)
+                    except Exception as error:
+                        print('Fatal Error in forward.confirm(): ', error)
+                        update.callback_query.edit_message_text(text=error_sending_messages.format(success))
+                        context.bot.report_error(error)
 
         client.disconnect()
         context.bot.edit_message_text(forward_successful.format(success), chat_id=forwarder.chat_id, message_id=forwarder.message_id, parse_mode=ParseMode.HTML)
