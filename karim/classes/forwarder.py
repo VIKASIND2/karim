@@ -66,7 +66,7 @@ class Forwarder(SessionManager):
         if not client:
             client = self.create_client()
             client.connect()
-        messages = client.iter_messages(chat_id, 4, from_user=self.user_id)
+        messages = client.get_messages(chat_id, limit=4, from_user=self.user_id)
         print('Messages size: ', len(messages))
         message = None
         for message in messages:
