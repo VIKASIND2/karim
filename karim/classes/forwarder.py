@@ -211,7 +211,7 @@ class Forwarder(SessionManager):
             print('Error in retrievig participants: ', error)
             raise UnauthorizedError
 
-    def send_message(self, target, client: TelegramClient=None):
+    def send_message(self, target, client=None):
         if not client:
             client = self.create_client()
             client.connect()
