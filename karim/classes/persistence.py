@@ -1,6 +1,5 @@
 import json
 from karim import LOCALHOST
-from telegram import update
 import os, redis
 
 def persistence_decorator(func):
