@@ -1,7 +1,7 @@
 import json
 from karim import LOCALHOST
 from telegram import update
-import os, jsonpickle
+import os, jsonpickle, redis
 
 def persistence_decorator(func):
     def wrapper(self, *args, **kw):
