@@ -1,7 +1,7 @@
 import os
 import queue
 from rq import Queue
-from karim.modules.worker import conn
+from worker import conn
 
 LOCALHOST = True
 if os.environ.get('PORT') in (None, ""):
