@@ -22,7 +22,7 @@ def send_typing_action(func):
     return command_func
 
 def check_auth(update, context):
-    if update.effective_user.id in secrets.get_var('USERS'):
+    if str(update.effective_user.id) in secrets.get_var('USERS'):
         print('User is authorized to use the bot')
         return True
     else:
