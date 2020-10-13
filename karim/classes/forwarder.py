@@ -68,6 +68,7 @@ class Forwarder(SessionManager):
         messages = client.iter_messages(chat_id, 4, from_user=self.user_id)
         message = None
         for message in messages:
+            print('Message: ', message.text)
             if message.id == message_id:
                 message = message
                 break
