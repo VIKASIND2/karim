@@ -1,11 +1,3 @@
-# TODO: Select Groups
-# TODO: Select Message
-# TODO: Retrieve Group Members
-# TODO: Send Message
-from inspect import Arguments
-from logging import exception
-from threading import main_thread
-from jinja2.runtime import markup_join
 import telethon
 from telethon.errors.rpcbaseerrors import UnauthorizedError
 from karim.bot.commands import *
@@ -47,7 +39,7 @@ def select_message(update, context):
         return
     # Set Forwarder Message
     forwarder.set_text(update.message.text_markdown_v2)
-    forwarder.set_telethon_message(context.bot.id, update.message.message_id)
+    forwarder.set_telethon_message(context.bot, update.message.message_id)
 
     # SEND GROUP SELECTION
     # Check User Connection to the Client

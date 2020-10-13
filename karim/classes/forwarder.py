@@ -61,12 +61,12 @@ class Forwarder(SessionManager):
         """Return list()"""
         return self.targets.copy()
 
-    def set_telethon_message(self, chat_id, message_id, client=None):
+    def set_telethon_message(self, bot, message_id, client=None):
         print('forwarder.set_telethon_message()')
         if not client:
             client = self.create_client()
             client.connect()
-        messages = client.get_messages(chat_id, limit=4, from_user=self.user_id)
+        messages = client.get_messages(bot, limit=4, from_user=self.user_id)
         print('Messages size: ', len(messages))
         message = None
         for message in messages:
