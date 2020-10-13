@@ -59,7 +59,7 @@ class Forwarder(SessionManager):
         """Return list()"""
         return self.targets.copy()
 
-    def set_telethon_message(self, client, id):
+    def set_telethon_message(self, id, client=None):
         if not client:
             client = self.create_client()
             client.connect()
