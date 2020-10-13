@@ -25,7 +25,8 @@ def dict_to_obj(obj_dict, method):
                     first_index=obj_dict.get('first_index'),
                     last_index=obj_dict.get('last_index'),
                     page_index=obj_dict.get('page_index'),
-                    pages=None if obj_dict.get('pages') == -1 else obj_dict.get('pages')
+                    pages=None if obj_dict.get('pages') == -1 else obj_dict.get('pages'),
+                    telethon_text=None if obj_dict.get('pages') == -1 else obj_dict.get('telethon_text')
                 )
     elif method == Objects.SESSION_MANAGER:
         # Class == Session Manager
