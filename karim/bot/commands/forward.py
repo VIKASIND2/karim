@@ -189,31 +189,46 @@ def confirm(update, context):
                     print('Appending {} to mtargets...'.format(target))
                     mtargets.append(target)
                 else:
-                    try:
-                        print('Attempting sending messages...')
-                        forwarder.send_messages(mtargets, client, context)
-                        print('First batch sent!')
-                        mtargets = []
-                        count = 0
-                        success += 16
-                        print('Sending message as User')
-                        count += 1
-                        update.callback_query.edit_message_text(text=sending_messages_text.format(success, secs))
-                        time.sleep(secs)
-                    except PeerFloodError as error:
-                        print('Message queue flood reached. Waiting 60 seconds. Error: ', error)
-                        context.bot.report_error(error)
-                        update.callback_query.edit_message_text(text=flood_limit_reached.format(success))
-                        time.sleep(120)
-                    except Exception as error:
-                        print('Fatal Error in forward.confirm(): ', error)
-                        update.callback_query.edit_message_text(text=error_sending_messages.format(success))
-                        context.bot.report_error(error)
+                    result = send_bulk(mtargets, success, count, update, context)
+                    if not result:
+                        continue
+                    else:
+                        success = result[0]
+                        count = result[1]
+
 
         client.disconnect()
         context.bot.edit_message_text(forward_successful.format(success), chat_id=forwarder.chat_id, message_id=forwarder.message_id, parse_mode=ParseMode.HTML)
         forwarder.discard()
         return ConversationHandler.END
+
+def send_bulk(mtargets, success, count, update, context, forwarder, client, secs):
+    try:
+        print('Attempting sending messages...')
+        forwarder.send_messages(mtargets, client, context)
+        print('First batch sent!')
+        mtargets = []
+        count = 0
+        success += 16
+        print('Sending message as User')
+        count += 1
+        update.callback_query.edit_message_text(text=sending_messages_text.format(success, secs))
+        time.sleep(secs)
+        return (success, count)
+
+    except PeerFloodError as error:
+        print('Message queue flood reached. Waiting 60 seconds. Error: ', error)
+        context.bot.report_error(error)
+        update.callback_query.edit_message_text(text=flood_limit_reached.format(success))
+        time.sleep(120)
+        return None
+
+    except Exception as error:
+        print('Fatal Error in forward.confirm(): ', error)
+        update.callback_query.edit_message_text(text=error_sending_messages.format(success))
+        context.bot.report_error(error)
+        return None
+
 
 
 @run_async

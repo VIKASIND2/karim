@@ -243,6 +243,7 @@ class Forwarder(SessionManager):
                 request.append(SendMessageRequest(peer=target, message=self.telethon_text))
             client(request)
         except PeerFloodError as error:
+            print('Peer Flood Limit reached when sending bulk messages - forwarder.send_messages(): ', error)
             raise error
         except Exception as error:
             print('Error in sending bulk messages - forwarder.send_messages(): ', error)
