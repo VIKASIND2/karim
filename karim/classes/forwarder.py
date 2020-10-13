@@ -62,17 +62,17 @@ class Forwarder(SessionManager):
         """Return list()"""
         return self.targets.copy()
 
-    def set_telethon_message(self, bot, message_id, client=None):
+    def set_telethon_message(self, bot, message_date, client=None):
         print('forwarder.set_telethon_message()')
         if not client:
             client = self.create_client()
             client.connect()
         messages = client.get_messages(bot, limit=4, from_user=self.user_id)
-        print('Messages size: ', len(messages), ' ', message_id)
+        print('Messages size: ', len(messages), ' ', message_date)
         message = None
         for message in messages:
-            print('Message: ', message.text, ' ', message.id)
-            if message.id == message_id:
+            print('Message: ', message.text, ' ', message.date)
+            if message.date == message_date:
                 message = message
                 break
         try:
