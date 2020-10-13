@@ -66,23 +66,31 @@ class SessionManager(Persistence):
         if LOCALHOST:
             session = 'karim/bot/persistence/{}'.format(self.user_id)
         else:
-            try:
-                # Falling Back to RedisSession
-                print('LOADING REDIS SESSION')
-                connector = redis.from_url(os.environ.get('REDIS_URL'))
-                string = connector.get('session:{}'.format(self.user_id))
-                print('SESSION STRING OUTPUTTED')
-                if string:
-                    # Session is stored in Redis
-                    decoded_string = string.decode("utf-8") 
-                    session = StringSession(decoded_string)
-                else:
-                    session = StringSession()
-                connector.close()
-            except Exception as error:
-                # No Session Error
-                print('Error in session_manager.create_client(): ', error)
-                raise error
+            session_string = os.environ.get('session:{}'.format(self.user_id))
+            if not session_string:
+                try:
+                    # Falling Back to RedisSession
+                    print('LOADING REDIS SESSION')
+                    connector = redis.from_url(os.environ.get('REDIS_URL'))
+                    string = connector.get('session:{}'.format(self.user_id))
+                    print('SESSION STRING OUTPUTTED')
+                    if string:
+                        # Session is stored in Redis
+                        decoded_string = string.decode("utf-8") 
+                        session = StringSession(decoded_string)
+                    else:
+                        session = StringSession()
+                    connector.close()
+                except Exception as error:
+                    # No Session Error
+                    print('Error in session_manager.create_client(): ', error)
+                    raise error
+            else:
+                try:
+                    session = StringSession(session_string)
+                except Exception as error:
+                    print('Error in session_manager.create_client(): ', error)
+                    raise error
         try:
             client = TelegramClient(session, api_id, api_hash, loop=loop) #proxy = proxy
         except Exception as error:
@@ -161,6 +169,7 @@ class SessionManager(Persistence):
                 connector = redis.from_url(os.environ.get('REDIS_URL'))
                 session_string = client.session.save()
                 connector.set('session:{}'.format(self.user_id), session_string)
+                os.environ.set('session:{}'.format(self.user_id), session_string)
                 connector.close()
                 print('SIGNED IN WITH STRING: ', client.session)
             client.disconnect()
@@ -229,10 +238,18 @@ class SessionManager(Persistence):
             except: pass 
         else: 
             print('Should delete Redis Session...')
-            try: 
-                connector = redis.from_url(os.environ.get('REDIS_URL'))
-                connector.delete('session:{}'.format(self.user_id))
-                connector.close()
-            except Exception as error:
-                print('Error in session_manager.sign_out(): ', error)
+            session_string = os.environ.get('session:{}'.format(self.user_id))
+            if not session_string:
+                try: 
+                    connector = redis.from_url(os.environ.get('REDIS_URL'))
+                    connector.delete('session:{}'.format(self.user_id))
+                    connector.close()
+                except Exception as error:
+                    print('Error in session_manager.sign_out(): ', error)
+            else:
+                try:
+                    del os.environ['session:{}'.format(self.user_id)]
+                except Exception as error:
+                    print('Error in deleting env var: ', error)
+                    pass
         return result 

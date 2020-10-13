@@ -3,6 +3,8 @@ from karim.bot.commands import *
 @run_async
 @send_typing_action
 def sign_out(update, context):
+    if not check_auth(update, context):
+        return ConversationHandler.END
     try:
         manager = SessionManager(Persistence.SIGNOUT, chat_id=update.effective_chat.id, user_id=update.effective_chat.id, message_id=update.message.message_id)
     except AttributeError as error:

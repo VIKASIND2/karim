@@ -13,6 +13,8 @@ from karim.bot.commands import *
 @send_typing_action
 def forward_message(update, context):
     """Initialize Forwarder Conversation. Ask for message input"""
+    if not check_auth(update, context):
+        return ConversationHandler.END
     forwarder = Forwarder(Persistence.FORWARDER, chat_id=update.effective_chat.id, user_id=update.effective_chat.id, message_id=update.message.message_id)
     result = forwarder.check_connection()
     if result:
