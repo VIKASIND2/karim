@@ -186,6 +186,7 @@ def confirm(update, context):
                 print('Sending message as user bot: ', error) """
             if target not in (context.bot.id,):
                 if count <= 15 and targets.index(target) <= len(targets)-1:
+                    print('Appending {} to mtargets...'.format(target))
                     mtargets.append(target)
                 else:
                     try:
