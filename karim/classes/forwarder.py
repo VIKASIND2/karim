@@ -218,7 +218,7 @@ class Forwarder(SessionManager):
             print('Error in retrievig participants: ', error)
             raise UnauthorizedError
 
-    def send_message(self, target):
+    def __call__(self, target):
         client = self.create_client()
         client.connect()
         try:
@@ -240,7 +240,7 @@ class Forwarder(SessionManager):
         success = 0
         client.disconnect()
         for target in targets:
-            result = queue.enqueue(self.send_message, target, client)
+            result = queue.enqueue(self, target, client)
             if result:
                 # Message Sent successfully
                 context.bot.send_message(self.user_id, sending_messages_text.format(success))
