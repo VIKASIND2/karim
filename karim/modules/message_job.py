@@ -1,3 +1,4 @@
+from rq.job import Retry
 from telethon.errors.rpcerrorlist import PeerFloodError
 from karim import queue, LOCALHOST
 from karim.bot.texts import *
@@ -75,8 +76,9 @@ def queue_messages(targets, context, forwarder, client=None):
     success = 0
     client.disconnect()
     for target in targets:
+        print('TARGET: ', target)
         if target not in (forwarder.user_id, context.bot.id,):
-            result = queue.enqueue(send_message, forwarder.user_id, target, forwarder.telethon_text)
+            result = queue.enqueue(send_message, forwarder.user_id, target, forwarder.telethon_text), retry=Retry(max=2, interval=[20, 30])
             if result:
                 # Message Sent successfully
                 success += 1
