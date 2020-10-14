@@ -3,12 +3,13 @@ from telethon.errors.rpcerrorlist import PeerFloodError
 from karim import queue, LOCALHOST
 from karim.bot.texts import *
 from karim.secrets import secrets
+from karim.classes.mq_bot import MQBot
 from telethon.sync import TelegramClient
 from telethon.sessions import StringSession
 import asyncio, time, redis, os
 
 
-def create_client(user_id):
+def create_client(user_id, bot=False):
     """Creates and returns a TelegramClient"""
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
@@ -16,7 +17,6 @@ def create_client(user_id):
     api_hash = secrets.get_var('API_HASH')
     # TODO
     # proxy=(socks.SOCKS5, '127.0.0.1', 4444)
-
     if LOCALHOST:
         session = 'karim/bot/persistence/{}'.format(user_id)
     else:
@@ -46,27 +46,33 @@ def create_client(user_id):
                 print('Error in session_manager.create_client(): ', error)
                 raise error
     try:
-        client = TelegramClient(session, api_id, api_hash, loop=loop) #proxy = proxy
+        client = TelegramClient(session, api_id, api_hash, loop=loop).start(bot_token=os.environ.get('BOT_TOKEN')) #proxy = proxy
     except Exception as error:
         print('Error in session_manager.create_client(): ', error)
         raise error
     print('TELEGRAM CLIENT WITH SESSION CREATED')
     return client
 
-def send_message(user_id, message_id, target, index, targets_len, telethon_text, context):
+
+def send_message(user_id, target, index, targets_len, telethon_text, context):
     client = create_client(user_id)
+    bot_client = create_client('bot', bot=True)
     client.connect()
+    bot_client.connect()
+    messages = client.get_messages(bot_client.get_me().username, limit=1, from_user=bot_client.get_me())
+    message = messages[0]
+    # Get Message:
     try:
         client.send_message(target, telethon_text)
+        bot_client.edit_message(user_id, message=message, text=sending_messages_text.format(len(targets_len), index))
         time.sleep(35)
-        context.bot.edit_message_text(sending_messages_text.format(len(targets_len), index), chat_id=user_id, message_id=message_id )
     except PeerFloodError as error:
         print('PeerFloodLimit reached. Account may be restricted or blocked: ', error)
-        context.bot.report_error(error)
     except Exception as error:
         print('Error in sending message ', error)
-        context.bot.report_error(error)
     client.disconnect()
+    bot_client.disconnect()
+
 
 def queue_messages(targets, context, forwarder, client=None):
     failed = []
@@ -74,7 +80,7 @@ def queue_messages(targets, context, forwarder, client=None):
     for index, target in enumerate(targets):
         print('TARGET: ', target)
         if target not in (forwarder.user_id, context.bot.id,):
-            queue.enqueue(send_message, user_id=forwarder.user_id, message_id=forwarder.message_id, target=target, index=index, targets_len=len(targets), telethon_text=forwarder.telethon_text, context=context, retry=Retry(max=2, interval=[20, 30]))
+            queue.enqueue(send_message, user_id=forwarder.user_id, target=target, index=index, targets_len=len(targets), telethon_text=forwarder.telethon_text, context=context, retry=Retry(max=2, interval=[20, 30]))
         
     client.disconnect()
     return success
