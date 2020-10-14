@@ -46,7 +46,7 @@ def create_client(user_id, bot=False):
                 print('Error in session_manager.create_client(): ', error)
                 raise error
     try:
-        client = TelegramClient(session, api_id, api_hash, loop=loop).start(bot_token=os.environ.get('BOT_TOKEN')) #proxy = proxy
+        client = TelegramClient(session, api_id, api_hash, loop=loop) #proxy = proxy
     except Exception as error:
         print('Error in session_manager.create_client(): ', error)
         raise error
@@ -55,32 +55,32 @@ def create_client(user_id, bot=False):
 
 
 def send_message(user_id, target, index, targets_len, telethon_text):
-    client = create_client(user_id)
-    bot_client = create_client('bot', bot=True)
-    client.connect()
-    bot_client.connect()
-    messages = client.get_messages(bot_client.get_me().username, limit=1, from_user=bot_client.get_me())
-    message = messages[0]
-    # Get Message:
+    # Send Message:
     try:
+        client = create_client(user_id)
+        client.connect()
         client.send_message(target, telethon_text)
-        bot_client.edit_message(user_id, message=message, text=sending_messages_text.format(len(targets_len), index))
-        time.sleep(35)
+        client.disconnect()
+        print('Message {} sent successfully'.format(index+1))
     except PeerFloodError as error:
         print('PeerFloodLimit reached. Account may be restricted or blocked: ', error)
     except Exception as error:
-        print('Error in sending message ', error)
-    client.disconnect()
-    bot_client.disconnect()
+        print('Error in sending message to user: ', error)
+
+    # Edit Bot Message
+    try:
+        bot_client = create_client('bot', bot=True).start(bot_token=os.environ.get('BOT_TOKEN'))
+        messages = bot_client.get_messages(user_id, limit=1, from_user=bot_client.get_me())
+        message = messages[0]
+        bot_client.edit_message(user_id, message=message, text=sending_messages_text.format(len(targets_len), index+1))
+        bot_client.disco()
+    except Exception as error:
+        print('Error in editing update message: ', error)
+    time.sleep(35)
 
 
 def queue_messages(targets, context, forwarder, client=None):
-    failed = []
-    success = 0
     for index, target in enumerate(targets):
         print('TARGET: ', target)
         if target not in (forwarder.user_id, context.bot.id,):
-            queue.enqueue(send_message, user_id=forwarder.user_id, target=target, index=index, targets_len=len(targets), telethon_text=forwarder.telethon_text, retry=Retry(max=2, interval=[35, 45]))
-        
-    client.disconnect()
-    return success
+            queue.enqueue(send_message, user_id=forwarder.user_id, target=target, index=index, targets_len=len(targets), telethon_text=forwarder.telethon_text, retry=Retry(max=2, interval=[35, 45]))       
