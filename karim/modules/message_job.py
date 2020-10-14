@@ -56,22 +56,27 @@ def create_client(user_id, bot=False):
 
 def send_message(user_id, target, index, targets_len, telethon_text):
     # Send Message:
+    client = create_client(user_id)
+    client.connect()
     try:
-        client = create_client(user_id)
-        client.connect()
         client.send_message(target, telethon_text)
-        client.disconnect()
         print('Message {} sent successfully'.format(index+1))
     except PeerFloodError as error:
         print('PeerFloodLimit reached. Account may be restricted or blocked: ', error)
     except Exception as error:
         print('Error in sending message to user: ', error)
 
+    try:
+        messages = client.get_messages(user_id, limit=1, from_user=os.environ.get('BOT_USERNAME'))
+        message = messages[0]
+    except Exception as error:
+        print('Error in retrieving the messages: ', error)
+        raise error
+    client.disconnect()
+
     # Edit Bot Message
     try:
         bot_client = create_client('bot', bot=True).start(bot_token=os.environ.get('BOT_TOKEN'))
-        messages = bot_client.get_messages(user_id, limit=1, from_user=bot_client.get_me())
-        message = messages[0]
         bot_client.edit_message(user_id, message=message, text=sending_messages_text.format(len(targets_len), index+1))
         bot_client.disco()
     except Exception as error:
