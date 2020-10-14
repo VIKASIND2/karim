@@ -1,18 +1,12 @@
-from logging import exception
-import time
-import jsonpickle
-from telethon import client
-import telethon
 from telethon.errors.rpcerrorlist import FirstNameInvalidError, PeerFloodError
 from telethon import utils
-
-from karim.classes.persistence import persistence_decorator
 from telethon.tl.functions.messages import *
-from telethon.tl.types import InputPeerEmpty
 from telethon.errors.rpcbaseerrors import UnauthorizedError
 from karim.bot.commands import *
 from karim.classes.callbacks import Callbacks
-import math
+from karim import queue
+from karim.classes.persistence import persistence_decorator
+import math, time
 
 class Forwarder(SessionManager):
     """Manages requests to the TelegramClient regarding the steps to scrape data from the Telegram API"""
@@ -230,84 +224,34 @@ class Forwarder(SessionManager):
             client.connect()
         try:
             client.send_message(target, self.telethon_text)
-        except Exception as error:
-            print('Error in sending message ', error)
-            raise error
-
-    def send_messages_request(self, update, context):
-        client = self.create_client()
-        client.connect()
-        targets = self.load_targets(client)
-        success = 0
-        count = 0
-        mtargets = []
-        secs = 90
-        for target in targets:
-            if target not in (context.bot.id,):
-                if count <= 4 and targets.index(target) <= len(targets)-1:
-                    print('Appending {} to mtargets...'.format(target))
-                    mtargets.append(target)
-                else:
-                    result = self.send_bulk(mtargets, success, count, update, context, client, secs)
-                    if not result:
-                        continue
-                    elif result is Exception:
-                        client.disconnect()
-                        self.discard()
-                        return Exception
-                    else:
-                        success = result[0]
-                        count = result[1]
-        result = self.send_bulk(mtargets, success, count, update, context, client, secs)
-        client.disconnect()
-        return result[0]
-
-    def send_bulk(mtargets, success, count, update, context, forwarder, client, secs):
-        try:
-            print('Attempting sending messages...')
-            forwarder.send_messages(mtargets, client, context)
-            print('First batch sent!')
-            mtargets = []
-            count = 0
-            success += 16
-            print('Sending message as User')
-            count += 1
-            update.callback_query.edit_message_text(text=sending_messages_text.format(success, secs))
-            time.sleep(secs)
-            return (success, count)
-
-        except PeerFloodError as error:
-            print('Message queue flood reached. Waiting 60 seconds. Error: ', error)
-            context.bot.report_error(error)
-            update.callback_query.edit_message_text(text=flood_limit_reached.format(success))
-            time.sleep(200)
-            return [None]
-
-        except Exception as error:
-            print('Fatal Error in forward.confirm(): ', error)
-            update.callback_query.edit_message_text(text=error_sending_messages.format(success))
-            context.bot.report_error(error)
-            return [error]
-
-    def send_messages(self, targets, client=None, context=None, secs=60):
-        if not client:
-            client = self.create_client()
-            client.connect()
-        try:
-            request = []
-            for target in targets:
-                request.append(SendMessageRequest(peer=target, message=self.telethon_text))
-            client(request)
-            time.sleep(secs)
             return True
         except PeerFloodError as error:
-            print('Peer Flood Limit reached when sending bulk messages - forwarder.send_messages(): ', error)
-            raise error
+            print('PeerFloodLimit reached. Account may be restricted or blocked: ', error)
+            return error
         except Exception as error:
-            print('Error in sending bulk messages - forwarder.send_messages(): ', error)
-            raise error
+            print('Error in sending message ', error)
+            return error
 
+    def queue_messages(self, targets, context, client=None):
+        if not client:
+            client = self.create_client()
+        failed = []
+        success = 0
+        for target in targets:
+            result = queue.enqueue(self.send_message, target, client)
+            if result:
+                # Message Sent successfully
+                context.bot.send_message(self.user_id, sending_messages_text.format(success))
+                success += 1
+            elif result is PeerFloodError:
+                # Flood
+                failed.append(target)
+            else:
+                # Error
+                failed.append(target)
+            time.sleep(30)
 
+        
             
 
 
