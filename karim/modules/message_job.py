@@ -60,7 +60,7 @@ def send_message(user_id, bot_id, target, index, targets_len, telethon_text):
     client.connect()
     print('TARGET: ', target, ' ', type(target))
     try:
-        entity = client.get_entity(target)
+        entity = client.get_input_entity(target)
         client.send_message(entity, telethon_text)
         print('Message {} sent successfully'.format(index+1))
     except PeerFloodError as error:
@@ -68,7 +68,8 @@ def send_message(user_id, bot_id, target, index, targets_len, telethon_text):
     except Exception as error:
         print('Error in sending message to user: ', error)
 
-    entity = client.get_entity(bot_id)
+    entity = client.get_input_entity(os.environ.get('BOT_USERNAME'))
+    print('Getting Messages: Entity: ', entity)
     messages = client.get_messages(entity, limit=1, from_user=bot_id)
     try:
         message = messages[0]
@@ -84,13 +85,13 @@ def send_message(user_id, bot_id, target, index, targets_len, telethon_text):
         bot_client = create_client('bot', bot=True).start(bot_token=os.environ.get('BOT_TOKEN'))
         if index == targets_len-1:
             print('Editing final message')
-            entity = bot_client.get_entity(user_id)
+            entity = bot_client.get_input_entity(user_id)
             try:
                 bot_client.edit_message(entity, message=message, text=message_queue_finished)
             except:
                 bot_client.send_message(entity, message=message_queue_finished)
         else:
-            entity = bot_client.get_entity(user_id)
+            entity = bot_client.get_input_entity(user_id)
             print('Editing in process message')
             bot_client.edit_message(entity, message=message, text=sending_messages_text.format(len(targets_len), index+1))
         bot_client.disconnect()
