@@ -16,7 +16,7 @@ if __name__ == '__main__':
         worker = Worker(map(Queue, listen))
         worker.work()
 
-def create_client(self):
+def create_client(user_id):
     """Creates and returns a TelegramClient"""
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
@@ -26,15 +26,15 @@ def create_client(self):
     # proxy=(socks.SOCKS5, '127.0.0.1', 4444)
 
     if LOCALHOST:
-        session = 'karim/bot/persistence/{}'.format(self.user_id)
+        session = 'karim/bot/persistence/{}'.format(user_id)
     else:
-        session_string = os.environ.get('session:{}'.format(self.user_id))
+        session_string = os.environ.get('session:{}'.format(user_id))
         if not session_string:
             try:
                 # Falling Back to RedisSession
                 print('LOADING REDIS SESSION')
                 connector = redis.from_url(os.environ.get('REDIS_URL'))
-                string = connector.get('session:{}'.format(self.user_id))
+                string = connector.get('session:{}'.format(user_id))
                 print('SESSION STRING OUTPUTTED')
                 if string:
                     # Session is stored in Redis
@@ -61,11 +61,12 @@ def create_client(self):
     print('TELEGRAM CLIENT WITH SESSION CREATED')
     return client
 
-def send_message(self, target):
-    client = self.create_client()
+def send_message(user_id, target, telethon_text):
+    client = create_client(user_id)
     client.connect()
     try:
-        client.send_message(target, self.telethon_text)
+        client.send_message(target, telethon_text)
+        time.wait(35)
         result= True
     except PeerFloodError as error:
         print('PeerFloodLimit reached. Account may be restricted or blocked: ', error)
@@ -76,17 +77,17 @@ def send_message(self, target):
     client.disconnect()
     return result
 
-def queue_messages(self, targets, context, client=None):
+def queue_messages(targets, context, forwarder, client=None):
     if not client:
-        client = self.create_client()
+        client = create_client(forwarder.user_id)
     failed = []
     success = 0
     client.disconnect()
     for target in targets:
-        result = queue.enqueue(self.send_message, target, client)
+        result = queue.enqueue(send_message, forwarder.user_id, target, forwarder.telethon_text)
         if result:
             # Message Sent successfully
-            context.bot.send_message(self.user_id, sending_messages_text.format(success))
+            context.bot.send_message(forwarder.user_id, sending_messages_text.format(success))
             success += 1
         elif result is PeerFloodError:
             # Flood
@@ -96,6 +97,6 @@ def queue_messages(self, targets, context, client=None):
             # Error
             failed.append(target)
             context.bot.report_error(result)
-        time.sleep(30)
+        
     client.disconnect()
     return success
