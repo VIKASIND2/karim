@@ -97,6 +97,8 @@ def select_group(update, context):
 
     elif data == Callbacks.DONE:
         # TODO DONE
+        if len(forwarder.get_selection()) == 0:
+            return
         markup = CreateMarkup({Callbacks.CONFIRM: 'Confirm', Callbacks.CANCEL: 'Cancel'}).create_markup()
         text = ''
         groups = forwarder.get_groups_dict()
