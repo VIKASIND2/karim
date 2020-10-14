@@ -45,6 +45,7 @@ confirm_forwarding = '<b>Are you sure you want to send the message above to all 
 cancel_forward_text = 'Forwarding Operation Cancelled. Your message has not been sent to any group.'
 preparing_queue_text = 'Preparing to send messages... Operation might take some time...'
 sending_messages_text = 'Sending Messages to {} Users... {} sent so far...'
+message_queue_finished = 'Message forwarding operation finished!'
 flood_limit_reached = 'Too many messages were sent at once... Waiting 2 minutes before trying again... The message has been sent successfully to {} users so far.'
 error_sending_messages = 'There was an error while sending the messages... So far, the message has been sent to {} users.'
 
