@@ -60,7 +60,8 @@ def send_message(user_id, bot_id, target, index, targets_len, telethon_text):
     client.connect()
     print('TARGET: ', target, ' ', type(target))
     try:
-        client.send_message(target, telethon_text)
+        entity = client.get_entity(target)
+        client.send_message(entity, telethon_text)
         print('Message {} sent successfully'.format(index+1))
     except PeerFloodError as error:
         print('PeerFloodLimit reached. Account may be restricted or blocked: ', error)
