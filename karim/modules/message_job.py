@@ -66,12 +66,9 @@ def send_message(user_id, target, index, targets_len, telethon_text):
     except Exception as error:
         print('Error in sending message to user: ', error)
 
-    try:
-        messages = client.get_messages(user_id, limit=1, from_user=os.environ.get('BOT_USERNAME'))
-        message = messages[0]
-    except Exception as error:
-        print('Error in retrieving the messages: ', error)
-        raise error
+    messages = client.get_messages(user_id, limit=1, from_user=os.environ.get('BOT_USERNAME'))
+    print('MESSAGES: ', messages)
+    message = messages[0]
     client.disconnect()
 
     # Edit Bot Message
