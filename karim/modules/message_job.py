@@ -78,7 +78,7 @@ def send_message(user_id, bot_id, target, index, targets_len, telethon_text):
         for message in messages:
             message = message
     client.disconnect()
-    print('Got messages')
+    print('Got messages: ', message)
 
     # Edit Bot Message
     try:
