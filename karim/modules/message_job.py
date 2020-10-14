@@ -53,21 +53,20 @@ def create_client(user_id):
     print('TELEGRAM CLIENT WITH SESSION CREATED')
     return client
 
-def send_message(user_id, target, telethon_text):
+def send_message(user_id, message_id, target, index, targets_len, telethon_text, context):
     client = create_client(user_id)
     client.connect()
     try:
         client.send_message(target, telethon_text)
         time.sleep(35)
-        result= True
+        context.bot.edit_message_text(sending_messages_text.format(len(targets_len), index), chat_id=user_id, message_id=message_id )
     except PeerFloodError as error:
         print('PeerFloodLimit reached. Account may be restricted or blocked: ', error)
-        result= error
+        context.bot.report_error(error)
     except Exception as error:
         print('Error in sending message ', error)
-        result= error
+        context.bot.report_error(error)
     client.disconnect()
-    return result
 
 def queue_messages(targets, context, forwarder, client=None):
     if not client:
@@ -78,19 +77,7 @@ def queue_messages(targets, context, forwarder, client=None):
     for target in targets:
         print('TARGET: ', target)
         if target not in (forwarder.user_id, context.bot.id,):
-            result = queue.enqueue(send_message, forwarder.user_id, target, forwarder.telethon_text, retry=Retry(max=2, interval=[20, 30]))
-            if result:
-                # Message Sent successfully
-                success += 1
-                context.bot.edit_message_text(sending_messages_text.format(len(targets), success), chat_id=forwarder.user_id, message_id=forwarder.message_id )
-            elif result is PeerFloodError:
-                # Flood
-                failed.append(target)
-                context.bot.report_error(result)
-            else:
-                # Error
-                failed.append(target)
-                context.bot.report_error(result)
+            queue.enqueue(send_message, forwarder.user_id, target, forwarder.telethon_text, context, retry=Retry(max=2, interval=[20, 30]))
         
     client.disconnect()
     return success
