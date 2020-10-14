@@ -87,7 +87,7 @@ class Forwarder(SessionManager):
             chats = client.get_dialogs()
             for chat in chats:
                 try:
-                    if not chat.is_user:
+                    if not chat.is_user and chat.id not in group_ids:
                         group_ids.append(chat.id)
                         group_titles.append(chat.title)
                 except:
@@ -196,7 +196,7 @@ class Forwarder(SessionManager):
                 members = self.__scrape_participants(group, client)
                 for member in members:
                     if member.username not in targets and member.username != os.environ.get('BOT_USERNAME') and member.id != self.user_id:
-                        print('Getting target: ', member.username)
+                        print('Getting target: ', member.username, ' ', member.id, ' ')
                         targets.append(member.username)
             if not client:
                 client.disconnect()
