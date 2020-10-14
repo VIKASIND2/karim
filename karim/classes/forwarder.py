@@ -27,7 +27,7 @@ class Forwarder(SessionManager):
         self.last_index = last_index
         self.page_index = page_index
         self.pages = pages
-        if last_index == None:
+        if last_index in (None, -1,):
             self.last_index = self.first_index + self.rotate_size
         self.telethon_text = telethon_text
 
