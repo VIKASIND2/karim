@@ -54,7 +54,7 @@ def create_client(user_id, bot=False):
     return client
 
 
-def send_message(user_id, target, index, targets_len, telethon_text, context):
+def send_message(user_id, target, index, targets_len, telethon_text):
     client = create_client(user_id)
     bot_client = create_client('bot', bot=True)
     client.connect()
