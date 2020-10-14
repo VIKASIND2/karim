@@ -81,10 +81,11 @@ def send_message(user_id, bot_id, target, index, targets_len, telethon_text):
     try:
         bot_client = create_client('bot', bot=True).start(bot_token=os.environ.get('BOT_TOKEN'))
         if index == targets_len-1:
+            entity = bot_client.get_entity(user_id)
             try:
-                bot_client.edit_message(user_id, message=message, text=message_queue_finished)
+                bot_client.edit_message(entity, message=message, text=message_queue_finished)
             except:
-                bot_client.send_message(user_id, message=message_queue_finished)
+                bot_client.send_message(entity, message=message_queue_finished)
         else:
             bot_client.edit_message(user_id, message=message, text=sending_messages_text.format(len(targets_len), index+1))
         bot_client.disconnect()
