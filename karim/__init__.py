@@ -1,5 +1,4 @@
 import os
-import queue
 from rq import Queue
 from worker import conn
 
