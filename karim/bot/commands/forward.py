@@ -170,7 +170,7 @@ def confirm(update, context):
         return ConversationHandler.END
     else:
         # Send Messages
-        context.bot.edit_message_text(sending_messages_text, parse_mode=ParseMode.HTML, chat_id=update.effective_chat.id, message_id=forwarder.message_id)
+        context.bot.edit_message_text(preparing_queue_text, parse_mode=ParseMode.HTML, chat_id=update.effective_chat.id, message_id=forwarder.message_id)
         targets = forwarder.load_targets()
         result = message_job.queue_messages(targets, context, forwarder)
         if result not in (None, Exception,):

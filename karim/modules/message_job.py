@@ -57,7 +57,7 @@ def send_message(user_id, target, telethon_text):
     client.connect()
     try:
         client.send_message(target, telethon_text)
-        time.wait(35)
+        time.sleep(35)
         result= True
     except PeerFloodError as error:
         print('PeerFloodLimit reached. Account may be restricted or blocked: ', error)
@@ -75,19 +75,20 @@ def queue_messages(targets, context, forwarder, client=None):
     success = 0
     client.disconnect()
     for target in targets:
-        result = queue.enqueue(send_message, forwarder.user_id, target, forwarder.telethon_text)
-        if result:
-            # Message Sent successfully
-            context.bot.send_message(forwarder.user_id, sending_messages_text.format(success))
-            success += 1
-        elif result is PeerFloodError:
-            # Flood
-            failed.append(target)
-            context.bot.report_error(result)
-        else:
-            # Error
-            failed.append(target)
-            context.bot.report_error(result)
+        if target not in (forwarder.user_id, context.bot.id,):
+            result = queue.enqueue(send_message, forwarder.user_id, target, forwarder.telethon_text)
+            if result:
+                # Message Sent successfully
+                success += 1
+                context.bot.edit_message_text(sending_messages_text.format(success), chat_id=forwarder.user_id, message_id=forwarder.message_id )
+            elif result is PeerFloodError:
+                # Flood
+                failed.append(target)
+                context.bot.report_error(result)
+            else:
+                # Error
+                failed.append(target)
+                context.bot.report_error(result)
         
     client.disconnect()
     return success
