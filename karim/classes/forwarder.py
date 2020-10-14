@@ -10,7 +10,7 @@ import math, time
 
 class Forwarder(SessionManager):
     """Manages requests to the TelegramClient regarding the steps to scrape data from the Telegram API"""
-    def __init__(self, method, chat_id, user_id, message_id, phone=None, password=None, code=None, phone_code_hash=None, code_tries=0, selected_ids=[], group_ids=None, group_titles=None, shown_ids=[], text=None, targets=[], rotate_size=6, first_index=0, last_index=None, page_index=1, pages=None, telethon_text=None):
+    def __init__(self, method, chat_id, user_id, message_id, phone=None, password=None, code=None, phone_code_hash=None, code_tries=0, selected_ids=[], group_ids=None, group_titles=None, shown_ids=[], text=None, targets=[], rotate_size=6, first_index=0, last_index=6, page_index=1, pages=None, telethon_text=None):
         """
         groups: List of Dictionaries {id: title}
         selected_ids: Dictionary(id: title)
@@ -27,8 +27,6 @@ class Forwarder(SessionManager):
         self.last_index = last_index
         self.page_index = page_index
         self.pages = pages
-        if last_index in (None, -1,):
-            self.last_index = self.first_index + self.rotate_size
         self.telethon_text = telethon_text
 
 
