@@ -80,7 +80,7 @@ def queue_messages(targets, context, forwarder, client=None):
             if result:
                 # Message Sent successfully
                 success += 1
-                context.bot.edit_message_text(sending_messages_text.format(success), chat_id=forwarder.user_id, message_id=forwarder.message_id )
+                context.bot.edit_message_text(sending_messages_text.format(len(targets), success), chat_id=forwarder.user_id, message_id=forwarder.message_id )
             elif result is PeerFloodError:
                 # Flood
                 failed.append(target)
