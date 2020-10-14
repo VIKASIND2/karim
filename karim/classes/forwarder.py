@@ -218,25 +218,27 @@ class Forwarder(SessionManager):
             print('Error in retrievig participants: ', error)
             raise UnauthorizedError
 
-    def send_message(self, target, client=None):
-        if not client:
-            client = self.create_client()
-            client.connect()
+    def send_message(self, target):
+        client = self.create_client()
+        client.connect()
         try:
             client.send_message(target, self.telethon_text)
-            return True
+            result= True
         except PeerFloodError as error:
             print('PeerFloodLimit reached. Account may be restricted or blocked: ', error)
-            return error
+            result= error
         except Exception as error:
             print('Error in sending message ', error)
-            return error
+            result= error
+        client.disconnect()
+        return result
 
     def queue_messages(self, targets, context, client=None):
         if not client:
             client = self.create_client()
         failed = []
         success = 0
+        client.disconnect()
         for target in targets:
             result = queue.enqueue(self.send_message, target, client)
             if result:
