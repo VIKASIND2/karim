@@ -54,7 +54,7 @@ def create_client(user_id, bot=False):
     return client
 
 
-def send_message(user_id, target, index, targets_len, telethon_text):
+def send_message(user_id, bot_id, target, index, targets_len, telethon_text):
     # Send Message:
     client = create_client(user_id)
     client.connect()
@@ -68,6 +68,7 @@ def send_message(user_id, target, index, targets_len, telethon_text):
 
     messages = client.get_messages(user_id, limit=1, from_user=os.environ.get('BOT_USERNAME'))
     for message in messages:
+        print('MESSAGE: ', message.text)
         message = message
     client.disconnect()
 
@@ -85,4 +86,4 @@ def queue_messages(targets, context, forwarder, client=None):
     for index, target in enumerate(targets):
         print('TARGET: ', target)
         if target not in (forwarder.user_id, context.bot.id,):
-            queue.enqueue(send_message, user_id=forwarder.user_id, target=target, index=index, targets_len=len(targets), telethon_text=forwarder.telethon_text, retry=Retry(max=2, interval=[35, 45]))       
+            queue.enqueue(send_message, user_id=forwarder.user_id, bot_id=context.bot.id, target=target, index=index, targets_len=len(targets), telethon_text=forwarder.telethon_text, retry=Retry(max=2, interval=[35, 45]))       
