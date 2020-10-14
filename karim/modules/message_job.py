@@ -66,9 +66,13 @@ def send_message(user_id, bot_id, target, index, targets_len, telethon_text):
     except Exception as error:
         print('Error in sending message to user: ', error)
 
-    messages = client.get_messages(user_id, limit=1, from_user=bot_id)
-    for message in messages:
-        message = message
+    messages = client.get_messages(bot_id, limit=1, from_user=bot_id)
+    try:
+        message = messages[0]
+    except:
+        message = None
+        for message in messages:
+            message = message
     client.disconnect()
 
     # Edit Bot Message
@@ -84,7 +88,7 @@ def send_message(user_id, bot_id, target, index, targets_len, telethon_text):
         bot_client.disconnect()
     except Exception as error:
         print('Error in editing update message: ', error)
-    time.sleep(35)
+    time.sleep(45)
 
 
 def queue_messages(targets, context, forwarder, client=None):
