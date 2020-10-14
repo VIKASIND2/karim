@@ -195,7 +195,7 @@ class Forwarder(SessionManager):
             for group in groups:
                 members = self.__scrape_participants(group, client)
                 for member in members:
-                    if member.username not in targets and member.username != os.environ.get('BOT_USERNAME') and member.id != self.user_id:
+                    if member.username not in targets and member.username != None and member.id != self.user_id:
                         print('Getting target: ', member.username, ' ', member.id, ' ')
                         targets.append(member.username)
             if not client:
