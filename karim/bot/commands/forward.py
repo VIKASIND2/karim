@@ -2,7 +2,7 @@ import telethon
 from telethon.errors.rpcbaseerrors import UnauthorizedError
 from telethon.errors.rpcerrorlist import PeerFloodError
 from karim.bot.commands import *
-import worker
+from karim.modules import message_job
 from karim import queue
 import time
 
@@ -172,7 +172,7 @@ def confirm(update, context):
         # Send Messages
         context.bot.edit_message_text(sending_messages_text, parse_mode=ParseMode.HTML, chat_id=update.effective_chat.id, message_id=forwarder.message_id)
         targets = forwarder.load_targets()
-        result = worker.queue_messages(targets, context)
+        result = message_job.queue_messages(targets, context)
         if result not in (None, Exception,):
             context.bot.edit_message_text(forward_successful.format(result), chat_id=forwarder.chat_id, message_id=forwarder.message_id, parse_mode=ParseMode.HTML)
         forwarder.discard()
