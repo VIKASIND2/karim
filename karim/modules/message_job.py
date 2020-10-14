@@ -69,15 +69,12 @@ def send_message(user_id, message_id, target, index, targets_len, telethon_text,
     client.disconnect()
 
 def queue_messages(targets, context, forwarder, client=None):
-    if not client:
-        client = create_client(forwarder.user_id)
     failed = []
     success = 0
-    client.disconnect()
-    for target in targets:
+    for index, target in enumerate(targets):
         print('TARGET: ', target)
         if target not in (forwarder.user_id, context.bot.id,):
-            queue.enqueue(send_message, forwarder.user_id, target, forwarder.telethon_text, context, retry=Retry(max=2, interval=[20, 30]))
+            queue.enqueue(send_message, user_id=forwarder.user_id, message_id=forwarder.message_id, target=target, index=index, targets_len=len(targets), telethon_text=forwarder.telethon_text, context=context, retry=Retry(max=2, interval=[20, 30]))
         
     client.disconnect()
     return success
