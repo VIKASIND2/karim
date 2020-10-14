@@ -177,9 +177,6 @@ def confirm(update, context):
         return ConversationHandler.END
 
 
-
-
-
 @run_async
 def cancel_forward(update, context, send_message=True, forwarder=None):
     if not forwarder:
