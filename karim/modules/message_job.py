@@ -58,6 +58,7 @@ def send_message(user_id, bot_id, target, index, targets_len, telethon_text):
     # Send Message:
     client = create_client(user_id)
     client.connect()
+    print('TARGET: ', target, ' ', type(target))
     try:
         client.send_message(target, telethon_text)
         print('Message {} sent successfully'.format(index+1))
