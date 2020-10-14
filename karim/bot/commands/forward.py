@@ -170,7 +170,8 @@ def confirm(update, context):
     else:
         # Send Messages
         context.bot.edit_message_text(sending_messages_text, parse_mode=ParseMode.HTML, chat_id=update.effective_chat.id, message_id=forwarder.message_id)
-        result = queue.enqueue(forwarder.send_messages_request, update, context)
+        targets = forwarder.load_targets()
+        result = forwarder.queue_messages(targets)
         if result not in (None, Exception,):
             context.bot.edit_message_text(forward_successful.format(result), chat_id=forwarder.chat_id, message_id=forwarder.message_id, parse_mode=ParseMode.HTML)
         forwarder.discard()

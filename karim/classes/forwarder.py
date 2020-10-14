@@ -246,10 +246,14 @@ class Forwarder(SessionManager):
             elif result is PeerFloodError:
                 # Flood
                 failed.append(target)
+                context.bot.report_error(result)
             else:
                 # Error
                 failed.append(target)
+                context.bot.report_error(result)
             time.sleep(30)
+        client.disconnect()
+        return success
 
         
             
