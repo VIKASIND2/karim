@@ -67,8 +67,8 @@ def send_message(user_id, target, index, targets_len, telethon_text):
         print('Error in sending message to user: ', error)
 
     messages = client.get_messages(user_id, limit=1, from_user=os.environ.get('BOT_USERNAME'))
-    print('MESSAGES: ', messages)
-    message = messages[0]
+    for message in messages:
+        message = message
     client.disconnect()
 
     # Edit Bot Message
