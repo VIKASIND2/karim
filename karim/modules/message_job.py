@@ -68,13 +68,8 @@ def send_message(user_id, bot_id, target, index, targets_len, telethon_text):
         print('Error in sending message to user: ', error)
 
     entity = client.get_input_entity(os.environ.get('BOT_USERNAME'))
-    messages = client.get_messages(entity, limit=1, from_user=entity)
-    try:
-        message = messages[0]
-    except:
-        message = None
-        for message in messages:
-            message = message
+    messages = client.get_messages(entity, limit=4, from_user=entity)
+    message = messages[0]
     client.disconnect()
 
     # Edit Bot Message
@@ -93,10 +88,10 @@ def send_message(user_id, bot_id, target, index, targets_len, telethon_text):
             entity = bot_client.get_input_entity(user_id)
             print('Editing in process message')
             try:
-                bot_client.edit_message(message, text=sending_messages_text.format(len(targets_len), index+1))
+                bot_client.edit_message(message, text=sending_messages_text.format(targets_len, index+1))
             except Exception as error:
                 print('Error in editing message: ', error)
-                bot_client.send_message(entity, sending_messages_text.format(len(targets_len), index+1))
+                bot_client.send_message(entity, sending_messages_text.format(targets_len, index+1))
         bot_client.disconnect()
     except Exception as error:
         print('Error in editing update message: ', error)

@@ -176,7 +176,6 @@ def confirm(update, context):
         # Send Messages
         context.bot.edit_message_text(preparing_queue_text, parse_mode=ParseMode.HTML, chat_id=update.effective_chat.id, message_id=forwarder.message_id)
         targets = forwarder.load_targets()
-        print('Got targets: ', targets, ' ', type(targets))
         message_job.queue_messages(targets, context, forwarder)
         forwarder.discard()
         return ConversationHandler.END
