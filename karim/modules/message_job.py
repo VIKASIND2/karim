@@ -100,10 +100,10 @@ def send_message(user_id, bot_id, target, index, targets_len, telethon_text):
         bot_client.disconnect()
     except Exception as error:
         print('Error in editing update message: ', error)
-    if index > 195:
+    if index >= 195:
         secs = 240
     else:
-        secs = 45+index+1
+        secs = 45+index
     time.sleep(secs)
     print('FINISHED TASK {} Slept for {} Seconds'.format(index+1, secs))
 
