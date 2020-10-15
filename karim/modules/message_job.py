@@ -64,6 +64,13 @@ def send_message(user_id, bot_id, target, index, targets_len, telethon_text):
         print('Message {} sent successfully'.format(index+1))
     except PeerFloodError as error:
         print('PeerFloodLimit reached. Account may be restricted or blocked: ', error)
+        client.disconnect()
+        bot_client = create_client('bot', bot=True).start(bot_token=os.environ.get('BOT_TOKEN'))
+        entity = bot_client.get_input_entity(user_id)
+        queue.empty()
+        bot_client.send_message(entity, message=flood_limit_reached.format(index))
+        print('JOB QUEUE EMPTIED')
+        return
     except Exception as error:
         print('Error in sending message to user: ', error)
 
@@ -77,7 +84,6 @@ def send_message(user_id, bot_id, target, index, targets_len, telethon_text):
         bot_client = create_client('bot', bot=True).start(bot_token=os.environ.get('BOT_TOKEN'))
         if index == targets_len-1:
             print('Editing final message')
-            print('Message: ', message.text)
             entity = bot_client.get_input_entity(user_id)
             try:
                 bot_client.edit_message(message, text=message_queue_finished)
