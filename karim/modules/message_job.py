@@ -68,7 +68,7 @@ def send_message(user_id, bot_id, target, index, targets_len, telethon_text):
         print('Error in sending message to user: ', error)
 
     entity = client.get_input_entity(os.environ.get('BOT_USERNAME'))
-    messages = client.get_messages(entity, limit=1, from_user=bot_id)
+    messages = client.get_messages(entity, limit=1, from_user=entity)
     try:
         message = messages[0]
     except:
@@ -96,6 +96,7 @@ def send_message(user_id, bot_id, target, index, targets_len, telethon_text):
     except Exception as error:
         print('Error in editing update message: ', error)
     time.sleep(45)
+    print('FINISHED TASK {}'.format(index+1))
 
 
 def queue_messages(targets, context, forwarder, client=None):
