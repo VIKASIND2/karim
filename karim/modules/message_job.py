@@ -85,7 +85,8 @@ def send_message(user_id, bot_id, target, index, targets_len, telethon_text):
             entity = bot_client.get_input_entity(user_id)
             try:
                 bot_client.edit_message(message, text=message_queue_finished)
-            except:
+            except Exception as error:
+                print('Error in editing message: ', error)
                 bot_client.send_message(entity, message=message_queue_finished)
         else:
             entity = bot_client.get_input_entity(user_id)
