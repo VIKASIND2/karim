@@ -92,12 +92,20 @@ def send_message(user_id, bot_id, target, index, targets_len, telethon_text):
         else:
             entity = bot_client.get_input_entity(user_id)
             print('Editing in process message')
-            bot_client.edit_message(message, text=sending_messages_text.format(len(targets_len), index+1))
+            try:
+                bot_client.edit_message(message, text=sending_messages_text.format(len(targets_len), index+1))
+            except Exception as error:
+                print('Error in editing message: ', error)
+                bot_client.send_message(entity, sending_messages_text.format(len(targets_len), index+1))
         bot_client.disconnect()
     except Exception as error:
         print('Error in editing update message: ', error)
-    time.sleep(45)
-    print('FINISHED TASK {}'.format(index+1))
+    if index > 195:
+        secs = 240
+    else:
+        secs = 45+index+1
+    time.sleep(secs)
+    print('FINISHED TASK {} Slept for {} Seconds'.format(index+1, secs))
 
 
 def queue_messages(targets, context, forwarder, client=None):
