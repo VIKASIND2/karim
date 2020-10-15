@@ -82,6 +82,7 @@ def send_message(user_id, bot_id, target, index, targets_len, telethon_text):
         bot_client = create_client('bot', bot=True).start(bot_token=os.environ.get('BOT_TOKEN'))
         if index == targets_len-1:
             print('Editing final message')
+            print('Message: ', message.text)
             entity = bot_client.get_input_entity(user_id)
             try:
                 bot_client.edit_message(message, text=message_queue_finished)
