@@ -1,4 +1,4 @@
-from telethon.errors.rpcerrorlist import FirstNameInvalidError, PeerFloodError
+from telethon.errors.rpcerrorlist import ChatAdminRequiredError, FirstNameInvalidError, PeerFloodError
 from telethon import utils
 from telethon.tl.functions.messages import *
 from telethon.errors.rpcbaseerrors import UnauthorizedError
@@ -189,13 +189,16 @@ class Forwarder(SessionManager):
                 if str(chat.id) in self.get_selection():
                     groups.append(chat)
             for group in groups:
-                members = self.__scrape_participants(group, client)
-                for member in members:
-                    if member.username not in targets and member.id != self.user_id:
-                        if member.username == None:
-                            targets.append(member.id)
-                        else:
-                            targets.append(member.username)
+                try:
+                    members = self.__scrape_participants(group, client)
+                    for member in members:
+                        if member.username not in targets and member.id != self.user_id:
+                            if member.username == None:
+                                targets.append(member.id)
+                            else:
+                                targets.append(member.username)
+                except ChatAdminRequiredError as error:
+                    continue
             if not client:
                 client.disconnect()
             return  targets
@@ -212,6 +215,9 @@ class Forwarder(SessionManager):
         try:
             all_participants = client.get_participants(target_group, aggressive=True)
             return all_participants
+        except ChatAdminRequiredError as error:
+            print('User does not have permission to get members list: ', error)
+            raise ChatAdminRequiredError
         except UnauthorizedError as error:
             print('Error in retrievig participants: ', error)
             raise UnauthorizedError
