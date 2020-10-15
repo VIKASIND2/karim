@@ -60,10 +60,8 @@ class Forwarder(SessionManager):
             client = self.create_client()
             client.connect()
         messages = client.get_messages(bot, limit=4, from_user=self.user_id)
-        print('Messages size: ', len(messages), ' ', message_date)
         message = None
         for message in messages:
-            print('Message: ', message.text, ' ', message.date)
             if message.date == message_date:
                 message = message
                 break
@@ -194,14 +192,12 @@ class Forwarder(SessionManager):
                 members = self.__scrape_participants(group, client)
                 for member in members:
                     if member.username not in targets and member.id != self.user_id:
-                        print('Getting target: ', member.username, ' ', member.id, ' ')
                         if member.username == None:
                             targets.append(member.id)
                         else:
                             targets.append(member.username)
             if not client:
                 client.disconnect()
-            print('Targets: ', targets)
             return  targets
         except UnauthorizedError as unauth:
             raise unauth
