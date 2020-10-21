@@ -169,7 +169,7 @@ class SessionManager(Persistence):
                 connector = redis.from_url(os.environ.get('REDIS_URL'))
                 session_string = client.session.save()
                 connector.set('session:{}'.format(self.user_id), session_string)
-                os.environ.set('session:{}'.format(self.user_id), session_string)
+                os.environ['session:{}'.format(self.user_id)] =  session_string
                 connector.close()
                 print('SIGNED IN WITH STRING: ', client.session)
             client.disconnect()

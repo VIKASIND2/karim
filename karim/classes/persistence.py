@@ -17,6 +17,10 @@ class Persistence(object):
     SIGNOUT = 'signout'
     ACCOUNT = 'account'
     FORWARDER = 'forwarder'
+    START = 'start'
+    UNSUBSCRIBE = 'unsubscribe'
+    SCRAPE_FOLLOWERS = 'scrape'
+    SEND_DM = 'send_dm'
     
     def __init__(self, method, chat_id, user_id, message_id=None):
         self.method = method

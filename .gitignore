@@ -4,6 +4,7 @@ __pycache__
 env
 data.db
 secrets.json
+client_secret.json
 anon.session
 bot.session
 anon.session-journal

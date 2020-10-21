@@ -11,9 +11,12 @@ class Callbacks:
     UNSELECT = 'UNSELECT'
     CONFIRM = 'CONFIRM'
     REQUEST_CODE = 'REQUEST_CODE'
+    NEWSLETTER = 'NEWSLETTER'
+    INSTAGRAM_DM = 'INSTAGRAM_DM'
+    TELEGRAM = 'TELEGRAM_GROUPS'
 
 
-class StartStates:
+class LogInStates:
     """Object to store PTB Start Conversation Handler states indicators"""
     INPUT_PHONE = 1
     INPUT_PASSWORD = 2
@@ -25,11 +28,18 @@ class LogOutStates:
     CONFIRM = 1
 
 
-class MessageStates:
+class ForwarderStates:
     """Object to store PTB Message Conversation Handler states indicators"""
-    MESSAGE = 1
-    SELECT_GROUP = 2
-    CONFIRM = 3
+    MODE = 1
+    MESSAGE = 2
+    SELECT_GROUP = 3
+    CONFIRM = 4
+
+
+class UnsubscribeStates:
+    """Object to store PTB Unsubscribe Conversation Handler states indicators"""
+    CONFIRM = 1
+
 
 class Objects:
     PERSISTENCE = 1

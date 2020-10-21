@@ -16,6 +16,7 @@ def dict_to_obj(obj_dict, method):
                     code=None if obj_dict.get('code') == -1 else obj_dict.get('code'),
                     phone_code_hash=None if obj_dict.get('phone_code_hash') == -1 else obj_dict.get('phone_code_hash'),
                     code_tries=None if obj_dict.get('code_tries') == -1 else obj_dict.get('code_tries'),
+                    mode=None if obj_dict.get('mode') == -1 else obj_dict.get('mode'),
                     selected_ids=None if obj_dict.get('selected_ids') == -1 else obj_dict.get('selected_ids'),
                     group_ids=None if obj_dict.get('group_ids') == -1 else obj_dict.get('group_ids'),
                     group_titles=None if obj_dict.get('group_titles') == -1 else obj_dict.get('group_titles'),

@@ -11,6 +11,19 @@ not_authorized_text = 'You are not authorized to use this bot\'s features'
 # Help Command
 help_text = '<b>Available Commands:</b>\n/account - Returns the current connection status to the Telegram Client (if the user is logged in and with which Telegram Account)\n\n/signin - Asks the user to input Telegram Credentials and attempts to sign in the Telegram Client. No credentials will be stored in the server.\n -> <code>phone</code> - The user\'s telegram account\'s phone number (<code>+49 123 123 1234</code>)\n -> <code>code</code> - The security code sent by Telegram to verify the identity. It is important to send the code separated by dots (<code>1.2.3.4.5</code>) otherwise it will immediatelly expire.\n -> <code>password</code> - In case the user has set a 2-steps-verification password, this will be required to sign in correctly.\n\n/signout - Signs out of the Telegram Client and deletes the session.\n\n/forward - Allows the user to forward a message to all the chat members present in a selection of group chats, via the user\'s own account.'
 
+# START NEWSLETTER COMMAND
+already_subscribed_text = 'You are already subscribed to this newsletter! Thank you for taking interest in our content!'
+subscription_successful_text = 'Thank you for subscribing to our newsletter! If you ever want to stop receiving our news, send /unsubscribe'
+error_in_subscribing_text = 'Unfortunately there was an error when activating your subscription... Try again in some time...'
+
+# UNSUBSCRIBE CONVERSATION
+admin_cannot_unsubscribe = 'You cannot unsubscribe from the newsletter as you are the admin.'
+confirm_unsubscription_text = 'Are you sure you want to unsubscribe from this newsletter?'
+not_subscribed_yet_text = 'You are not subscribed to this newsletter yet! To activate your subscribption, simply type /start'
+unsubscription_successful_text = 'You successfully unsubscribed from this newsletter. We are sorry to see you go! You ever want to subscribe again, justr type /start !'
+unsubscription_cancelled_text = 'Your subscribtion is still active!'
+
+
 # START/SIGN IN CONVERSATION
 client_already_signed_in = 'You are already signed into the Telegram Client. If you wish to sign in with another account, please make sure to log out first with /signout'
 request_login_text = 'You will be asked your Telegram credentials, which will be used by the bot to log into the Telegram Client. No personal information will be saved.'

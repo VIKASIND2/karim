@@ -10,13 +10,14 @@ import math, time
 
 class Forwarder(SessionManager):
     """Manages requests to the TelegramClient regarding the steps to scrape data from the Telegram API"""
-    def __init__(self, method, chat_id, user_id, message_id, phone=None, password=None, code=None, phone_code_hash=None, code_tries=0, selected_ids=[], group_ids=None, group_titles=None, shown_ids=[], text=None, targets=[], rotate_size=6, first_index=0, last_index=6, page_index=1, pages=None, telethon_text=None):
+    def __init__(self, method, chat_id, user_id, message_id, phone=None, password=None, code=None, phone_code_hash=None, code_tries=0, mode=None, selected_ids=[], group_ids=None, group_titles=None, shown_ids=[], text=None, targets=[], rotate_size=6, first_index=0, last_index=6, page_index=1, pages=None, telethon_text=None):
         """
         groups: List of Dictionaries {id: title}
         selected_ids: Dictionary(id: title)
         shown_groups: Dictionary(id: title)
         """
         SessionManager.__init__(self, method=method, chat_id=chat_id, user_id=user_id, message_id=message_id, phone=phone, password=password, code=code, phone_code_hash=phone_code_hash, code_tries=code_tries)
+        self.mode = mode
         self.selected_ids = selected_ids
         self.group_ids = group_ids
         self.group_titles = group_titles
@@ -53,6 +54,10 @@ class Forwarder(SessionManager):
     def get_targets(self):
         """Return list()"""
         return self.targets.copy()
+
+    def get_mode(self):
+        """Return forwarder mode"""
+        return self.mode
 
     def set_telethon_message(self, bot, message_date, client=None):
         print('forwarder.set_telethon_message()')
@@ -117,6 +122,11 @@ class Forwarder(SessionManager):
     def set_text(self, text):
         self.text = text
         return self.text
+
+    @persistence_decorator
+    def set_mode(self, mode):
+        self.mode = mode
+        return self.mode
 
     # MANAGE MARKUP ROTATION AND SELECTIONS
     @persistence_decorator

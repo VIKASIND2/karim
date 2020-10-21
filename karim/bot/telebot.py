@@ -3,6 +3,8 @@ from karim.bot.commands.help import *
 from karim.bot.commands.signout import *
 from karim.bot.commands.forward import *
 from karim.bot.commands.account import *
+from karim.bot.commands.unsubscribe import *
+from karim.bot.commands.start import *
 from karim.classes.callbacks import *
 
 
@@ -10,11 +12,11 @@ def setup(updater):
     dp = updater.dispatcher
 
     start_handler = ConversationHandler(
-        entry_points=[CommandHandler('start', client_sign_in), CommandHandler('signin', client_sign_in), CallbackQueryHandler(client_sign_in, pattern=Callbacks.LOGIN)],
+        entry_points=[CommandHandler('signin', client_sign_in), CallbackQueryHandler(client_sign_in, pattern=Callbacks.LOGIN)],
         states={
-            StartStates.INPUT_PHONE: [MessageHandler(Filters.text, input_phone)],
-            StartStates.INPUT_PASSWORD: [MessageHandler(Filters.text, input_password)],
-            StartStates.INPUT_CODE: [MessageHandler(Filters.text, input_code), CallbackQueryHandler(input_code, pattern=Callbacks.REQUEST_CODE)]
+            LogInStates.INPUT_PHONE: [MessageHandler(Filters.text, input_phone)],
+            LogInStates.INPUT_PASSWORD: [MessageHandler(Filters.text, input_password)],
+            LogInStates.INPUT_CODE: [MessageHandler(Filters.text, input_code), CallbackQueryHandler(input_code, pattern=Callbacks.REQUEST_CODE)]
         },
         fallbacks=[CallbackQueryHandler(cancel_start)]
     )
@@ -28,17 +30,26 @@ def setup(updater):
     forwarder_handler = ConversationHandler(
         entry_points=[CommandHandler('forward', forward_message)],
         states = {
-            MessageStates.MESSAGE: [MessageHandler(Filters.text, select_message)],
-            MessageStates.SELECT_GROUP: [CallbackQueryHandler(select_group)],
-            MessageStates.CONFIRM: [CallbackQueryHandler(confirm)],
+            ForwarderStates.MESSAGE: [MessageHandler(Filters.text, select_message)],
+            ForwarderStates.SELECT_GROUP: [CallbackQueryHandler(select_group)],
+            ForwarderStates.CONFIRM: [CallbackQueryHandler(confirm)],
         },
         fallbacks=[CallbackQueryHandler(cancel_forward)]
+    )
+    unsubscribe_handler = ConversationHandler(
+        entry_points=[CommandHandler('unsubscribe', unsubscribe)],
+        states={
+            UnsubscribeStates.CONFIRM: [CallbackQueryHandler(confirm_unsubscription)]
+        },
+        fallbacks=[]
     )
 
     # Commands
     dp.add_handler(CommandHandler("help", help_def))
     dp.add_handler(CommandHandler('account', check_account))
+    dp.add_handler(CommandHandler('start', start))
     dp.add_handler(signout_handler)
     dp.add_handler(start_handler)
     dp.add_handler(forwarder_handler)
+    dp.add_handler(unsubscribe_handler)
     dp.add_error_handler(error)

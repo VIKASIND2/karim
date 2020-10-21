@@ -31,7 +31,7 @@ def client_sign_in(update, context):
         except:
             message = update.effective_chat.send_message(request_phone_text, parse_mode = ParseMode.HTML, reply_markup = markup)
         manager.set_message(message.message_id)
-        return StartStates.INPUT_PHONE
+        return LogInStates.INPUT_PHONE
     else:
         # Error
         update.effective_chat.send_message(error_checking_connection, parse_mode=ParseMode.HTML)
@@ -106,7 +106,7 @@ def input_code(update, context):
         # INVALID CODE - TRY AGAIN
         message = update.message.reply_text(invalid_security_code, reply_markup=markup, parse_mode=ParseMode.HTML)
         manager.set_message(message.message_id)
-        return StartStates.INPUT_CODE
+        return LogInStates.INPUT_CODE
 
     except PhoneCodeExpiredError:
         print('Code Expired')
@@ -117,7 +117,7 @@ def input_code(update, context):
         # REQUEST PASSWORD
         message = update.message.reply_text(request_password_text, reply_markup=markup, parse_mode=ParseMode.HTML)
         manager.set_message(message.message_id)
-        return StartStates.INPUT_PASSWORD
+        return LogInStates.INPUT_PASSWORD
 
     except:
         # SIGN IN FAILED
@@ -149,7 +149,7 @@ def input_password(update, context):
         markup = CreateMarkup({Callbacks.CANCEL: 'Cancel'}).create_markup()
         message = update.message.reply_text(wrong_password_text, reply_markup=markup, parse_mode=ParseMode.HTML)
         manager.set_message(message.message_id)
-        return StartStates.INPUT_PASSWORD
+        return LogInStates.INPUT_PASSWORD
     except:
         # Attempt Another Sign In after 15 seconds
         time.sleep(5)
@@ -198,7 +198,7 @@ def manage_code_request(update, context, text, manager: SessionManager, markup=N
                 message = update.callback_query.edit_message_text(text=text, reply_markup=reply_markup, parse_mode=ParseMode.HTML)
                 manager.set_message(message.message_id)
             except: pass
-        return StartStates.INPUT_CODE
+        return LogInStates.INPUT_CODE
 
     except FloodWaitError as error:
         print('Error in singin.manage_code_request(): ', error)
@@ -208,7 +208,7 @@ def manage_code_request(update, context, text, manager: SessionManager, markup=N
             update.message.reply_text(floodwaiterror_text, parse_mode=ParseMode.HTML)
         except:
             update.callback_query.edit_message_text(floodwaiterror_text, parse_mode=ParseMode.HTML)
-        return StartStates.INPUT_CODE
+        return LogInStates.INPUT_CODE
 
     except Exception as error:
         print('Error in singin.manage_code_request(): ', error)
