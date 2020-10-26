@@ -74,6 +74,7 @@ inform_sending_newsletter_text = 'You message is being sent to your newsletter..
 no_selection_available_text = 'No IG users have been scraped so far. Please use /scrape to get a user\'s instagram followers.'
 confirm_send_dm_text = 'Are you sure you want to send your message to {} instagram users?'
 inform_sending_dms_text = 'You message is being sent to the selected instagram followers... This might take a while...'
+finished_sending_dm_text = 'You message has been successfully sent to the users. {} failed.'
 # Telegram
 failed_scrape_dialogues = 'There was a problem in retrieving the group chats from the Telegram API... Try again or contact @davidwickerhf for support'
 send_message_to_forward = 'Send below the message you would like to forward:'
