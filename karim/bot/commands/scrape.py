@@ -57,7 +57,7 @@ def select_name(update, context):
     name = update.message.text
     scraper.set_name(name)
     # User is valid -  select followers count
-    markup = CreateMarkup({Callbacks.TEN: '10', Callbacks.HUNDRED: '100', Callbacks.FIVEHUNDRED: '500', Callbacks.THOUSAND: '1000', Callbacks.CANCEL: 'Cancel'})
+    markup = CreateMarkup({Callbacks.TEN: '10', Callbacks.HUNDRED: '100', Callbacks.FIVEHUNDRED: '500', Callbacks.THOUSAND: '1000', Callbacks.CANCEL: 'Cancel'}).create_markup()
     message = update.message.reply_text(select_count_text, reply_markup=markup)
     scraper.set_message(message.message_id)
 
