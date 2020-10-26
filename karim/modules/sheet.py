@@ -79,7 +79,9 @@ def remove_subscriber(id:int or str):
     """
     spreadsheet = auth()
     subscribers = spreadsheet.get_worksheet(0)
-    subscribers.delete_row(find_by_username(username=str(id), sheet=subscribers)[0])
+    row = find_by_username(username=str(id), sheet=subscribers)[0]
+    print('ROW: ', row)
+    subscribers.delete_row()
     # LOG
     log(datetime.utcnow(),id, 'UNSUBSCRIBE')
     return True
@@ -215,6 +217,7 @@ def find_by_username(username:str, sheet:Worksheet, col:int=1):
     column = sheet.col_values(col)
     rows = []
     for num, cell in enumerate(column):
+        print('Row value: ', cell)
         if str(cell) == str(username):
             rows.append(num + 1)
     if rows == []:
