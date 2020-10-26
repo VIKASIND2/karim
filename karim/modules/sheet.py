@@ -215,6 +215,7 @@ def find_by_username(username:str, sheet:Worksheet, col:int=1):
         spreadsheet = auth()
         sheet = spreadsheet.get_worksheet(0)
     column = sheet.col_values(col)
+    print('COLUMN: ', column)
     rows = []
     for num, cell in enumerate(column):
         print('Row value: ', cell)
