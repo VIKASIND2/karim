@@ -236,6 +236,7 @@ def confirm(update, context):
         return
 
     data = update.callback_query.data
+    print('CONFIRM DATA:  ', data)
     if data == Callbacks.CANCEL:
         context.bot.edit_message_text(cancel_forward_text, parse_mode=ParseMode.HTML, chat_id=update.effective_chat.id, message_id=forwarder.message_id)
         forwarder.discard()
@@ -250,6 +251,7 @@ def confirm(update, context):
             return ConversationHandler.END
 
         elif forwarder.get_mode() == Callbacks.NEWSLETTER:
+            print('Confirmed Newsletter')
             targets = sheet.get_subscribers()
             context.bot.edit_message_text(chat_id=update.effective_chat.id, message_id=forwarder.message_id, text=inform_sending_newsletter_text)
             message_job.queue_messages(targets, context, forwarder)
