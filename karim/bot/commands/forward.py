@@ -17,7 +17,7 @@ def forward_message(update, context):
     result = forwarder.check_connection()
     if result:
         # User is authorised, ask mode input
-        markup = CreateMarkup({Callbacks.NEWSLETTER: 'Newsletter', Callbacks.INSTAGRAM_DM: 'Instagram DMs', Callbacks.TELEGRAM: 'Telegram Groups', Callbacks.CANCEL: 'Cancel'})
+        markup = CreateMarkup({Callbacks.NEWSLETTER: 'Newsletter', Callbacks.INSTAGRAM_DM: 'Instagram DMs', Callbacks.TELEGRAM: 'Telegram Groups', Callbacks.CANCEL: 'Cancel'}).create_markup()
         message = update.effective_chat.send_message(select_forward_mode_text, reply_markup=markup)
         forwarder.set_message(message.message_id)
         return ForwarderStates.MODE
