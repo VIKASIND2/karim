@@ -51,7 +51,7 @@ def auth():
 def log(timestamp:datetime, user_id:int or str, action:str):
     spreadsheet = auth()
     logs = spreadsheet.get_worksheet(2)                     
-    logs.append_row([timestamp, user_id, action])
+    logs.append_row([str(timestamp), user_id, action])
 
 
 def add_subscriber(id:int or str):
