@@ -6,7 +6,7 @@ class Scraper(Persistence):
     Manage persistence within the Scrape Followers conversation.
     Extends the Persistence class
     """
-    def __init__(self, method, chat_id: int or str, user_id: int or str, message_id: int or str):
+    def __init__(self, method, chat_id: int or str, user_id: int or str, message_id: int or str=None):
         super().__init__(method, chat_id, user_id, message_id)
         self.name = None
         self.count = None
