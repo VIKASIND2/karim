@@ -4,7 +4,7 @@ from karim.classes.scraper import Scraper
 from karim.modules import sheet
 from rq.job import Retry
 from rq.registry import FailedJobRegistry
-from karim import queue, LOCALHOST, instaclient, testbot
+from karim import queue, instaclient
 from karim.bot.texts import *
 import time
 
