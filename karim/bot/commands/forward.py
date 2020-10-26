@@ -253,8 +253,11 @@ def confirm(update, context):
         elif forwarder.get_mode() == Callbacks.NEWSLETTER:
             print('Confirmed Newsletter')
             targets = sheet.get_subscribers()
+            print('Got Targets')
             context.bot.edit_message_text(chat_id=update.effective_chat.id, message_id=forwarder.message_id, text=inform_sending_newsletter_text)
+            print('Sent message')
             message_job.queue_messages(targets, context, forwarder)
+            print('Queued messages')
             return ConversationHandler.END
 
         elif forwarder.get_mode() == Callbacks.INSTAGRAM_DM:
