@@ -1,7 +1,6 @@
-from karim import LOCALHOST
 import os, logging
 import telegram
-from karim import updater, BOT_TOKEN, URL, PORT
+from karim import updater, BOT_TOKEN, URL, PORT, LOCALHOST
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',

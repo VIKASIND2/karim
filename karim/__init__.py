@@ -7,7 +7,6 @@ from telegram.ext.defaults import Defaults
 from telegram.utils.request import Request
 from karim.classes.mq_bot import MQBot
 from telegram import ParseMode
-from karim.bot import telebot
 from telegram.ext import messagequeue as mq
 
 LOCALHOST = True
@@ -19,6 +18,7 @@ else:
 
 # Initialize Bot
 from karim.secrets import secrets
+from karim.bot import telebot
 BOT_TOKEN = secrets.get_var('BOT_TOKEN')
 URL = secrets.get_var('SERVER_APP_DOMAIN')
 PORT = int(os.environ.get('PORT', 5000))
