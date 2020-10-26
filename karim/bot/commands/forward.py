@@ -68,7 +68,8 @@ def select_message(update, context):
         print('Newsletter selected')
         users = sheet.get_subscribers()
         markup = CreateMarkup({Callbacks.CONFIRM: 'Confirm', Callbacks.CANCEL: 'Cancel'}).create_markup()
-        update.message.reply_text(text=confirm_send_newsletter_text.format(len(users)), reply_markup=markup)
+        message = update.message.reply_text(text=confirm_send_newsletter_text.format(len(users)), reply_markup=markup)
+        forwarder.set_message(message.message_id)
         return ForwarderStates.CONFIRM
 
     elif forwarder.get_mode() == Callbacks.INSTAGRAM_DM:
@@ -142,8 +143,9 @@ def select_scrape(update, context):
         targets_str = scrape[2]
         targets = list(targets_str)
         markup = CreateMarkup({Callbacks.CANCEL: 'Cancel'}).create_markup()
-        context.bot.edit_message_text(chat_id=update.effective_chat.id, 
+        message = context.bot.edit_message_text(chat_id=update.effective_chat.id, 
         message_id=forwarder.message_id, text=confirm_send_dm_text.format(len(targets)), reply_markup=markup)
+        forwarder.set_message(message.message_id)
         forwarder.set_users(targets)
         return ForwarderStates.CONFIRM
         #instagram_job.queue_send_dm(targets, forwarder.text)
