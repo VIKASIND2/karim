@@ -2,7 +2,7 @@ from logging import Filter
 from karim.bot.commands.signin import *
 from karim.bot.commands.help import *
 from karim.bot.commands.signout import *
-from karim.bot.commands.scrape_followers import *
+from karim.bot.commands.scrape import *
 from karim.bot.commands.forward import *
 from karim.bot.commands.account import *
 from karim.bot.commands.unsubscribe import *

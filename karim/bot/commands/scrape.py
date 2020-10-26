@@ -1,5 +1,4 @@
 from karim.classes.scraper import Scraper
-from typing import Callable
 from instaclient.errors.common import InvalidUserError, PrivateAccountError
 from karim.bot.commands import *
 from karim.modules import instagram_job
