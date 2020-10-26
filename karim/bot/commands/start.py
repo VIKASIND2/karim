@@ -7,7 +7,9 @@ def start(update, context):
     Subscribe the user to the newsletter.
     Adds user id to Sheet Mailing List
     """
-    if update.effective_user.id in secrets.get_var('USERS'):
+    users = secrets.get_var('USERS')
+    print('USERS: ', users)
+    if update.effective_user.id in users:
         # User is Admin, start sign in
         client_sign_in(update, context)
     elif sheet.is_subscriber(update.effective_user.id):
