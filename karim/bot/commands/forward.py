@@ -75,7 +75,7 @@ def select_message(update, context):
     elif forwarder.get_mode() == Callbacks.INSTAGRAM_DM:
         # TODO SELECT SCRAPED SELECTION
         # Get Scraped from Sheet
-        scraped = sheet.get_scraped()
+        scraped = sheet.get_all_scraped()
         if not scraped:
             # No selection available, ask to start  a new scrape
             context.bot.edit_message_text(chat_id=update.effective_chat.id, message_id=forwarder.message_id, text=no_selection_available_text)

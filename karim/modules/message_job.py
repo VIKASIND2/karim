@@ -112,3 +112,4 @@ def send_message(user_id, bot_id, target, index, targets_len, telethon_text):
 def queue_messages(targets, context, forwarder, client=None):
     for index, target in enumerate(targets):
         queue.enqueue(send_message, user_id=forwarder.user_id, bot_id=context.bot.id, target=target, index=index, targets_len=len(targets), telethon_text=forwarder.telethon_text, retry=Retry(max=2, interval=[35, 45]))       
+        
