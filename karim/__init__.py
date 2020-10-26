@@ -10,11 +10,17 @@ from telegram import ParseMode
 from telegram.ext import messagequeue as mq
 
 LOCALHOST = True
+queue = None
 if os.environ.get('PORT') in (None, ""):
     # Code running locally
     LOCALHOST = True
+    instaclient = InstaClient()
+    if not os.path.exists('karim/bot/persistence'):
+        os.makedirs('karim/bot/persistence')
 else:
     LOCALHOST = False
+    queue = Queue(connection=conn)
+    instaclient = InstaClient(host=InstaClient.WEB_SERVER)
 
 # Initialize Bot
 from karim.secrets import secrets
@@ -29,14 +35,5 @@ updater = Updater(bot=testbot, use_context=True, defaults=Defaults(parse_mode=Pa
 q = mq.MessageQueue(all_burst_limit=3, all_time_limit_ms=3000)
 # SET UP BOT COMMAND HANDLERS
 telebot.setup(updater)
-
-if LOCALHOST:
-    instaclient = InstaClient()
-    if not os.path.exists('karim/bot/persistence'):
-        os.makedirs('karim/bot/persistence')
-else:
-    LOCALHOST = False
-    queue = Queue(connection=conn)
-    instaclient = InstaClient(host=InstaClient.WEB_SERVER)
         
 
