@@ -61,6 +61,7 @@ def setup(updater):
 
     # Commands
     dp.add_handler(CommandHandler("help", help_def))
+    dp.add_handler(CommandHandler('adminhelp', admin_help))
     dp.add_handler(CommandHandler('account', check_account))
     dp.add_handler(CommandHandler('start', start))
     dp.add_handler(scrape_handler)
