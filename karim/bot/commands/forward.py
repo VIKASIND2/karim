@@ -46,7 +46,7 @@ def forward_mode(update, context):
     forwarder.set_mode(mode)
     # Ask for message text
     markup = CreateMarkup({Callbacks.CANCEL: 'Cancel'}).create_markup()
-    message = update.effective_chat.send_message(send_message_to_forward, reply_markup=markup, parse_mode=ParseMode.HTML)
+    message = context.bot.edit_message_text(chat_id=forwarder.chat_id, message_id=forwarder.message_id, text=send_message_to_forward, reply_markup=markup)
     forwarder.set_message(message.message_id)            
     return ForwarderStates.MESSAGE
 

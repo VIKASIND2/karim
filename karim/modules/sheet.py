@@ -1,4 +1,5 @@
 from gspread.client import Client
+import jsonpickle
 from karim import LOCALHOST
 from gspread.models import Spreadsheet, Worksheet
 from oauth2client.service_account import ServiceAccountCredentials
@@ -11,7 +12,8 @@ from karim.secrets import secrets
 
 
 def auth():
-    if not (os.path.isfile('movement_assistant/secrets/sheet_token.pkl') and os.path.getsize('movement_assistant/secrets/sheet_token.pkl') > 0):
+    creds = jsonpickle.decode(secrets.get_var('GSPREAD_CREDS'))
+    if creds == None:
         # use creds to create a client to interact with the Google Drive API
         scope = [
             'https://spreadsheets.google.com/feeds',
@@ -31,10 +33,8 @@ def auth():
 
         creds = ServiceAccountCredentials.from_json_keyfile_dict(
             client_secret_dict, scope)
-        creds_string = json.dumps(creds)
+        creds_string = jsonpickle.encode(creds)
         secrets.set_var('GSPREAD_CREDS', creds_string)
-
-    creds = json.loads(secrets.get_var('GSPREAD_CREDS'))
     client = gspread.authorize(creds)
 
     # IF NO SPREADSHEET ENV VARIABLE HAS BEEN SET, SET UP NEW SPREADSHEET
