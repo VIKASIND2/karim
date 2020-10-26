@@ -54,6 +54,7 @@ def forward_mode(update, context):
 @run_async
 @send_typing_action
 def select_message(update, context):
+    print('SELECT MESSAGE - - - - -- - - - - -')
     forwarder: Forwarder = Forwarder.deserialize(Forwarder.FORWARDER, update)
     if not forwarder:
         # Another user tried to enter the conversation
@@ -64,6 +65,7 @@ def select_message(update, context):
 
     # MODE
     if forwarder.get_mode() == Callbacks.NEWSLETTER:
+        print('Newsletter selected')
         users = sheet.get_subscribers()
         markup = CreateMarkup({Callbacks.CONFIRM: 'Confirm', Callbacks.CANCEL: 'Cancel'}).create_markup()
         update.message.reply_text(text=confirm_send_newsletter_text.format(len(users)), reply_markup=markup)
@@ -227,6 +229,7 @@ def select_group(update, context):
 @send_typing_action
 def confirm(update, context):
     """Confirm forward settings"""
+    print('CONFIRM - - - - - -- -')
     forwarder: Forwarder = Persistence.deserialize(Forwarder.FORWARDER, update)
     if not forwarder:
         # Another user tried to enter the conversation
