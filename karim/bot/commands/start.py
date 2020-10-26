@@ -12,8 +12,8 @@ def start(update, context):
         # User is Admin, start sign in
         return client_sign_in(update, context)
 
-    subscribed = sheet.is_subscriber(update.effective_user.id)
     message = update.effective_chat.send_message(checking_subscription)
+    subscribed = sheet.is_subscriber(update.effective_user.id)
     if subscribed :
         # User is already subscribed
         context.bot.edit_message_text(chat_id=update.effective_chat.id, message_id=message.message_id, text=already_subscribed_text)
