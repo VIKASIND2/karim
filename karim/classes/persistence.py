@@ -1,4 +1,4 @@
-import json
+import json, jsonpickle
 from karim import LOCALHOST
 import os, redis
 
@@ -34,6 +34,19 @@ class Persistence(object):
         self.message_id = message_id
         return self.message_id
 
+    
+    def get_chat_id(self):
+        return self.chat_id
+
+
+    def get_user_id(self):
+        return self.user_id
+
+
+    def get_message_id(self):
+        return self.message_id
+
+
     def discard(self):
         if LOCALHOST:
             # CODE RUNNING LOCALLY
@@ -54,19 +67,14 @@ class Persistence(object):
     def serialize(self):
         if LOCALHOST:
             # CODE RUNNING LOCALLY
-            obj_dict = self.__dict__
             with open("karim/bot/persistence/{}{}{}.json".format(self.method, self.user_id, self.chat_id), "w") as write_file:
-                 json.dump(obj_dict, write_file, indent=4)
+                encoded = jsonpickle.encode(self)
+                json.dump(encoded, write_file, indent=4)
         else:
             # Code running on Heroku
-            # Turn object into dict
-            obj_dict = self.__dict__
-            for key in obj_dict.keys():
-                if obj_dict.get(key) is None:
-                    obj_dict[key] = -1
             try:
                 connector = redis.from_url(os.environ.get('REDIS_URL'))
-                obj_string = json.dumps(obj_dict)
+                obj_string = jsonpickle.encode(self)
                 connector.set('persistence:{}{}{}'.format(self.method, self.user_id, self.chat_id), obj_string)
                 connector.close()
             except Exception as error:
@@ -77,7 +85,9 @@ class Persistence(object):
         if LOCALHOST:
             # CODE RUNNING LOCALLY
             with open("karim/bot/persistence/{}{}{}.json".format(method, update.effective_chat.id, update.effective_chat.id)) as file:
-                return json.load(file)
+                json_string = json.load(file)
+                obj = jsonpickle.decode(json_string)
+                return obj
         else:
             # Code Running on Heroku
             # Get Redis String
@@ -85,11 +95,9 @@ class Persistence(object):
                 connector = redis.from_url(os.environ.get('REDIS_URL'))
                 obj_bytes = connector.get("persistence:{}{}{}".format(method, update.effective_chat.id, update.effective_chat.id))
                 connector.close()
-                obj_string = json.loads(obj_bytes)
-                # Turn into Object
-                # Class is Persistence
-                obj_dict = dict(obj_string)
-                return obj_string
+                obj_string = obj_bytes.decode("utf-8") 
+                obj = jsonpickle.decode(obj_string)
+                return obj
             except Exception as error:
                 print('Error in persistence.deserialzie(): ', error)
             

@@ -9,7 +9,9 @@ class symbols:
 not_authorized_text = 'You are not authorized to use this bot\'s features'
 
 # Help Command
-help_text = '<b>Available Commands:</b>\n/account - Returns the current connection status to the Telegram Client (if the user is logged in and with which Telegram Account)\n\n/signin - Asks the user to input Telegram Credentials and attempts to sign in the Telegram Client. No credentials will be stored in the server.\n -> <code>phone</code> - The user\'s telegram account\'s phone number (<code>+49 123 123 1234</code>)\n -> <code>code</code> - The security code sent by Telegram to verify the identity. It is important to send the code separated by dots (<code>1.2.3.4.5</code>) otherwise it will immediatelly expire.\n -> <code>password</code> - In case the user has set a 2-steps-verification password, this will be required to sign in correctly.\n\n/signout - Signs out of the Telegram Client and deletes the session.\n\n/forward - Allows the user to forward a message to all the chat members present in a selection of group chats, via the user\'s own account.'
+help_text = '<b>Available Commands:</b>\n/start - Use this command to subscribe to the newsletter.\n\n/unsubscribe - Use this command to unsubscribe from the newsletter and to stop receiving our messages.\n\n/adminhelp - Use this command to get a list of available commands if you are admin of this newsletter.'
+not_admin_text = 'Sorry, this command can only be used by an admin.'
+admin_help_text = '<b>Available Commands:</b>\n/account - Returns the current connection status to the Telegram Client (if the user is logged in and with which Telegram Account)\n\n/signin - Asks the user to input Telegram Credentials and attempts to sign in the Telegram Client. No credentials will be stored in the server.\n -> <code>phone</code> - The user\'s telegram account\'s phone number (<code>+49 123 123 1234</code>)\n -> <code>code</code> - The security code sent by Telegram to verify the identity. It is important to send the code separated by dots (<code>1.2.3.4.5</code>) otherwise it will immediatelly expire.\n -> <code>password</code> - In case the user has set a 2-steps-verification password, this will be required to sign in correctly.\n\n/signout - Signs out of the Telegram Client and deletes the session.\n\n/scrape - Allows you to scrape an instagram user\'s followers to use in the /forward command later.\n\n/forward - Allows the user to forward a message to all the chat members present in a selection of group chats, via the user\'s own account.'
 
 # START NEWSLETTER COMMAND
 already_subscribed_text = 'You are already subscribed to this newsletter! Thank you for taking interest in our content!'
@@ -49,8 +51,30 @@ sign_out_unsuccessful = 'There was a problem in signing out of the Telegram Clie
 not_signed_in = 'You are not signed in yet! To sign in, use /signin'
 sign_out_cancelled = 'Sign Out Cancelled. You are still signed into the client.'
 
+# SCRAPE CONVERSATION
+input_username_text = 'Input below the instagram username you would like to get the followers for:'
+user_not_valid_text = 'The user \'{}\' is not valid. Please try again below:'
+user_private_text = 'The user \'{}\' is a private account, hence it\'s not possible to get it\'s followers. Please try again with another username:'
+select_name_text = 'Input below a name for this follower\'s selection (can be customized, so that you can find it later)'
+select_count_text = 'Select below the amount of followers you would like to scrape. Note that the higher the number, the longer the operation will take to complete.'
+update_scraping_ig_text = 'Starting to scrape {} followers... This might take a while...'
+cancelling_scrape_text = 'Scraping operation has been cancelled.'
+# Instagram Scrape Job
+failed_scraping_ig_text = 'There was an error when scraping the followers. Please try again in a bit or contact a developer of the bot'
+update_scrape_status_text = 'A batch of followers has been scraped... Continuing scrape operation...'
+finished_scrape_text = 'The scrape operation has been completed successfully! {} followers have been scraped and saved into the Google Sheet below:'
+
 # FORWARD MESSAGE CONVERSATION
 client_not_connected = 'The client is not currently connected. Please sign into the Telegram Client with /signin'
+select_forward_mode_text = 'Select below on which platform you would like to forward your message:'
+# Newsletter
+confirm_send_newsletter_text = 'Are you sure you want to send your message through the Karim newsletter to {} users?'
+inform_sending_newsletter_text = 'You message is being sent to your newsletter...'
+# Instagram
+no_selection_available_text = 'No IG users have been scraped so far. Please use /scrape to get a user\'s instagram followers.'
+confirm_send_dm_text = 'Are you sure you want to send your message to {} instagram users?'
+inform_sending_dms_text = 'You message is being sent to the selected instagram followers... This might take a while...'
+# Telegram
 failed_scrape_dialogues = 'There was a problem in retrieving the group chats from the Telegram API... Try again or contact @davidwickerhf for support'
 send_message_to_forward = 'Send below the message you would like to forward:'
 select_group_text = 'Select below the groups you wish to forward your message to. The bot will then forward your messages to all the users in such group'

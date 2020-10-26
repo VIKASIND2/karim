@@ -21,7 +21,7 @@ def unsubscribe(update, context):
 
 
 def confirm_unsubscription(update, context):
-    persistence = dict_to_obj(Persistence.deserialize(Persistence.UNSUBSCRIBE, update), method=Objects.PERSISTENCE)
+    persistence = Persistence.deserialize(Persistence.UNSUBSCRIBE, update), method=Objects.PERSISTENCE)
     if not persistence:
         # Another user tried to enter the conversation
         update.callback_query.answer()

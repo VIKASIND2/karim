@@ -14,6 +14,10 @@ class Callbacks:
     NEWSLETTER = 'NEWSLETTER'
     INSTAGRAM_DM = 'INSTAGRAM_DM'
     TELEGRAM = 'TELEGRAM_GROUPS'
+    TEN = 'TEN'
+    HUNDRED = 'HUNDRED'
+    FIVEHUNDRED = 'FIVEHUNDRED'
+    THOUSAND = 'THOUSAND'
 
 
 class LogInStates:
@@ -33,12 +37,21 @@ class ForwarderStates:
     MODE = 1
     MESSAGE = 2
     SELECT_GROUP = 3
+    SELECT_SCRAPE = 5
     CONFIRM = 4
 
 
 class UnsubscribeStates:
     """Object to store PTB Unsubscribe Conversation Handler states indicators"""
     CONFIRM = 1
+
+
+class ScrapeStates:
+    """Object to store PTB Scraoe Conversation Handler states indicators"""
+    SELECT_TARGET = 1
+    SELECT_COUNT = 2
+    CONFIRM = 3
+    SELECT_NAME = 4
 
 
 class Objects:

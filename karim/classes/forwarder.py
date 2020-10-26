@@ -9,26 +9,25 @@ from karim.classes.persistence import persistence_decorator
 import math, time
 
 class Forwarder(SessionManager):
-    """Manages requests to the TelegramClient regarding the steps to scrape data from the Telegram API"""
-    def __init__(self, method, chat_id, user_id, message_id, phone=None, password=None, code=None, phone_code_hash=None, code_tries=0, mode=None, selected_ids=[], group_ids=None, group_titles=None, shown_ids=[], text=None, targets=[], rotate_size=6, first_index=0, last_index=6, page_index=1, pages=None, telethon_text=None):
-        """
-        groups: List of Dictionaries {id: title}
-        selected_ids: Dictionary(id: title)
-        shown_groups: Dictionary(id: title)
-        """
-        SessionManager.__init__(self, method=method, chat_id=chat_id, user_id=user_id, message_id=message_id, phone=phone, password=password, code=code, phone_code_hash=phone_code_hash, code_tries=code_tries)
-        self.mode = mode
-        self.selected_ids = selected_ids
-        self.group_ids = group_ids
-        self.group_titles = group_titles
-        self.shown_ids = shown_ids
-        self.text = text
-        self.rotate_size = rotate_size
-        self.first_index = first_index
-        self.last_index = last_index
-        self.page_index = page_index
-        self.pages = pages
-        self.telethon_text = telethon_text
+    def __init__(self, method, chat_id, user_id, message_id):
+        SessionManager.__init__(self, method=method, chat_id=chat_id, user_id=user_id, message_id=message_id)
+        self.mode = None
+        self.text = None
+        # Specific to Telegram mode
+        self.selected_ids = None
+        self.group_ids = None
+        self.group_titles = None
+        self.shown_ids = None
+        self.rotate_size = 6
+        self.first_index = 0
+        self.last_index = 6
+        self.page_index = 1
+        self.pages = None
+        self.telethon_text = None
+        # Specific to Newsletter
+        self.subscribers = None
+        # Specific to IG
+        self.users = None
 
 
     def get_selection(self):
@@ -51,9 +50,9 @@ class Forwarder(SessionManager):
         """Return list()"""
         return self.shown_ids.copy()
 
-    def get_targets(self):
-        """Return list()"""
-        return self.targets.copy()
+    def get_users(self):
+        """Return IG Users usernames"""
+        return self.users.copy()
 
     def get_mode(self):
         """Return forwarder mode"""
@@ -122,6 +121,19 @@ class Forwarder(SessionManager):
     def set_text(self, text):
         self.text = text
         return self.text
+
+    @persistence_decorator
+    def set_users(self, users:list):
+        """
+        Set users (instagram usernames) to send the IG DMs to
+
+        :param users: List of instagram usernames
+        :type users: list
+        :return: Returns the saved users list
+        :rtype: list
+        """
+        self.users = users
+        return self.users.copy()
 
     @persistence_decorator
     def set_mode(self, mode):

@@ -39,7 +39,7 @@ def sign_out(update, context):
 @run_async
 @send_typing_action
 def confirm_sign_out(update, context):
-    manager = dict_to_obj(SessionManager.deserialize(SessionManager.SIGNOUT, update), method=Objects.SESSION_MANAGER)
+    manager = SessionManager.deserialize(SessionManager.SIGNOUT, update)
     if not manager:
         # Another user tried to enter the conversation
         return
@@ -60,7 +60,7 @@ def confirm_sign_out(update, context):
 
 @run_async
 def cancel_sign_out(update, context):
-    manager:SessionManager = dict_to_obj(SessionManager.deserialize(SessionManager.SIGNOUT, update), method=Objects.SESSION_MANAGER)
+    manager:SessionManager = SessionManager.deserialize(SessionManager.SIGNOUT, update)
     if not manager:
         # Another user tried to enter the conversation
         return

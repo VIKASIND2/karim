@@ -55,7 +55,7 @@ def validNumber(phone_number):
 def input_phone(update, context):
     """Input Telegram phone number to log into the Telegram client"""
     print('received phone')
-    manager = dict_to_obj(Persistence.deserialize(Persistence.SIGNIN, update), method=Objects.SESSION_MANAGER)
+    manager = Persistence.deserialize(Persistence.SIGNIN, update)
     if not manager:
         # Another user tried to enter the conversation
         print('FAILED ATTEMPT AT PERSISTENCE')
@@ -78,7 +78,7 @@ def input_phone(update, context):
 @send_typing_action
 def input_code(update, context):
     """Input Telegram security code to log into the Telegram client"""
-    manager: SessionManager = dict_to_obj(Persistence.deserialize(Persistence.SIGNIN, update), method=Objects.SESSION_MANAGER)
+    manager: SessionManager = Persistence.deserialize(Persistence.SIGNIN, update)
     if not manager:
         # Another user tried to enter the conversation
         print('FAILED ATTEMPT AT PERSISTENCE')
@@ -130,7 +130,7 @@ def input_code(update, context):
 @send_typing_action
 def input_password(update, context):
     """Input Telegram password to log into the Telegram client"""
-    manager: SessionManager = dict_to_obj(Persistence.deserialize(Persistence.SIGNIN, update), method=Objects.SESSION_MANAGER)
+    manager: SessionManager = Persistence.deserialize(Persistence.SIGNIN, update)
     if not manager:
         # Another user tried to enter the conversation
         return
@@ -168,7 +168,7 @@ def input_password(update, context):
 @run_async
 def cancel_start(update, context, include_message=True):
     """Fallback method. Cancels Start manager"""
-    manager = dict_to_obj(Persistence.deserialize(Persistence.SIGNIN, update), method=Objects.SESSION_MANAGER)
+    manager = Persistence.deserialize(Persistence.SIGNIN, update)
     if not manager:
         # Another user tried to enter the conversation
         return

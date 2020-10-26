@@ -17,13 +17,13 @@ from telethon.tl.types.auth import SentCode
 class SessionManager(Persistence):
     """Used for persistance and passing of login information"""
     @persistence_decorator
-    def __init__(self, method, chat_id, user_id, message_id, phone=None, password=None, code=None, phone_code_hash=None, code_tries=0):
+    def __init__(self, method, chat_id, user_id, message_id):
         super().__init__(method=method, chat_id=chat_id, user_id=user_id, message_id=message_id)
-        self.phone = phone
-        self.password = password
-        self.code = code
-        self.phone_code_hash = phone_code_hash
-        self.code_tries = code_tries
+        self.phone = None
+        self.password = None
+        self.code = None
+        self.phone_code_hash = None
+        self.code_tries = None
 
     def __str__(self):
         return 'SessionManager({}, {}, {}, {})'.format(self.phone, self.password, self.phone_code_hash)

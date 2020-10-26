@@ -1,8 +1,9 @@
+from telegram.ext import updater
 import telethon
 from telethon.errors.rpcbaseerrors import UnauthorizedError
 from telethon.errors.rpcerrorlist import PeerFloodError
 from karim.bot.commands import *
-from karim.modules import message_job
+from karim.modules import message_job, instagram_job
 from karim.modules import sheet
 from karim import queue
 import time
@@ -35,7 +36,7 @@ def forward_message(update, context):
 @run_async
 @send_typing_action
 def forward_mode(update, context):
-    forwarder: Forwarder = dict_to_obj(Forwarder.deserialize(Forwarder.FORWARDER, update), method=Objects.FORWARDER)
+    forwarder: Forwarder = Forwarder.deserialize(Forwarder.FORWARDER, update)
     if not forwarder:
         # Another user tried to enter the conversation
         return
@@ -53,8 +54,7 @@ def forward_mode(update, context):
 @run_async
 @send_typing_action
 def select_message(update, context):
-    """Initialize message Conversation"""
-    forwarder: Forwarder = dict_to_obj(Forwarder.deserialize(Forwarder.FORWARDER, update), method=Objects.FORWARDER)
+    forwarder: Forwarder = Forwarder.deserialize(Forwarder.FORWARDER, update)
     if not forwarder:
         # Another user tried to enter the conversation
         return
@@ -65,12 +65,26 @@ def select_message(update, context):
     # MODE
     if forwarder.get_mode() == Callbacks.NEWSLETTER:
         users = sheet.get_subscribers()
-        for user in users:
-            context.bot.send_queued_message(chat_id=user,text=forwarder.text, parse_mode=ParseMode.MARKDOWN_V2)
+        markup = CreateMarkup({Callbacks.CONFIRM: 'Confirm', Callbacks.CANCEL: 'Cancel'}).create_markup()
+        update.message.reply_text(text=confirm_send_newsletter_text.format(len(users)), reply_markup=markup)
+        return ForwarderStates.CONFIRM
 
     elif forwarder.get_mode() == Callbacks.INSTAGRAM_DM:
-        """Send to IG"""
-        
+        # TODO SELECT SCRAPED SELECTION
+        # Get Scraped from Sheet
+        scraped = sheet.get_scraped()
+        if not scraped:
+            # No selection available, ask to start  a new scrape
+            context.bot.edit_message_text(chat_id=update.effective_chat.id, message_id=forwarder.message_id, text=no_selection_available_text)
+            return ConversationHandler.END
+        else:
+            markup_dict = {}
+            for item in scraped:
+                markup_dict[scraped[0]] = scraped[1]
+            markup_dict[Callbacks.CANCEL] = 'Cancel'
+            markup = CreateMarkup(markup_dict).create_markup()
+            context.bot.edit_message_text(chat_id=update.effective_chat.id, message_id=forwarder.message_id, reply_markup=markup)
+            return ForwarderStates.SELECT_SCRAPE
 
     elif forwarder.get_mode() == Callbacks.TELEGRAM:
         # SEND TO TELEGRAM GROUP SELECTION
@@ -107,10 +121,35 @@ def select_message(update, context):
             update.effective_chat.send_message(error_checking_connection, parse_mode=ParseMode.HTML)
             return ConversationHandler.END
 
+
+@run_async
+@send_typing_action
+def select_scrape(update, context):
+    forwarder: Forwarder = Forwarder.deserialize(Forwarder.FORWARDER, update)
+    if not forwarder:
+        # Another user tried to enter the conversation
+        return
+
+    # GET INPUT CALLBACK 
+    data = update.callback_query.data
+    update.callback_query.answer()
+    if data == Callbacks.CANCEL:
+        return cancel_forward(update, context, forwarder)
+    else:
+        scrape = sheet.get_scraped(username=data)
+        targets_str = scrape[2]
+        targets = list(targets_str)
+        markup = CreateMarkup({Callbacks.CANCEL: 'Cancel'}).create_markup()
+        context.bot.edit_message_text(chat_id=update.effective_chat.id, 
+        message_id=forwarder.message_id, text=confirm_send_dm_text.format(len(targets)), reply_markup=markup)
+        forwarder.set_users(targets)
+        return ForwarderStates.CONFIRM
+        #instagram_job.queue_send_dm(targets, forwarder.text)
     
+
 @run_async
 def select_group(update, context):
-    forwarder: Forwarder = dict_to_obj(Forwarder.deserialize(Forwarder.FORWARDER, update), method=Objects.FORWARDER)
+    forwarder: Forwarder = Forwarder.deserialize(Forwarder.FORWARDER, update)
     if not forwarder:
         # Another user tried to enter the conversation
         return
@@ -184,12 +223,11 @@ def select_group(update, context):
         return
 
 
-
 @run_async
 @send_typing_action
 def confirm(update, context):
     """Confirm forward settings"""
-    forwarder: Forwarder = dict_to_obj(Persistence.deserialize(Forwarder.FORWARDER, update), method=Objects.FORWARDER)
+    forwarder: Forwarder = Persistence.deserialize(Forwarder.FORWARDER, update)
     if not forwarder:
         # Another user tried to enter the conversation
         return
@@ -201,17 +239,30 @@ def confirm(update, context):
         return ConversationHandler.END
     else:
         # Send Messages
-        context.bot.edit_message_text(preparing_queue_text, parse_mode=ParseMode.HTML, chat_id=update.effective_chat.id, message_id=forwarder.message_id)
-        targets = forwarder.load_targets()
-        message_job.queue_messages(targets, context, forwarder)
-        forwarder.discard()
-        return ConversationHandler.END
+        if forwarder.get_mode() == Callbacks.TELEGRAM:
+            context.bot.edit_message_text(preparing_queue_text, parse_mode=ParseMode.HTML, chat_id=update.effective_chat.id, message_id=forwarder.message_id)
+            targets = forwarder.load_targets()
+            message_job.queue_messages(targets, context, forwarder)
+            forwarder.discard()
+            return ConversationHandler.END
+
+        elif forwarder.get_mode() == Callbacks.NEWSLETTER:
+            targets = sheet.get_subscribers()
+            context.bot.edit_message_text(chat_id=update.effective_chat.id, message_id=forwarder.message_id, text=inform_sending_newsletter_text)
+            message_job.queue_messages(targets, context, forwarder)
+            return ConversationHandler.END
+
+        elif forwarder.get_mode() == Callbacks.INSTAGRAM_DM:
+            users = forwarder.get_users()
+            context.bot.edit_message_text(chat_id=update.effective_chat.id, message_id=forwarder.message_id, text=inform_sending_dms_text)
+            instagram_job.queue_send_dm(users, forwarder.text)
+            return ConversationHandler.END
 
 
 @run_async
 def cancel_forward(update, context, send_message=True, forwarder=None):
     if not forwarder:
-        forwarder = dict_to_obj(Persistence.deserialize(Persistence.FORWARDER, update), method=Objects.FORWARDER)
+        forwarder = Persistence.deserialize(Persistence.FORWARDER, update)
     if not forwarder:
         # Another user tried to enter the conversation
         return
