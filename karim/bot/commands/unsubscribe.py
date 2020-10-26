@@ -3,7 +3,7 @@ from karim.bot.commands import *
 from karim.modules import sheet
 
 def unsubscribe_command(update, context):
-    if update.effective_user.id in secrets.get_var('USERS'):
+    if update.effective_user.id in list(secrets.get_var('USERS')):
         update.message.replu_text(admin_cannot_unsubscribe)
         return ConversationHandler.END
     elif sheet.is_subscriber(update.effective_user.id):
