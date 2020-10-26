@@ -10,19 +10,22 @@ def start(update, context):
     users = list(secrets.get_var('USERS'))
     if update.effective_user.id in users:
         # User is Admin, start sign in
-        client_sign_in(update, context)
-    elif sheet.is_subscriber(update.effective_user.id):
+        return client_sign_in(update, context)
+
+    subscribed = sheet.is_subscriber(update.effective_user.id)
+    message = update.effective_chat.send_message(checking_subscription)
+    if subscribed :
         # User is already subscribed
-        update.message.reply_text(already_subscribed_text)
+        context.bot.edit_message_text(chat_id=update.effective_chat.id, message_id=message.message_id, text=already_subscribed_text)
         return
     else:
         # Subscribe user
         result = sheet.add_subscriber(update.effective_user.id)
         if result:
-            update.message.reply_text(subscription_successful_text)
+            context.bot.edit_message_text(chat_id=update.effective_chat.id, message_id=message.message_id, text=subscription_successful_text)
             return
         else:
-            update.message.reply_text(error_in_subscribing_text)
+            context.bot.edit_message_text(chat_id=update.effective_chat.id, message_id=message.message_id, text=error_in_subscribing_text)
             return
 
 
