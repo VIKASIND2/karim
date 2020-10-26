@@ -11,7 +11,7 @@ def unsubscribe_command(update, context):
         # User is subscribed
         persistence = Persistence(Persistence.UNSUBSCRIBE, update.effective_chat.id, update.effective_user.id, update.message.message_id)
         update.message.reply_text
-        markup = CreateMarkup({Callbacks.CONFIRM, Callbacks.CANCEL}).create_markup()
+        markup = CreateMarkup({Callbacks.CONFIRM: 'Confirm', Callbacks.CANCEL: 'Cancel'}).create_markup()
         message = update.message.reply_text(confirm_unsubscription_text, reply_markup=markup)
         persistence.set_message(message.message_id)
         return UnsubscribeStates.CONFIRM
