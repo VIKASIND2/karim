@@ -12,8 +12,8 @@ from karim.secrets import secrets
 
 
 def auth():
-    creds = jsonpickle.decode(secrets.get_var('GSPREAD_CREDS'))
-    if creds == None:
+    creds_string = secrets.get_var('GSPREAD_CREDS')
+    if creds_string == None:
         # use creds to create a client to interact with the Google Drive API
         scope = [
             'https://spreadsheets.google.com/feeds',
@@ -35,6 +35,7 @@ def auth():
             client_secret_dict, scope)
         creds_string = jsonpickle.encode(creds)
         secrets.set_var('GSPREAD_CREDS', creds_string)
+    creds = jsonpickle.decode(creds_string)
     client = gspread.authorize(creds)
 
     # IF NO SPREADSHEET ENV VARIABLE HAS BEEN SET, SET UP NEW SPREADSHEET
