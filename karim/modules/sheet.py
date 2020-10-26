@@ -79,7 +79,7 @@ def remove_subscriber(id:int or str):
     """
     spreadsheet = auth()
     subscribers = spreadsheet.get_worksheet(0)
-    subscribers.delete_row(find_by_username(username=id, sheet=subscribers)[0])
+    subscribers.delete_row(find_by_username(username=str(id), sheet=subscribers)[0])
     # LOG
     log(datetime.utcnow(),id, 'UNSUBSCRIBE')
     return True
