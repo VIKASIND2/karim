@@ -1,15 +1,13 @@
 import json
 import os
-from karim import LOCALHOST
 
 
-
-def get_var(key="", parent="", default="", value=""):
+def get_var(key="", parent="", default="", value="", localhost=False):
     """
     Retrieve configuration variables from the secrets.json file.
     :variable: String of the name of the variable you are retrieving (see secrets.json)
     """
-    if LOCALHOST:
+    if localhost:
         # CODE RUNNING LOCALLY
         variables = {}
         with open('karim/secrets/secrets.json') as variables_file:
@@ -36,13 +34,13 @@ def get_var(key="", parent="", default="", value=""):
         return os.environ.get(key)
 
 
-def set_var(key, value):
+def set_var(key, value, localhost=False):
     """
     Set a variable to the env_variables.json file.
     :key: String (all caps) with the dictionary name of the variable (type str)
     :value: the value of the variable (type str)
     """
-    if LOCALHOST:
+    if localhost:
         with open('karim/secrets/secrets.json') as variables_file:
             variables = json.load(variables_file)
 
