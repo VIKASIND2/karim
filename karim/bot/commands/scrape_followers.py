@@ -1,4 +1,4 @@
-from karim.classes.scraper import Scraper, scraper
+from karim.classes.scraper import Scraper
 from typing import Callable
 from instaclient.errors.common import InvalidUserError, PrivateAccountError
 from karim.bot.commands import *
