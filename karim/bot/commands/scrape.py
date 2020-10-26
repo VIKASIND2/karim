@@ -80,6 +80,7 @@ def select_count(update, context):
         scraper.set_count(1000)
     else:
         #cancel
+        print('Cancel Scrape')
         return cancel_scrape(update, context, scraper)
 
     context.bot.edit_message_text(chat_id=update.effective_chat.id, message_id=scraper.message_id, text=update_scraping_ig_text.format(scraper.get_count()))
@@ -89,7 +90,11 @@ def select_count(update, context):
 
 @run_async
 @send_typing_action
-def cancel_scrape(update, context, scraper:Scraper):
+def cancel_scrape(update, context, scraper:Scraper=None):
+    if not scraper:
+        scraper:Scraper = Scraper.deserialize(Persistence.SCRAPE_FOLLOWERS, update)
+        if not scraper:
+            return
     try:
         context.bot.edit_message_text(chat_id=update.effective_chat.id, message_id=scraper.message_id, text=cancelling_scrape_text)
     except:
