@@ -7,6 +7,7 @@ def unsubscribe_command(update, context):
         update.message.replu_text(admin_cannot_unsubscribe)
         return ConversationHandler.END
     elif sheet.is_subscriber(update.effective_user.id):
+        print('Subscribed')
         # User is subscribed
         persistence = Persistence(Persistence.UNSUBSCRIBE, update.effective_chat.id, update.effective_user.id, update.message.message_id)
         update.message.reply_text
@@ -15,6 +16,7 @@ def unsubscribe_command(update, context):
         persistence.set_message(message.message_id)
         return UnsubscribeStates.CONFIRM
     else:
+        print('Not subscribed')
         # User is not subscribed
         update.message.reply_text(not_subscribed_yet_text)
         return ConversationHandler.END

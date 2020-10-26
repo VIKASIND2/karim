@@ -101,8 +101,8 @@ def is_subscriber(id:int or str):
     """
     spreadsheet = auth()
     subscribers = spreadsheet.get_worksheet(0)
-    rows:int = find_by_username(str(id), sheet=subscribers)[0]
-    if not rows:
+    rows:int = find_by_username(str(id), sheet=subscribers)
+    if str(id) in rows:
         return False
     else:
         return True
