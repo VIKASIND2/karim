@@ -52,7 +52,7 @@ def setup(updater):
         ]
     )
     unsubscribe_handler = ConversationHandler(
-        entry_points=[CommandHandler('unsubscribe', unsubscribe)],
+        entry_points=[CommandHandler('unsubscribe', unsubscribe_command)],
         states={
             UnsubscribeStates.CONFIRM: [CallbackQueryHandler(confirm_unsubscription)]
         },
