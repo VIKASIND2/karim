@@ -32,7 +32,7 @@ def setup(updater):
     forwarder_handler = ConversationHandler(
         entry_points=[CommandHandler('forward', forward_message)],
         states = {
-            ForwarderStates.MODE: [],
+            ForwarderStates.MODE: [CallbackQueryHandler(forward_mode)],
             ForwarderStates.MESSAGE: [MessageHandler(Filters.text, select_message)],
             ForwarderStates.SELECT_SCRAPE: [CallbackQueryHandler(select_scrape)],
             ForwarderStates.SELECT_GROUP: [CallbackQueryHandler(select_group)],
