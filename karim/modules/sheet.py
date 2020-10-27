@@ -80,8 +80,7 @@ def remove_subscriber(id:int or str):
     spreadsheet = auth()
     subscribers = spreadsheet.get_worksheet(0)
     row = find_by_username(username=str(id), sheet=subscribers)[0]
-    print('ROW: ', row)
-    subscribers.delete_row()
+    subscribers.delete_row(row)
     # LOG
     log(datetime.utcnow(),id, 'UNSUBSCRIBE')
     return True
@@ -102,9 +101,9 @@ def is_subscriber(id:int or str):
     rows:int = find_by_username(str(id), sheet=subscribers)
     print('CHECK ROW: ', rows)
     if str(id) in rows:
-        return False
-    else:
         return True
+    else:
+        return False
 
 
 def get_subscribers():
@@ -216,10 +215,8 @@ def find_by_username(username:str, sheet:Worksheet, col:int=1):
         spreadsheet = auth()
         sheet = spreadsheet.get_worksheet(0)
     column = sheet.col_values(col)
-    print('COLUMN: ', column)
     rows = []
     for num, cell in enumerate(column):
-        print('Row value: ', cell)
         if str(cell) == str(username):
             rows.append(num + 1)
     if rows == []:
