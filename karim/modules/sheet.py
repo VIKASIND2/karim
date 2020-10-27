@@ -61,11 +61,15 @@ def add_subscriber(id:int or str):
     :param id: Telegram id of the user
     :type id: intorstr
     """
-    spreadsheet = auth()
-    subscribers = spreadsheet.get_worksheet(0)
-    subscribers.append_row([id])
-    # LOG
-    log(datetime.utcnow(), id, 'SUBSCRIBE')
+    try:
+        spreadsheet = auth()
+        subscribers = spreadsheet.get_worksheet(0)
+        subscribers.append_row([id])
+        # LOG
+        log(datetime.utcnow(), id, 'SUBSCRIBE')
+        return True
+    except:
+        return False
     
 
 def remove_subscriber(id:int or str):

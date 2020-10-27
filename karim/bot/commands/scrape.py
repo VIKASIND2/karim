@@ -70,6 +70,7 @@ def select_count(update, context):
         return ScrapeStates.SELECT_COUNT
 
     data = update.callback_query.data
+    print('SCRAPE DATA: ', data)
     if data == Callbacks.TEN:
         scraper.set_count(10)
     elif data == Callbacks.HUNDRED:
