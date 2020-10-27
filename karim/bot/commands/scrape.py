@@ -11,15 +11,16 @@ def scrape_followers(update, context):
     if not check_auth(update, context):
         return ConversationHandler.END
     # Check IG Connection
+    message = update.effective_chat.send_message(text=checking_ig_status)
     result = instaclient.check_status()
     if result:
         scraper = Scraper(Persistence.SCRAPE_FOLLOWERS, update.effective_chat.id, update.effective_user.id)
         markup = CreateMarkup({Callbacks.CANCEL: 'Cancel'}).create_markup()
-        message = update.message.reply_text(input_username_text, reply_markup = markup)
+        context.bot.edit_message_text(text=input_username_text, message_id=message.message_id, chat_id=update.effective_chat.id, reply_markup=markup)
         scraper.set_message(message.message_id)
         return ScrapeStates.SELECT_TARGET
     else:
-        update.effective_chat.send_message(text=ig_not_logged_in_text)
+        context.bot.edit_message_text(text=ig_not_logged_in_text, message_id=message.message_id, chat_id=update.effective_chat.id)
         return ConversationHandler.END
 
 

@@ -42,7 +42,7 @@ def ig_login(update, context):
 @run_async
 @send_typing_action
 def instagram_username(update, context):
-    instasession:InstaSession = InstaSession.deserialize(Persistence.INSASESSION, update)
+    instasession:InstaSession = InstaSession.deserialize(Persistence.INSTASESSION, update)
     if not instasession:
         return InstaStates.INPUT_USERNAME
     
@@ -68,7 +68,7 @@ def instagram_username(update, context):
 @run_async
 @send_typing_action
 def instagram_password(update, context):
-    instasession:InstaSession = InstaSession.deserialize(Persistence.INSASESSION, update)
+    instasession:InstaSession = InstaSession.deserialize(Persistence.INSTASESSION, update)
     if not instasession:
         return InstaStates.INPUT_PASSWORD
 
@@ -97,7 +97,7 @@ def instagram_password(update, context):
 @run_async
 @send_typing_action
 def instagram_security_code(update, context):
-    instasession:InstaSession = InstaSession.deserialize(Persistence.INSASESSION, update)
+    instasession:InstaSession = InstaSession.deserialize(Persistence.INSTASESSION, update)
     if not instasession:
         return InstaStates.INPUT_SECURITY_CODE
 
@@ -124,7 +124,7 @@ def instagram_security_code(update, context):
 @send_typing_action
 def cancel_instagram(update, context, instasession:InstaSession=None):
     if not instasession:
-        instasession = InstaSession.deserialize(Persistence.INSASESSION, update)
+        instasession = InstaSession.deserialize(Persistence.INSTASESSION, update)
         if not instasession:
             return
 
