@@ -3,6 +3,7 @@ from karim.bot.texts import *
 from karim.classes.persistence import Persistence
 from karim.classes.session_manager import SessionManager
 from karim.classes.forwarder import Forwarder
+from karim.classes.insta_session import InstaSession
 from karim.classes.forwarder_markup import ForwarderMarkup, CreateMarkup, MarkupDivider
 from telethon.sync import TelegramClient
 from karim.classes.callbacks import *
