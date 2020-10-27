@@ -17,7 +17,7 @@ class Persistence(object):
     SIGNOUT = 'signout'
     ACCOUNT = 'account'
     FORWARDER = 'forwarder'
-    INSASESSION = 'instasession'
+    INSTASESSION = 'instasession'
     START = 'start'
     UNSUBSCRIBE = 'unsubscribe'
     SCRAPE_FOLLOWERS = 'scrape'

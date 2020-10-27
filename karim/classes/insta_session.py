@@ -5,9 +5,9 @@ import os, redis
 class InstaSession(Persistence):
     def __init__(self, chat_id, user_id, message_id=None):
         super().__init__(Persistence.INSTASESSION, chat_id, user_id, message_id)
-        username = None
-        password = None
-        security_code = None
+        self.username = None
+        self.password = None
+        self.security_code = None
 
     @persistence_decorator
     def set_username(self, username):
