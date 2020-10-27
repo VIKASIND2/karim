@@ -53,6 +53,7 @@ def instagram_username(update, context):
     # Verify User
     try:
         instaclient.is_valid_user(username)
+        print('USER IS VALID')
     except InvalidUserError as error:
         context.bot.edit_message_text(text=invalid_user_text.format(error.username), chat_id=update.effective_chat.id, message_id=instasession.message_id, reply_markup=markup)
         instasession.set_message(message.message_id)
