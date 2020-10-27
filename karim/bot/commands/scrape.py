@@ -19,7 +19,7 @@ def scrape_followers(update, context):
         scraper.set_message(message.message_id)
         return ScrapeStates.SELECT_TARGET
     else:
-        update.message.send_message(text=ig_not_logged_in_text)
+        update.effective_chat.send_message(text=ig_not_logged_in_text)
         return ConversationHandler.END
 
 
