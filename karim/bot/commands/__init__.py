@@ -7,6 +7,23 @@ from karim.classes.insta_session import InstaSession
 from karim.classes.forwarder_markup import ForwarderMarkup, CreateMarkup, MarkupDivider
 from telethon.sync import TelegramClient
 from karim.classes.callbacks import *
+from telegram import InputMediaPhoto, InputFile
+""" import io
+from PIL import Image
+
+def photo_to_byte(path, expipt):
+    im = Image.open(path)
+    fp = io.BytesIO()
+    format = Image.registered_extensions()['.'+ext]
+    im.save(fp, format)
+    return fp.getvalue()
+
+
+def send_photo(path, context):
+    file = InputFile(path)
+    media = InputMediaPhoto(file)
+    context.bot.send_message() """
+
 
 
 

@@ -52,7 +52,7 @@ def instagram_username(update, context):
     markup = CreateMarkup({Callbacks.CANCEL: 'Cancel'}).create_markup()
     # Verify User
     try:
-        instaclient.driver.save_screenshot("before.png")
+        instaclient.driver.save_screenshot("before.png") # TODO remove
         result = instaclient.is_valid_user(username)
         print('USER {} IS VALID: '.format(username), result)
         instaclient.driver.save_screenshot("after.png")
