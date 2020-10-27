@@ -15,9 +15,9 @@ class Callbacks:
     INSTAGRAM_DM = 'INSTAGRAM_DM'
     TELEGRAM = 'TELEGRAM_GROUPS'
     TEN = 'TEN'
-    HUNDRED = 'HUNDRED'
-    FIVEHUNDRED = 'FIVEHUNDRED'
-    THOUSAND = 'THOUSAND'
+    TFIVE = 'TFIVE'
+    FIFTY = 'FIFTY'
+    SFIVE = 'SFIVE'
 
 
 class LogInStates:
@@ -38,6 +38,7 @@ class ForwarderStates:
     MESSAGE = 2
     SELECT_GROUP = 3
     SELECT_SCRAPE = 5
+    SELECT_COUNT = 6
     CONFIRM = 4
 
 
@@ -52,6 +53,14 @@ class ScrapeStates:
     SELECT_COUNT = 2
     CONFIRM = 3
     SELECT_NAME = 4
+
+
+class InstaStates:
+    """Object to store PTB InstaSession Conversation Handler states indicators"""
+    INPUT_SECURITY_CODE = 1
+    INPUT_USERNAME = 2
+    INPUT_PASSWORD = 3
+
 
 
 class Objects:

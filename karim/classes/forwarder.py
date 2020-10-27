@@ -28,6 +28,7 @@ class Forwarder(SessionManager):
         self.subscribers = None
         # Specific to IG
         self.users = None
+        self.count = None
 
 
     def get_selection(self):
@@ -121,6 +122,11 @@ class Forwarder(SessionManager):
     def set_text(self, text):
         self.text = text
         return self.text
+
+    @persistence_decorator
+    def set_count(self, count):
+        self.count = count
+        return self.count
 
     @persistence_decorator
     def set_users(self, users:list):

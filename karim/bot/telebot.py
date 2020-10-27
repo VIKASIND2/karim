@@ -1,5 +1,6 @@
 from logging import Filter
 from karim.bot.commands.signin import *
+from karim.bot.commands.instagram import *
 from karim.bot.commands.help import *
 from karim.bot.commands.signout import *
 from karim.bot.commands.scrape import *
@@ -22,6 +23,8 @@ def setup(updater):
         },
         fallbacks=[CallbackQueryHandler(cancel_start)]
     )
+
+
     signout_handler = ConversationHandler(
         entry_points=[CommandHandler('signout', sign_out), CallbackQueryHandler(sign_out, pattern=Callbacks.LOGOUT)],
         states={
@@ -29,28 +32,46 @@ def setup(updater):
         },
         fallbacks=[CallbackQueryHandler(cancel_sign_out)]
     )
+
+
     forwarder_handler = ConversationHandler(
         entry_points=[CommandHandler('forward', forward_message)],
         states = {
             ForwarderStates.MODE: [CallbackQueryHandler(forward_mode)],
             ForwarderStates.MESSAGE: [MessageHandler(Filters.text, select_message)],
             ForwarderStates.SELECT_SCRAPE: [CallbackQueryHandler(select_scrape)],
+            ForwarderStates.SELECT_COUNT: [CallbackQueryHandler(select_count)],
             ForwarderStates.SELECT_GROUP: [CallbackQueryHandler(select_group)],
             ForwarderStates.CONFIRM: [CallbackQueryHandler(confirm)],
         },
         fallbacks=[CallbackQueryHandler(cancel_forward)]
     )
+
+
     scrape_handler = ConversationHandler(
         entry_points=[CommandHandler('scrape', scrape_followers)],
         states={
             ScrapeStates.SELECT_TARGET: [MessageHandler(Filters.text, select_target)],
             ScrapeStates.SELECT_NAME: [MessageHandler(Filters.text, select_name)],
-            ScrapeStates.SELECT_COUNT: [CallbackQueryHandler(select_count)],
+            ScrapeStates.CONFIRM: [CallbackQueryHandler(select_count)],
         },
         fallbacks=[
             CallbackQueryHandler(cancel_scrape)
         ]
     )
+
+
+    instagram_handler = ConversationHandler(
+        entry_points=[CommandHandler('instagram', ig_login)],
+        states={
+            InstaStates.INPUT_USERNAME: [MessageHandler(Filters.text, instagram_username)],
+            InstaStates.INPUT_PASSWORD: [MessageHandler(Filters.text, instagram_password)],
+            InstaStates.INPUT_SECURITY_CODE: [MessageHandler(Filters.text, instagram_security_code)],
+        },
+        fallbacks=[CallbackQueryHandler(cancel_instagram)]
+    )
+
+    
     unsubscribe_handler = ConversationHandler(
         entry_points=[CommandHandler('unsubscribe', unsubscribe_command)],
         states={
@@ -64,6 +85,7 @@ def setup(updater):
     dp.add_handler(CommandHandler('adminhelp', admin_help))
     dp.add_handler(CommandHandler('account', check_account))
     dp.add_handler(CommandHandler('start', start))
+    dp.add_handler(instagram_handler)
     dp.add_handler(scrape_handler)
     dp.add_handler(signout_handler)
     dp.add_handler(start_handler)

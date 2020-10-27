@@ -1,3 +1,4 @@
+import random
 from telegram.ext import updater
 import telethon
 from telethon.errors.rpcbaseerrors import UnauthorizedError
@@ -142,14 +143,52 @@ def select_scrape(update, context):
         scrape = sheet.get_scraped(username=data)
         targets_str = scrape[2]
         targets = list(targets_str)
-        markup = CreateMarkup({Callbacks.CANCEL: 'Cancel'}).create_markup()
+        markup = CreateMarkup({Callbacks.TEN: '10', Callbacks.TFIVE: '25', Callbacks.FIFTY: '50', Callbacks.SFIVE: '75', Callbacks.CANCEL: 'Cancel'}).create_markup()
         message = context.bot.edit_message_text(chat_id=update.effective_chat.id, 
         message_id=forwarder.message_id, text=confirm_send_dm_text.format(len(targets)), reply_markup=markup)
         forwarder.set_message(message.message_id)
         forwarder.set_users(targets)
         return ForwarderStates.CONFIRM
-        #instagram_job.queue_send_dm(targets, forwarder.text)
+
+
+@run_async
+@send_typing_action
+def select_count(update, context):
+    forwarder: Forwarder = Forwarder.deserialize(Forwarder.FORWARDER, update)
+    if not forwarder:
+        # Another user tried to enter the conversation
+        return
+
+    data = update.callback_query.data
     
+    if data == Callbacks.CANCEL:
+        return cancel_forward(update, context, forwarder)
+    elif data == Callbacks.TEN:
+        forwarder.set_count(10)
+    elif data == Callbacks.TFIVE:
+        forwarder.set_count(25)
+    elif data == Callbacks.FIFTY:
+        forwarder.set_count(50)
+    elif data == Callbacks.SFIVE:
+        forwarder.set_count(75)
+
+    
+    # Load targets:
+    scrape = sheet.get_scraped(username=data)
+    users = scrape[2]
+    targets = []
+    for i in range(forwarder.count):
+        rand = random.randrange(len(users))
+        targets.append(users[rand])
+    forwarder.set_users(users)
+
+    # Confirm
+    markup = CreateMarkup({Callbacks.CONFIRM: 'Confirm', Callbacks.CANCEL: 'Cancel'}).create_markup()
+    message = context.bot.edit_message_text(chat_id=update.effective_chat.id, 
+    message_id=forwarder.message_id, text=confirm_send_dm_text.format(forwarder.count), reply_markup=markup)
+    forwarder.set_message(message.message_id)
+    return ForwarderStates.CONFIRM
+
 
 @run_async
 def select_group(update, context):
