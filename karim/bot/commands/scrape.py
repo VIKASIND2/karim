@@ -44,7 +44,8 @@ def select_target(update, context):
         scraper.set_message(message.message_id)
         return ScrapeStates.SELECT_TARGET
     
-    except:
+    except Exception as error:
+        context.bot.report_error(error)
         return cancel_scrape(update, context, scraper)
 
 
@@ -92,6 +93,7 @@ def select_count(update, context):
 @run_async
 @send_typing_action
 def cancel_scrape(update, context, scraper:Scraper=None):
+    print('Scrape')
     if not scraper:
         scraper:Scraper = Scraper.deserialize(Persistence.SCRAPE_FOLLOWERS, update)
         if not scraper:
