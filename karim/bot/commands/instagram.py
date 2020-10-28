@@ -1,4 +1,4 @@
-from instaclient.errors.common import InvaildPasswordError, InvalidSecurityCodeError, InvalidUserError, PrivateAccountError, SecurityCodeNecessary
+from instaclient.errors.common import InvaildPasswordError, InvalidSecurityCodeError, InvalidUserError, PrivateAccountError, InvalidVerificationCodeError, VerificationCodeNecessary, SuspisciousLoginAttemptError
 from karim.bot.commands import *
 from karim import instaclient
 
@@ -26,7 +26,11 @@ def ig_login(update, context):
             # Creds Exist, attempt login
             try:
                 instaclient.login(instasession.username, instasession.password)
-            except SecurityCodeNecessary:
+            except VerificationCodeNecessary:
+                # Creds are correct
+                context.bot.edit_message_text(text=input_verification_code_text, chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)
+                return InstaStates.INPUT_VERIFICATION_CODE
+            except SuspisciousLoginAttemptError:
                 # Creds are correct
                 context.bot.edit_message_text(text=input_security_code_text, chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)
                 return InstaStates.INPUT_SECURITY_CODE
@@ -86,9 +90,35 @@ def instagram_password(update, context):
     except InvaildPasswordError:
         context.bot.edit_message_text(text=invalid_password_text.format(instaclient.password), chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)
         return InstaStates.INPUT_PASSWORD
-    except SecurityCodeNecessary:
-        context.bot.edit_message_text(text=input_security_code_text, chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)
-        return InstaStates.INPUT_SECURITY_CODE
+    except VerificationCodeNecessary:
+        context.bot.edit_message_text(text=input_verification_code_text, chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)
+        return InstaStates.INPUT_VERIFICATION_CODE
+
+    # Login Successful
+    instasession.save_creds()
+    context.bot.edit_message_text(text=login_successful_text, chat_id=instasession.chat_id, message_id=instasession.message_id)
+    instasession.discard()
+    return ConversationHandler.END
+
+
+@run_async
+@send_typing_action
+def instagram_verification_code(update, context):
+    instasession:InstaSession = InstaSession.deserialize(Persistence.INSTASESSION, update)
+    if not instasession:
+        return InstaStates.INPUT_VERIFICATION_CODE
+
+    markup = CreateMarkup({Callbacks.CANCEL: 'Cancel'}).create_markup()
+    code = update.message.text
+    message = update.effective_chat.send_message(text=validating_code_text, reply_markup=markup)
+    instasession.set_code(code)
+    instasession.set_message(message.message_id)
+
+    try:
+        instaclient.input_verification_code(code)
+    except InvalidVerificationCodeError:
+        context.bot.edit_message_text(text=invalid_security_code_text.format(code), chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)
+        return InstaStates.INPUT_VERIFICATION_CODE
 
     # Login Successful
     instasession.save_creds()

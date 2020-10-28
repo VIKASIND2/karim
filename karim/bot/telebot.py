@@ -67,6 +67,7 @@ def setup(updater):
             InstaStates.INPUT_USERNAME: [MessageHandler(Filters.text, instagram_username)],
             InstaStates.INPUT_PASSWORD: [MessageHandler(Filters.text, instagram_password)],
             InstaStates.INPUT_SECURITY_CODE: [MessageHandler(Filters.text, instagram_security_code)],
+            InstaStates.INPUT_VERIFICATION_CODE: [MessageHandler(Filters.text, instagram_verification_code)],
         },
         fallbacks=[CallbackQueryHandler(cancel_instagram)]
     )

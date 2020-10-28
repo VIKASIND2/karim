@@ -57,9 +57,10 @@ class ScrapeStates:
 
 class InstaStates:
     """Object to store PTB InstaSession Conversation Handler states indicators"""
-    INPUT_SECURITY_CODE = 1
+    INPUT_VERIFICATION_CODE = 1
     INPUT_USERNAME = 2
     INPUT_PASSWORD = 3
+    INPUT_SECURITY_CODE = 4
 
 
 
