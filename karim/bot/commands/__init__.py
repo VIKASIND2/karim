@@ -8,24 +8,6 @@ from karim.classes.forwarder_markup import ForwarderMarkup, CreateMarkup, Markup
 from telethon.sync import TelegramClient
 from karim.classes.callbacks import *
 from telegram import InputMediaPhoto, InputFile
-""" import io
-from PIL import Image
-
-def photo_to_byte(path, expipt):
-    im = Image.open(path)
-    fp = io.BytesIO()
-    format = Image.registered_extensions()['.'+ext]
-    im.save(fp, format)
-    return fp.getvalue()
-
-
-def send_photo(path, context):
-    file = InputFile(path)
-    media = InputMediaPhoto(file)
-    context.bot.send_message() """
-
-
-
 
 def send_typing_action(func):
     """Sends typing action while processing func command."""
@@ -37,6 +19,13 @@ def send_typing_action(func):
         return func(update, context, *args, **kwargs)
 
     return command_func
+
+
+@send_typing_action
+def send_photo(name, context, update):
+    context.bot.send_photo(chat_id=update.effective_chat.id, photo=open('karim/images/{}.png'.format(name), 'rb'))
+
+
 
 def check_auth(update, context):
     if str(update.effective_user.id) in secrets.get_var('USERS'):

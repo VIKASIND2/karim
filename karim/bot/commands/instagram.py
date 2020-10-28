@@ -1,4 +1,5 @@
 from instaclient.errors.common import InvaildPasswordError, InvalidSecurityCodeError, InvalidUserError, PrivateAccountError, InvalidVerificationCodeError, VerificationCodeNecessary, SuspisciousLoginAttemptError
+from telegram.ext import updater
 from karim.bot.commands import *
 from karim import instaclient
 
@@ -56,10 +57,12 @@ def instagram_username(update, context):
     markup = CreateMarkup({Callbacks.CANCEL: 'Cancel'}).create_markup()
     # Verify User
     try:
-        instaclient.driver.save_screenshot("before.png") # TODO remove
+        instaclient.driver.save_screenshot("karim/images/before.png") # TODO remove
+        send_photo('before', context, update)
         result = instaclient.is_valid_user(username)
         print('USER {} IS VALID: '.format(username), result)
         instaclient.driver.save_screenshot("after.png")
+        send_photo('after', context, update)
     except InvalidUserError as error:
         context.bot.edit_message_text(text=invalid_user_text.format(error.username), chat_id=update.effective_chat.id, message_id=instasession.message_id, reply_markup=markup)
         instasession.set_message(message.message_id)
