@@ -22,7 +22,7 @@ def send_typing_action(func):
 
 
 def send_photo(name, context, update):
-    context.bot.send_photo(chat_id=update.effective_chat.id, photo=open('karim/images/{}.png'.format(name), 'rb'))
+    context.bot.send_photo(chat_id=update.effective_chat.id, photo=open('{}.png'.format(name), 'rb'))
 
 
 
