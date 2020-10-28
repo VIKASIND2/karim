@@ -28,7 +28,7 @@ def ig_login(update, context):
                 instaclient.login(instasession.username, instasession.password)
             except SecurityCodeNecessary:
                 # Creds are correct
-                context.bot.edit_message_text(text=input_security_code_text, chat_id=instaclient.chat_id, message_id=instaclient.message_id, reply_markup=markup)
+                context.bot.edit_message_text(text=input_security_code_text, chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)
                 return InstaStates.INPUT_SECURITY_CODE
             except (InvalidUserError, InvaildPasswordError):
                 # Credentials incorrect, continue login procedure as normal
@@ -84,15 +84,15 @@ def instagram_password(update, context):
     try:
         instaclient.login(instasession.username, instasession.password, check_user=False)
     except InvaildPasswordError:
-        context.bot.edit_message_text(text=invalid_password_text.format(instaclient.password), chat_id=instaclient.chat_id, message_id=instaclient.message_id, reply_markup=markup)
+        context.bot.edit_message_text(text=invalid_password_text.format(instaclient.password), chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)
         return InstaStates.INPUT_PASSWORD
     except SecurityCodeNecessary:
-        context.bot.edit_message_text(text=input_security_code_text, chat_id=instaclient.chat_id, message_id=instaclient.message_id, reply_markup=markup)
+        context.bot.edit_message_text(text=input_security_code_text, chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)
         return InstaStates.INPUT_SECURITY_CODE
 
     # Login Successful
     instasession.save_creds()
-    context.bot.edit_message_text(text=login_successful_text, chat_id=instaclient.chat_id, message_id=instaclient.message_id)
+    context.bot.edit_message_text(text=login_successful_text, chat_id=instasession.chat_id, message_id=instasession.message_id)
     instasession.discard()
     return ConversationHandler.END
 
@@ -113,12 +113,12 @@ def instagram_security_code(update, context):
     try:
         instaclient.input_security_code(code)
     except InvalidSecurityCodeError:
-        context.bot.edit_message_text(text=invalid_security_code_text.format(code), chat_id=instaclient.chat_id, message_id=instaclient.message_id, reply_markup=markup)
+        context.bot.edit_message_text(text=invalid_security_code_text.format(code), chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)
         return InstaStates.INPUT_SECURITY_CODE
 
     # Login Successful
     instasession.save_creds()
-    context.bot.edit_message_text(text=login_successful_text, chat_id=instaclient.chat_id, message_id=instaclient.message_id)
+    context.bot.edit_message_text(text=login_successful_text, chat_id=instasession.chat_id, message_id=instasession.message_id)
     instasession.discard()
     return ConversationHandler.END
 
