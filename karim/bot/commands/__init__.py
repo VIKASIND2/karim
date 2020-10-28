@@ -21,7 +21,6 @@ def send_typing_action(func):
     return command_func
 
 
-@send_typing_action
 def send_photo(name, context, update):
     context.bot.send_photo(chat_id=update.effective_chat.id, photo=open('karim/images/{}.png'.format(name), 'rb'))
 
