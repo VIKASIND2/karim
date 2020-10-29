@@ -39,7 +39,7 @@ def ig_login(update, context):
                 # Creds are correct
                 context.bot.edit_message_text(text=input_verification_code_text, chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)
                 return InstaStates.INPUT_VERIFICATION_CODE
-            except SuspisciousLoginAttemptError:
+            except SuspisciousLoginAttemptError as error:
                 # Creds are correct
                 instasession.increment_code_request()
                 if error.mode == SuspisciousLoginAttemptError.PHONE:
@@ -120,6 +120,7 @@ def instagram_password(update, context):
         send_photo('after_login', context, update)
         return InstaStates.INPUT_VERIFICATION_CODE
     except SuspisciousLoginAttemptError as error:
+        print('Error: ', error)
         # Creds are correct
         instasession.increment_code_request()
         if error.mode == SuspisciousLoginAttemptError.PHONE:
