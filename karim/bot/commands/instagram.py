@@ -14,8 +14,6 @@ def ig_login(update, context):
     markup = CreateMarkup({Callbacks.CANCEL: 'Cancel'}).create_markup()
     message = update.effective_chat.send_message(text=checking_ig_status)
     instasession.set_message(message.message_id)
-    instaclient.driver.save_screenshot("before_check_status.png") # TODO remove
-    send_photo('before_check_status', context, update)
     result = instaclient.check_status()
     if result:
         # Account is already logged in
@@ -32,8 +30,6 @@ def ig_login(update, context):
             print('Signin in with existing creds')
             # Creds Exist, attempt login
             try:
-                instaclient.driver.save_screenshot("logging_in.png") # TODO remove
-                send_photo('logging_in', context, update)
                 instaclient.login(instasession.username, instasession.password)
             except VerificationCodeNecessary:
                 # Creds are correct
@@ -106,8 +102,6 @@ def instagram_password(update, context):
     instasession.set_message(message.message_id)
     # Attempt login
     try:
-        instaclient.driver.save_screenshot("before_login.png") # TODO remove
-        send_photo('before_login', context, update)
         instaclient.login(instasession.username, instasession.password, check_user=False)
         instaclient.driver.save_screenshot("after_login.png") # TODO remove
         send_photo('after_login', context, update)
