@@ -148,13 +148,21 @@ def instagram_resend_scode(update, context):
 
     instaclient.driver.save_screenshot("before_resend.png") # TODO remove
     send_photo('before_resend', context, update)
-    instaclient.resend_security_code()
+    try:
+        instaclient.resend_security_code()
+        text = 'phone number'
+    except SuspisciousLoginAttemptError as error:
+        if error.mode == SuspisciousLoginAttemptError.EMAIL:
+            # Code to sent via email
+            text = 'email'
+        else:
+            text = 'phone number'
     instaclient.driver.save_screenshot("after_resend.png") # TODO remove
     send_photo('after_resend', context, update)
     instasession.increment_code_request()
     update.callback_query.answer()
     markup = CreateMarkup({Callbacks.RESEND_CODE: 'Resend Code', Callbacks.CANCEL: 'Cancel'}).create_markup()
-    context.bot.edit_message_text(text=security_code_resent.format(instasession.code_request), chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)
+    context.bot.edit_message_text(text=security_code_resent.format(text, instasession.code_request), chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)
     return InstaStates.INPUT_SECURITY_CODE
     
 
