@@ -127,7 +127,7 @@ def instagram_verification_code(update, context):
     markup = CreateMarkup({Callbacks.CANCEL: 'Cancel'}).create_markup()
     code = update.message.text
     message = update.effective_chat.send_message(text=validating_code_text, reply_markup=markup)
-    instasession.set_code(code)
+    instasession.set_scode(code)
     instasession.set_message(message.message_id)
 
     try:
@@ -153,7 +153,7 @@ def instagram_security_code(update, context):
     markup = CreateMarkup({Callbacks.CANCEL: 'Cancel'}).create_markup()
     code = update.message.text
     message = update.effective_chat.send_message(text=validating_code_text, reply_markup=markup)
-    instasession.set_code(code)
+    instasession.set_scode(code)
     instasession.set_message(message.message_id)
 
     try:
