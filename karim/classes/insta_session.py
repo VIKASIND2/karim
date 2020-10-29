@@ -41,5 +41,5 @@ class InstaSession(Persistence):
             print(creds)
             self.set_username(list(creds.keys())[0].decode('utf-8'))
             print(self.username)
-            self.set_password(creds.get(bytes(self.username), encoding='utf-8').decode('utf-8'))
+            self.set_password(creds.get(bytes(self.username, encoding='utf8')).decode('utf-8'))
             return True
