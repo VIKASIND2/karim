@@ -92,9 +92,13 @@ def queue_scrape(target, scraper:Scraper):
     api_hash = secrets.get_var('API_HASH')
     bot = TelegramClient(StringSession(), api_id, api_hash).start(bot_token=BOT_TOKEN) 
     while True:
-        result = job.result
         registry:FailedJobRegistry = FailedJobRegistry(queue=queue)
+        print(registry.get_job_ids())
+        time.sleep(15)
+        print(registry.get_job_ids())
+        result = job.result
         if target in registry.get_job_ids():
+            print('found target in failed ids: ', target)
             # Process Failed
             bot.send_message(scraper.get_user_id(), failed_scraping_ig_text)
             print('SCRAPE JOB ERROR: \n{}'.format(job.exc_info))
@@ -102,7 +106,6 @@ def queue_scrape(target, scraper:Scraper):
         elif not result:
             # Queue not finished yet
             bot.send_message(scraper.get_user_id(), update_scrape_status_text)
-            time.sleep(20)
             continue
         else:
             # Result is done
