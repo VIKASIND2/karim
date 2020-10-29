@@ -13,7 +13,7 @@ from telegram.inline.inlinekeyboardbutton import InlineKeyboardButton
 from telegram.inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from rq.job import Retry
 from rq.registry import FailedJobRegistry, StartedJobRegistry
-import time
+import time, random, string
 
 def random_string():
     letters_and_digits = string.ascii_letters + string.digits
