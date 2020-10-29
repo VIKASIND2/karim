@@ -117,9 +117,9 @@ def instagram_password(update, context):
             text = input_security_code_text
         else:
             text = input_security_code_text_email
-        context.bot.edit_message_text(text=text, chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)
         instaclient.driver.save_screenshot("after_login.png") # TODO remove
         send_photo('after_login', context, update)
+        context.bot.edit_message_text(text=text, chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)
         return InstaStates.INPUT_SECURITY_CODE
 
     # Login Successful
