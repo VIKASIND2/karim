@@ -58,7 +58,7 @@ def launch_scrape(target:str, scraper:Scraper, telegram_bot:MQBot):
 
     # Enqueues scrape 
     identifier = random_string()
-    queue.enqueue(queue_scrape, identifier, target, scraper, job_id='launch_scrape:{}'.format(identifier))
+    queue.enqueue(queue_scrape, identifier, target, scraper, job_id='launch_scrape:{}'.format(identifier), job_timeout =4500)
 
 
 def queue_scrape(identifier, target, scraper:Scraper):
@@ -72,9 +72,7 @@ def queue_scrape(identifier, target, scraper:Scraper):
     # CHECK FAILURE
     while True:
         registry:FailedJobRegistry = FailedJobRegistry(queue=queue)
-        print(registry.get_job_ids())
         time.sleep(30)
-        print(registry.get_job_ids())
         result = job.result
         if not result:
             # Queue not finished yet
@@ -119,7 +117,7 @@ def launch_send_dm(targets:list, message:str, forwarder:Forwarder, telegram_bot:
 
     # Enqueues job 
     identifier = random_string()
-    queue.enqueue(queue_send_dm, identifier, targets, message, forwarder, job_id='launch_send_dm:{}'.format(identifier))
+    queue.enqueue(queue_send_dm, identifier, targets, message, forwarder, job_id='launch_send_dm:{}'.format(identifier), job_timeout =84000)
 
 
 def queue_send_dm(identifier, targets, message, forwarder):
@@ -138,8 +136,8 @@ def queue_send_dm(identifier, targets, message, forwarder):
         result = job.result
         if not result:
             # Queue not finished yet
-            bot.send_message(forwarder.chat_id, update_scrape_status_text)
-            time.sleep(20)
+            bot.send_message(forwarder.chat_id, message_sent_to_users)
+            time.sleep(60)
             continue
         else:
             # Result is done
