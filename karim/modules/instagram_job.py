@@ -49,6 +49,11 @@ def launch_scrape(target:str, scraper:Scraper, telegram_bot:MQBot):
     
     # Check if no other job is in queue
     check_job_queue(scraper, telegram_bot)
+    # Remove jobs from failed registry
+    registry:FailedJobRegistry = FailedJobRegistry(queue=queue)
+    for job_id in registry.get_job_ids():
+        if 'launch_scrape' in job_id:
+            registry.remove(job_id)
 
     # Enqueues scrape 
     queue.enqueue(queue_scrape, target, scraper, job_id='launch_scrape:{}'.format(target))
@@ -71,10 +76,17 @@ def launch_send_dm(targets:list, message:str, forwarder:Forwarder, telegram_bot:
     check_job_queue(forwarder, telegram_bot)
 
     # Enqueues job 
+    # Remove jobs from failed registry
+    registry:FailedJobRegistry = FailedJobRegistry(queue=queue)
+    for job_id in registry.get_job_ids():
+        if 'launch_send_dm' in job_id:
+            registry.remove(job_id)
+
     queue.enqueue(queue_send_dm, targets, message, forwarder, job_id='launch_send_dm')
 
 
 def queue_scrape(target, scraper:Scraper):
+    print('queue_scrape()')
     job = queue.enqueue(scrape_job, user=target, job_id=target)
     api_id = secrets.get_var('API_ID')
     api_hash = secrets.get_var('API_HASH')
@@ -103,6 +115,7 @@ def queue_scrape(target, scraper:Scraper):
 
 
 def scrape_job(user:str):
+    print('scrape_job()')
     instaclient.scrape_followers(user=user)
 
 
