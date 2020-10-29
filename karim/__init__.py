@@ -21,6 +21,7 @@ else:
     LOCALHOST = False
     queue = Queue(connection=conn)
     instaclient = InstaClient(host=InstaClient.WEB_SERVER)
+    
 
 # Initialize Bot
 from karim.secrets import secrets

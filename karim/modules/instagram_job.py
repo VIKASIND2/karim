@@ -1,12 +1,19 @@
+from karim.classes.callbacks import ScrapeStates
 from telegram.inline.inlinekeyboardbutton import InlineKeyboardButton
 from telegram.inline.inlinekeyboardmarkup import InlineKeyboardMarkup
-from karim.classes.scraper import Scraper
+from karim.classes.scraper import Scraper, scraper
 from karim.modules import sheet
 from rq.job import Retry
 from rq.registry import FailedJobRegistry
 from karim import queue, instaclient
 from karim.bot.texts import *
 import time
+
+
+def launch_scrape(context, scraper:Scraper):
+    # Enqueues scrape 
+    # Check if no other job is in queue
+    """"""
 
 def queue_scrape(target, count, context, scraper:Scraper):
     job = queue.enqueue(instaclient.scrape_followers, user=target, count=count, callback_frequency=count//10, timeout=84000, job_id=target)   

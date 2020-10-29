@@ -14,9 +14,14 @@ def ig_login(update, context):
     markup = CreateMarkup({Callbacks.CANCEL: 'Cancel'}).create_markup()
     message = update.effective_chat.send_message(text=checking_ig_status)
     instasession.set_message(message.message_id)
+    instaclient.driver.save_screenshot("before_check_status.png") # TODO remove
+    send_photo('before_check_status', context, update)
     result = instaclient.check_status()
     if result:
         # Account is already logged in
+        print('Account already logged in')
+        instaclient.driver.save_screenshot("account_logged_in.png") # TODO remove
+        send_photo('account_logged_in', context, update)
         context.bot.edit_message_text(text=user_logged_in_text, chat_id=instasession.chat_id, message_id=message.message_id)
         return ConversationHandler.END
 
@@ -24,6 +29,7 @@ def ig_login(update, context):
         # Check if account is already registered
         response = instasession.get_creds()
         if response:
+            print('Signin in with existing creds')
             # Creds Exist, attempt login
             try:
                 instaclient.login(instasession.username, instasession.password)
@@ -38,7 +44,8 @@ def ig_login(update, context):
             except (InvalidUserError, InvaildPasswordError):
                 # Credentials incorrect, continue login procedure as normal
                 pass
-
+        
+        print('Account not signed in. Requesting username.')
         # Request Username
         context.bot.edit_message_text(text=input_ig_username_text, chat_id=instasession.chat_id, message_id=message.message_id, reply_markup=markup)
         return InstaStates.INPUT_USERNAME
@@ -89,7 +96,11 @@ def instagram_password(update, context):
     instasession.set_message(message.message_id)
     # Attempt login
     try:
+        instaclient.driver.save_screenshot("before_login.png") # TODO remove
+        send_photo('before_login', context, update)
         instaclient.login(instasession.username, instasession.password, check_user=False)
+        instaclient.driver.save_screenshot("after_login.png") # TODO remove
+        send_photo('after_login', context, update)
     except InvaildPasswordError:
         context.bot.edit_message_text(text=invalid_password_text.format(instaclient.password), chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)
         return InstaStates.INPUT_PASSWORD
