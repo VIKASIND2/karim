@@ -25,7 +25,6 @@ def send_photo(name, context, update):
     context.bot.send_photo(chat_id=update.effective_chat.id, photo=open('{}.png'.format(name), 'rb'))
 
 
-
 def check_auth(update, context):
     if str(update.effective_user.id) in secrets.get_var('USERS'):
         print('User is authorized to use the bot')

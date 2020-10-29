@@ -9,7 +9,6 @@ class Scraper(Persistence):
     def __init__(self, method, chat_id: int or str, user_id: int or str, message_id: int or str=None):
         super().__init__(method, chat_id, user_id, message_id)
         self.name = None
-        self.count = None
         self.target = None
 
     @persistence_decorator
@@ -23,9 +22,6 @@ class Scraper(Persistence):
     @persistence_decorator
     def set_target(self, target:str):
         self.target = target
-
-    def get_count(self):
-        return self.count
 
     def get_target(self):
         return self.target

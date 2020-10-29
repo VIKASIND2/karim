@@ -299,12 +299,14 @@ def confirm(update, context):
             for target in targets:
                 context.bot.send_queued_message(text=forwarder.text, chat_id=target, parse_mode=ParseMode.MARKDOWN_V2)
             print('Queued messages')
+            forwarder.discard()
             return ConversationHandler.END
 
         elif forwarder.get_mode() == Callbacks.INSTAGRAM_DM:
             users = forwarder.get_users()
             context.bot.edit_message_text(chat_id=update.effective_chat.id, message_id=forwarder.message_id, text=inform_sending_dms_text)
-            instagram_job.queue_send_dm(users, forwarder.text)
+            instagram_job.launch_send_dm(users, forwarder.text, context, forwarder)
+            forwarder.discard()
             return ConversationHandler.END
 
 

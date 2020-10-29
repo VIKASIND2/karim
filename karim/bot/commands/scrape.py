@@ -80,7 +80,7 @@ def confirm_scrape(update, context):
     data = update.callback_query.data
     if data == Callbacks.CONFIRM:
         context.bot.edit_message_text(chat_id=update.effective_chat.id, message_id=scraper.message_id, text=update_scraping_ig_text)
-        instagram_job.queue_scrape(scraper.get_target(), scraper.get_count(), context, scraper)
+        instagram_job.launch_scrape(scraper.get_target(), context, scraper)
         scraper.discard()
         return ConversationHandler.END
     elif data == Callbacks.CANCEL:
