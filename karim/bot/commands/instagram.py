@@ -18,16 +18,16 @@ def ig_login(update, context):
     if result:
         # Account is already logged in
         print('Account already logged in')
-        instaclient.driver.save_screenshot("account_logged_in.png") # TODO remove
-        send_photo('account_logged_in', context, update)
         context.bot.edit_message_text(text=user_logged_in_text, chat_id=instasession.chat_id, message_id=message.message_id)
         return ConversationHandler.END
 
     else:
         # Check if account is already registered
+        message.edit_text(text=checking_ig_credentials_text)
         response = instasession.get_creds()
         if response:
             print('Signin in with existing creds')
+            message.edit_text(text=logging_in_with_credentials_text)
             # Creds Exist, attempt login
             try:
                 instaclient.login(instasession.username, instasession.password)

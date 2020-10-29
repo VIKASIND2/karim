@@ -32,8 +32,8 @@ PORT = int(os.environ.get('PORT', 5000))
 # set connection pool size for bot 
 request = Request(con_pool_size=8)
 q = mq.MessageQueue(all_burst_limit=3, all_time_limit_ms=3000)
-testbot = MQBot(BOT_TOKEN, request=request, mqueue=q)
-updater = Updater(bot=testbot, use_context=True)
+telegram_bot = MQBot(BOT_TOKEN, request=request, mqueue=q)
+updater = Updater(bot=telegram_bot, use_context=True)
 
 # SET UP BOT COMMAND HANDLERS
 telebot.setup(updater)

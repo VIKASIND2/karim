@@ -4,10 +4,12 @@ from karim.classes.persistence import Persistence
 from karim.classes.session_manager import SessionManager
 from karim.classes.forwarder import Forwarder
 from karim.classes.insta_session import InstaSession
-from karim.classes.forwarder_markup import ForwarderMarkup, CreateMarkup, MarkupDivider
-from telethon.sync import TelegramClient
 from karim.classes.callbacks import *
-from telegram import InputMediaPhoto, InputFile
+from karim.classes.forwarder_markup import ForwarderMarkup, CreateMarkup, MarkupDivider
+
+from telethon.sync import TelegramClient
+from telegram import InputMediaPhoto, InputFile, Update
+from telegram.ext import CallbackContext
 
 def send_typing_action(func):
     """Sends typing action while processing func command."""

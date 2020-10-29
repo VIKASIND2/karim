@@ -32,10 +32,11 @@ def select_target(update, context):
         return ScrapeStates.SELECT_TARGET
     user = update.message.text
     try:
+        message = update.message.send_message(text=checking_user_text)
         result = instaclient.is_valid_user(user)
         scraper.set_target(user)
         markup = CreateMarkup({Callbacks.CANCEL: 'Cancel'}).create_markup()
-        message = update.message.reply_text(select_name_text, reply_markup=markup)
+        message = message.edit_text(select_name_text, reply_markup=markup)
         return ScrapeStates.SELECT_NAME
 
     except InvalidUserError as error:
