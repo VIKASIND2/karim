@@ -111,9 +111,13 @@ def instagram_password(update, context):
         instaclient.driver.save_screenshot("after_login.png") # TODO remove
         send_photo('after_login', context, update)
         return InstaStates.INPUT_VERIFICATION_CODE
-    except SuspisciousLoginAttemptError:
+    except SuspisciousLoginAttemptError as error:
         # Creds are correct
-        context.bot.edit_message_text(text=input_security_code_text, chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)
+        if error.mode == SuspisciousLoginAttemptError.PHONE:
+            text = input_security_code_text
+        else:
+            text = input_security_code_text_email
+        context.bot.edit_message_text(text=text, chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)
         instaclient.driver.save_screenshot("after_login.png") # TODO remove
         send_photo('after_login', context, update)
         return InstaStates.INPUT_SECURITY_CODE
