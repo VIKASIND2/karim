@@ -79,7 +79,7 @@ def launch_send_dm(targets:list, message:str, forwarder:Forwarder, telegram_bot:
 
 
 def queue_scrape(target, scraper:Scraper):
-    job = queue.enqueue(instaclient.scrape_followers, user=target, job_id=target)   
+    job = queue.enqueue(scrape_job, user=target, job_id=target)   
     while True:
         result = job.result
         registry:FailedJobRegistry = FailedJobRegistry(queue=queue)
@@ -102,10 +102,14 @@ def queue_scrape(target, scraper:Scraper):
             return True
 
 
+def scrape_job(user:str):
+    instaclient.scrape_followers(user=user)
+
+
 def queue_send_dm(targets, message, forwarder):
     job = None
     for target in targets:
-        job = queue.enqueue(instaclient.send_dm, user=target, message=message, timeout=120)
+        job = queue.enqueue(send_dm_job, user=target, message=message, timeout=120)
     registry:FailedJobRegistry = FailedJobRegistry(queue=queue)
     failed = 0
     while True:
@@ -122,6 +126,9 @@ def queue_send_dm(targets, message, forwarder):
                     failed += 1
             BOT.send_message(chat_id=forwarder.chat_id, text=finished_sending_dm_text.format(failed))
             return True
+
+def send_dm_job(user:str, message:str):
+    instaclient.send_dm(user=user, message=message)
 
         
         
