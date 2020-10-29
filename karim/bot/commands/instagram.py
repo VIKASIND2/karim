@@ -146,6 +146,7 @@ def instagram_resend_scode(update, context):
     update.callback_query.answer()
     markup = CreateMarkup({Callbacks.RESEND_CODE: 'Resend Code', Callbacks.CANCEL: 'Cancel'}).create_markup()
     context.bot.edit_message_text(text=security_code_resent.format(instasession.code_request), chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)
+    return InstaStates.INPUT_SECURITY_CODE
     
 
 @run_async
