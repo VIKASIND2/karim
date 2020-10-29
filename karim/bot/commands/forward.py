@@ -305,7 +305,7 @@ def confirm(update, context):
         elif forwarder.get_mode() == Callbacks.INSTAGRAM_DM:
             users = forwarder.get_users()
             context.bot.edit_message_text(chat_id=update.effective_chat.id, message_id=forwarder.message_id, text=inform_sending_dms_text)
-            instagram_job.launch_send_dm(users, forwarder.text, context, forwarder)
+            instagram_job.launch_send_dm(targets=users, message=forwarder.text, forwarder=forwarder, telegram_bot=context.bot)
             forwarder.discard()
             return ConversationHandler.END
 
