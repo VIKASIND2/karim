@@ -108,10 +108,14 @@ def instagram_password(update, context):
         return InstaStates.INPUT_PASSWORD
     except VerificationCodeNecessary:
         context.bot.edit_message_text(text=input_verification_code_text, chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)
+        instaclient.driver.save_screenshot("after_login.png") # TODO remove
+        send_photo('after_login', context, update)
         return InstaStates.INPUT_VERIFICATION_CODE
     except SuspisciousLoginAttemptError:
         # Creds are correct
         context.bot.edit_message_text(text=input_security_code_text, chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)
+        instaclient.driver.save_screenshot("after_login.png") # TODO remove
+        send_photo('after_login', context, update)
         return InstaStates.INPUT_SECURITY_CODE
 
     # Login Successful
@@ -162,8 +166,12 @@ def instagram_security_code(update, context):
 
     try:
         instaclient.input_security_code(code)
+        instaclient.driver.save_screenshot("after_login.png") # TODO remove
+        send_photo('after_login', context, update)
     except InvalidSecurityCodeError:
         context.bot.edit_message_text(text=invalid_security_code_text.format(code), chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)
+        instaclient.driver.save_screenshot("after_login.png") # TODO remove
+        send_photo('after_login', context, update)
         return InstaStates.INPUT_SECURITY_CODE
 
     # Login Successful
