@@ -109,6 +109,10 @@ def instagram_password(update, context):
     except VerificationCodeNecessary:
         context.bot.edit_message_text(text=input_verification_code_text, chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)
         return InstaStates.INPUT_VERIFICATION_CODE
+    except SuspisciousLoginAttemptError:
+        # Creds are correct
+        context.bot.edit_message_text(text=input_security_code_text, chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)
+        return InstaStates.INPUT_SECURITY_CODE
 
     # Login Successful
     instasession.save_creds()
