@@ -1,7 +1,7 @@
 from karim.classes.callbacks import ScrapeStates
 from telegram.inline.inlinekeyboardbutton import InlineKeyboardButton
 from telegram.inline.inlinekeyboardmarkup import InlineKeyboardMarkup
-from karim.classes.scraper import Scraper, scraper
+from karim.classes.scraper import Scraper
 from karim.modules import sheet
 from rq.job import Retry
 from rq.registry import FailedJobRegistry

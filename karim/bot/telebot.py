@@ -1,4 +1,3 @@
-from logging import Filter
 from karim.bot.commands.signin import *
 from karim.bot.commands.instagram import *
 from karim.bot.commands.help import *
