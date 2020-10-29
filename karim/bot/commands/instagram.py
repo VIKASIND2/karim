@@ -32,6 +32,8 @@ def ig_login(update, context):
             print('Signin in with existing creds')
             # Creds Exist, attempt login
             try:
+                instaclient.driver.save_screenshot("logging_in.png") # TODO remove
+                send_photo('logging_in', context, update)
                 instaclient.login(instasession.username, instasession.password)
             except VerificationCodeNecessary:
                 # Creds are correct
