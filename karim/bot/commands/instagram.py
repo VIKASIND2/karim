@@ -41,7 +41,7 @@ def ig_login(update, context):
                 return InstaStates.INPUT_VERIFICATION_CODE
             except SuspisciousLoginAttemptError:
                 # Creds are correct
-                instasession.incement_code_request()
+                instasession.increment_code_request()
                 if error.mode == SuspisciousLoginAttemptError.PHONE:
                     text = input_security_code_text
                 else:
@@ -121,7 +121,7 @@ def instagram_password(update, context):
         return InstaStates.INPUT_VERIFICATION_CODE
     except SuspisciousLoginAttemptError as error:
         # Creds are correct
-        instasession.incement_code_request()
+        instasession.increment_code_request()
         if error.mode == SuspisciousLoginAttemptError.PHONE:
             text = input_security_code_text
         else:
@@ -150,7 +150,7 @@ def instagram_resend_scode(update, context):
     instaclient.resend_security_code()
     instaclient.driver.save_screenshot("after_resend.png") # TODO remove
     send_photo('after_resend', context, update)
-    instasession.incement_code_request()
+    instasession.increment_code_request()
     update.callback_query.answer()
     markup = CreateMarkup({Callbacks.RESEND_CODE: 'Resend Code', Callbacks.CANCEL: 'Cancel'}).create_markup()
     context.bot.edit_message_text(text=security_code_resent.format(instasession.code_request), chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)
