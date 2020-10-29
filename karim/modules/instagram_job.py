@@ -85,6 +85,7 @@ def queue_scrape(target, scraper:Scraper):
         if target in registry.get_job_ids():
             # Process Failed
             bot.send_message(scraper.get_user_id(), failed_scraping_ig_text)
+            print('SCRAPE JOB ERROR: \n{}'.format(job.exc_info))
             return False
         elif not result:
             # Queue not finished yet
