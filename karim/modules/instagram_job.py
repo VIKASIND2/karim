@@ -38,11 +38,6 @@ def check_job_queue(obj: Scraper or Forwarder, telegram_bot:MQBot):
         elif 'launch_send_dm' in job_id:
             text = dm_job_in_queue_text
             telegram_bot.send_message(chat_id=obj.chat_id, text=text)
-    # Remove jobs from failed registry
-    failed_registry:FailedJobRegistry = FailedJobRegistry(queue=queue)
-    for job_id in failed_registry.get_job_ids():
-
-        registry.remove(job_id)
 
 
 # SCRAPE JOB HANDLER ----------------------------------------------------------------------------
