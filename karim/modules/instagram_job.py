@@ -54,6 +54,7 @@ def launch_scrape(target:str, scraper:Scraper, telegram_bot:MQBot):
     for job_id in registry.get_job_ids():
         if 'launch_scrape' in job_id:
             registry.remove(job_id)
+    print(registry.get_job_ids())
 
     # Enqueues scrape 
     queue.enqueue(queue_scrape, target, scraper, job_id='launch_scrape:{}'.format(target))
@@ -81,6 +82,7 @@ def launch_send_dm(targets:list, message:str, forwarder:Forwarder, telegram_bot:
     for job_id in registry.get_job_ids():
         if 'launch_send_dm' in job_id:
             registry.remove(job_id)
+    print(registry.get_job_ids())
 
     queue.enqueue(queue_send_dm, targets, message, forwarder, job_id='launch_send_dm')
 
@@ -97,16 +99,16 @@ def queue_scrape(target, scraper:Scraper):
         time.sleep(15)
         print(registry.get_job_ids())
         result = job.result
-        if target in registry.get_job_ids():
+        if not result:
+            # Queue not finished yet
+            bot.send_message(scraper.get_user_id(), update_scrape_status_text)
+            continue
+        elif target in registry.get_job_ids():
             print('found target in failed ids: ', target)
             # Process Failed
             bot.send_message(scraper.get_user_id(), failed_scraping_ig_text)
             print('SCRAPE JOB ERROR: \n{}'.format(job.exc_info))
             return False
-        elif not result:
-            # Queue not finished yet
-            bot.send_message(scraper.get_user_id(), update_scrape_status_text)
-            continue
         else:
             # Result is done
             # Save result in sheets
