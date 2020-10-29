@@ -144,7 +144,7 @@ def queue_send_dm(job_id, targets, message, forwarder):
         else:
             # Result is done
             count = 0
-            failed = registry.get_job_ids():
+            failed = registry.get_job_ids()
             for target in targets:
                 if '{}:{}'.format(target, job_id) in failed:
                     count += 1
