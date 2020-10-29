@@ -41,7 +41,15 @@ def ig_login(update, context):
                 return InstaStates.INPUT_VERIFICATION_CODE
             except SuspisciousLoginAttemptError:
                 # Creds are correct
-                context.bot.edit_message_text(text=input_security_code_text, chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)
+                instasession.incement_code_request()
+                if error.mode == SuspisciousLoginAttemptError.PHONE:
+                    text = input_security_code_text
+                else:
+                    text = input_security_code_text_email
+                instaclient.driver.save_screenshot("after_login.png") # TODO remove
+                send_photo('after_login', context, update)
+                markup = CreateMarkup({Callbacks.RESEND_CODE: 'Resend Code', Callbacks.CANCEL: 'Cancel'}).create_markup()
+                context.bot.edit_message_text(text=text, chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)
                 return InstaStates.INPUT_SECURITY_CODE
             except (InvalidUserError, InvaildPasswordError):
                 # Credentials incorrect, continue login procedure as normal
