@@ -25,10 +25,11 @@ else:
 
 # Initialize Bot
 from karim.secrets import secrets
-from karim.bot import telebot
 BOT_TOKEN = secrets.get_var('BOT_TOKEN')
 URL = secrets.get_var('SERVER_APP_DOMAIN')
 PORT = int(os.environ.get('PORT', 5000))
+from karim.bot import telebot
+
 # set connection pool size for bot 
 request = Request(con_pool_size=8)
 q = mq.MessageQueue(all_burst_limit=3, all_time_limit_ms=3000)

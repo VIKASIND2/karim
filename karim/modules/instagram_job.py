@@ -1,9 +1,12 @@
+from telethon.client.telegramclient import TelegramClient
+from telethon.sessions.string import StringSession
 from karim.classes.mq_bot import MQBot
 from karim.classes.callbacks import ScrapeStates
 from karim.classes.scraper import Scraper
 from karim.classes.forwarder import Forwarder
+from karim.secrets import secrets
 from karim.modules import sheet
-from karim import queue, instaclient
+from karim import queue, instaclient, BOT_TOKEN
 from karim.bot.texts import *
 
 from telegram.inline.inlinekeyboardbutton import InlineKeyboardButton
@@ -11,8 +14,6 @@ from telegram.inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from rq.job import Retry
 from rq.registry import FailedJobRegistry, StartedJobRegistry
 import time
-
-BOT = None
 
 
 def check_job_queue(obj: Scraper or Forwarder, telegram_bot:MQBot):
@@ -50,8 +51,6 @@ def launch_scrape(target:str, scraper:Scraper, telegram_bot:MQBot):
     check_job_queue(scraper, telegram_bot)
 
     # Enqueues scrape 
-    global BOT
-    BOT = telegram_bot
     queue.enqueue(queue_scrape, target, scraper, job_id='launch_scrape:{}'.format(target))
 
 
@@ -72,24 +71,24 @@ def launch_send_dm(targets:list, message:str, forwarder:Forwarder, telegram_bot:
     check_job_queue(forwarder, telegram_bot)
 
     # Enqueues job 
-    global BOT
-    BOT = telegram_bot
-
     queue.enqueue(queue_send_dm, targets, message, forwarder, job_id='launch_send_dm')
 
 
 def queue_scrape(target, scraper:Scraper):
-    job = queue.enqueue(scrape_job, user=target, job_id=target)   
+    job = queue.enqueue(scrape_job, user=target, job_id=target)
+    api_id = secrets.get_var('API_ID')
+    api_hash = secrets.get_var('API_HASH')
+    bot = TelegramClient(StringSession(), api_id, api_hash).start(bot_token=BOT_TOKEN) 
     while True:
         result = job.result
         registry:FailedJobRegistry = FailedJobRegistry(queue=queue)
         if target in registry.get_job_ids():
             # Process Failed
-            BOT.send_message(chat_id=scraper.get_user_id(), text=failed_scraping_ig_text)
+            bot.send_message(scraper.get_user_id(), failed_scraping_ig_text)
             return False
         elif not result:
             # Queue not finished yet
-            BOT.send_message(chat_id=scraper.get_user_id(), text=update_scrape_status_text)
+            bot.send_message(scraper.get_user_id(), update_scrape_status_text)
             time.sleep(20)
             continue
         else:
@@ -98,7 +97,7 @@ def queue_scrape(target, scraper:Scraper):
             sheet.add_scrape(scraper.get_target(), name=scraper.get_name(), scraped=result)
             # Update user
             markup = InlineKeyboardMarkup([InlineKeyboardButton(text='Google Sheet', url=sheet.get_sheet_url())])
-            BOT.send_message(chat_id=scraper.get_user_id(), text=finished_scrape_text, reply_markup=markup)
+            bot.send_message(scraper.get_user_id(), finished_scrape_text, reply_markup=markup)
             return True
 
 
@@ -110,13 +109,16 @@ def queue_send_dm(targets, message, forwarder):
     job = None
     for target in targets:
         job = queue.enqueue(send_dm_job, user=target, message=message, timeout=120)
+    api_id = secrets.get_var('API_ID')
+    api_hash = secrets.get_var('API_HASH')
+    bot = TelegramClient(StringSession(), api_id, api_hash).start(bot_token=BOT_TOKEN) 
     registry:FailedJobRegistry = FailedJobRegistry(queue=queue)
     failed = 0
     while True:
         result = job.result
         if not result:
             # Queue not finished yet
-            BOT.send_message(chat_id=forwarder.chat_id, text=update_scrape_status_text)
+            bot.send_message(forwarder.chat_id, update_scrape_status_text)
             time.sleep(20)
             continue
         else:
@@ -124,7 +126,7 @@ def queue_send_dm(targets, message, forwarder):
             for job in registry.get_job_ids():
                 if job in targets:
                     failed += 1
-            BOT.send_message(chat_id=forwarder.chat_id, text=finished_sending_dm_text.format(failed))
+            bot.send_message(forwarder.chat_id, finished_sending_dm_text.format(failed))
             return True
 
 def send_dm_job(user:str, message:str):

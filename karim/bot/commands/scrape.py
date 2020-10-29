@@ -33,6 +33,7 @@ def select_target(update, context):
     user = update.message.text
     try:
         message = update.effective_chat.send_message(text=checking_user_text)
+        scraper.set_message(message.message_id)
         result = instaclient.is_valid_user(user)
         scraper.set_target(user)
         markup = CreateMarkup({Callbacks.CANCEL: 'Cancel'}).create_markup()
@@ -41,13 +42,13 @@ def select_target(update, context):
 
     except InvalidUserError as error:
         markup = CreateMarkup({Callbacks.CANCEL: 'Cancel'}).create_markup()
-        message = update.message.reply_text(user_not_valid_text.format(user), reply_markup=markup)
+        message = context.bot.edit_message_text(text=user_not_valid_text.format(user), reply_markup=markup, chat_id=scraper.chat_id, message_id=scraper.message_id)
         scraper.set_message(message.message_id)
         return ScrapeStates.SELECT_TARGET
 
     except PrivateAccountError as error:
         markup = CreateMarkup({Callbacks.CANCEL: 'Cancel'}).create_markup()
-        message = update.message.reply_text(user_private_text, reply_markup=markup)
+        message = context.bot.edit_message_text(text=user_private_text, reply_markup=markup, chat_id=scraper.chat_id, message_id=scraper.message_id)
         scraper.set_message(message.message_id)
         return ScrapeStates.SELECT_TARGET
     
