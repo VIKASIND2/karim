@@ -37,6 +37,6 @@ class InstaSession(Persistence):
             # No credentials
             return False
         else:
-            self.set_username(list(creds.keys())[0])
-            self.set_password(creds.get(self.username))
+            self.set_username(list(creds.keys())[0].decode('utf-8'))
+            self.set_password(creds.get(self.username).decode('utf-8'))
             return True
