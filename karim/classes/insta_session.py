@@ -26,6 +26,7 @@ class InstaSession(Persistence):
         Store working instagram credentials (username and password) into 
         """
         connector = redis.from_url(os.environ.get('REDIS_URL'))
+        connector.delete('instacreds:{}'.format(self.user_id))
         connector.hmset('instacreds:{}'.format(self.user_id), {self.username: self.password})
         connector.close()
 
@@ -40,5 +41,5 @@ class InstaSession(Persistence):
             print(creds)
             self.set_username(list(creds.keys())[0].decode('utf-8'))
             print(self.username)
-            self.set_password(creds.get(self.username).decode('utf-8'))
+            self.set_password(creds.get(bytes(self.username)).decode('utf-8'))
             return True
