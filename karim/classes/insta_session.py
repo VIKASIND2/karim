@@ -33,10 +33,12 @@ class InstaSession(Persistence):
         connector = redis.from_url(os.environ.get('REDIS_URL'))
         creds:dict = connector.hgetall('instacreds:{}'.format(self.user_id))
         connector.close()
-        if not creds:
+        if not creds or list(creds.keys()) == []:
             # No credentials
             return False
         else:
+            print(creds)
             self.set_username(list(creds.keys())[0].decode('utf-8'))
+            print(self.username)
             self.set_password(creds.get(self.username).decode('utf-8'))
             return True
