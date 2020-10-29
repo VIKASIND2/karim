@@ -11,7 +11,7 @@ not_authorized_text = 'You are not authorized to use this bot\'s features'
 # Help Command
 help_text = '<b>Available Commands:</b>\n/start - Use this command to subscribe to the newsletter.\n\n/unsubscribe - Use this command to unsubscribe from the newsletter and to stop receiving our messages.\n\n/adminhelp - Use this command to get a list of available commands if you are admin of this newsletter.'
 not_admin_text = 'Sorry, this command can only be used by an admin.'
-admin_help_text = '<b>Available Commands:</b>\n/account - Returns the current connection status to the Telegram Client (if the user is logged in and with which Telegram Account)\n\n/signin - Asks the user to input Telegram Credentials and attempts to sign in the Telegram Client. No credentials will be stored in the server.\n -> <code>phone</code> - The user\'s telegram account\'s phone number (<code>+49 123 123 1234</code>)\n -> <code>code</code> - The security code sent by Telegram to verify the identity. It is important to send the code separated by dots (<code>1.2.3.4.5</code>) otherwise it will immediatelly expire.\n -> <code>password</code> - In case the user has set a 2-steps-verification password, this will be required to sign in correctly.\n\n/signout - Signs out of the Telegram Client and deletes the session.\n\n/scrape - Allows you to scrape an instagram user\'s followers to use in the /forward command later.\n\n/forward - Allows the user to forward a message to all the chat members present in a selection of group chats, via the user\'s own account.'
+admin_help_text = '<b>Available Commands:</b>\n/account - Returns the current connection status to the Telegram Client (if the user is logged in and with which Telegram Account) and to the Instagram Client\n\n/signin - Asks the user to input Telegram Credentials and attempts to sign in the Telegram Client. No credentials will be stored in the server.\n -> <code>phone</code> - The user\'s telegram account\'s phone number (<code>+49 123 123 1234</code>)\n -> <code>code</code> - The security code sent by Telegram to verify the identity. It is important to send the code separated by dots (<code>1.2.3.4.5</code>) otherwise it will immediatelly expire.\n -> <code>password</code> - In case the user has set a 2-steps-verification password, this will be required to sign in correctly.\n\n/signout - Signs out of the Telegram Client and deletes the session.\n\n/scrape - Allows you to scrape an instagram user\'s followers to use in the /forward command later.\n\n/forward - Allows the user to forward a message to all the chat members present in a selection of group chats, via the user\'s own account.\n\n/instagram - Connects to Instagram and logs int with user credentials.\n\n/iglogout - Logs out of current Instagram account.'
 
 # START NEWSLETTER COMMAND
 checking_subscription = 'Checking subscription...'
@@ -83,7 +83,12 @@ cancelling_scrape_text = 'Scraping operation has been cancelled.'
 # Instagram Scrape Job
 failed_scraping_ig_text = 'There was an error when scraping the followers. Please try again in a bit or contact a developer of the bot'
 update_scrape_status_text = 'A batch of followers has been scraped... Continuing scrape operation...'
-finished_scrape_text = 'The scrape operation has been completed successfully! {} followers have been scraped and saved into the Google Sheet below:'
+finished_scrape_text = 'The scrape operation has been completed successfully! The followers have been scraped and saved into the Google Sheet below:'
+
+# INSTAGRAM LOG OUT COMMAND
+logging_out = 'Logging out of instagram...'
+instagram_loggedout_text = 'Operation successful! The bot is no longer connected to Instagram. To log in again, use /instagram'
+error_loggingout_text = 'There was an error when trying to log out of instagram... Try again later or contact a developer.'
 
 # FORWARD MESSAGE CONVERSATION
 client_not_connected = 'The client is not currently connected. Please sign into the Telegram Client with /signin'

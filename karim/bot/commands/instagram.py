@@ -31,6 +31,9 @@ def ig_login(update, context):
             # Creds Exist, attempt login
             try:
                 instaclient.login(instasession.username, instasession.password)
+                context.bot.edit_message_text(text=login_successful_text, chat_id=instasession.chat_id, message_id=instasession.message_id)
+                instasession.discard()
+                return ConversationHandler.END
             except VerificationCodeNecessary:
                 # Creds are correct
                 context.bot.edit_message_text(text=input_verification_code_text, chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)

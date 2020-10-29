@@ -87,8 +87,6 @@ def confirm_scrape(update, context):
         print('Cancel Scrape')
         return cancel_scrape(update, context, scraper)
 
-    
-
 
 @run_async
 @send_typing_action

@@ -10,13 +10,13 @@ from karim.bot.texts import *
 import time
 
 
-def launch_scrape(context, scraper:Scraper):
+def launch_scrape(target, context, scraper:Scraper):
     # Enqueues scrape 
     # Check if no other job is in queue
-    """"""
+    queue.enqueue(queue_scrape, target, context, scraper, job_id='launch_scrape:{}'.format(target))
 
-def queue_scrape(target, count, context, scraper:Scraper):
-    job = queue.enqueue(instaclient.scrape_followers, user=target, count=count, callback_frequency=count//10, timeout=84000, job_id=target)   
+def queue_scrape(target, context, scraper:Scraper):
+    job = queue.enqueue(instaclient.scrape_followers, user=target, job_id=target)   
     while True:
         result = job.result
         registry:FailedJobRegistry = FailedJobRegistry(queue=queue)
@@ -35,8 +35,13 @@ def queue_scrape(target, count, context, scraper:Scraper):
             sheet.add_scrape(scraper.get_target(), name=scraper.get_name(), scraped=result)
             # Update user
             markup = InlineKeyboardMarkup([InlineKeyboardButton(text='Google Sheet', url=sheet.get_sheet_url())])
-            context.bot.send_message(chat_id=scraper.get_user_id(), text=finished_scrape_text.format(count))
+            context.bot.send_message(chat_id=scraper.get_user_id(), text=finished_scrape_text)
             return True
+
+def launch_send_dm(targets, message, context, forwarder):
+    # Enqueues job 
+    # Check if no other job is in queue
+    queue.enqueue(queue_send_dm, targets, message, context, forwarder, job_id='launch_send_dm')
 
 def queue_send_dm(targets, message, context, forwarder):
     job = None

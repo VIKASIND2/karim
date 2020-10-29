@@ -174,13 +174,12 @@ def select_count(update, context):
 
     
     # Load targets:
-    scrape = sheet.get_scraped(username=data)
-    users = scrape[2]
+    users = forwarder.users
     targets = []
     for i in range(forwarder.count):
         rand = random.randrange(len(users))
         targets.append(users[rand])
-    forwarder.set_users(users)
+    forwarder.set_users(targets)
 
     # Confirm
     markup = CreateMarkup({Callbacks.CONFIRM: 'Confirm', Callbacks.CANCEL: 'Cancel'}).create_markup()

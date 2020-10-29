@@ -7,6 +7,7 @@ from karim.bot.commands.forward import *
 from karim.bot.commands.account import *
 from karim.bot.commands.unsubscribe import *
 from karim.bot.commands.start import *
+from karim.bot.commands.iglogout import *
 from karim.classes.callbacks import *
 
 
@@ -52,7 +53,7 @@ def setup(updater):
         states={
             ScrapeStates.SELECT_TARGET: [MessageHandler(Filters.text, select_target)],
             ScrapeStates.SELECT_NAME: [MessageHandler(Filters.text, select_name)],
-            ScrapeStates.CONFIRM: [CallbackQueryHandler(select_count)],
+            ScrapeStates.CONFIRM: [CallbackQueryHandler(confirm_scrape)],
         },
         fallbacks=[
             CallbackQueryHandler(cancel_scrape)
@@ -85,6 +86,7 @@ def setup(updater):
     dp.add_handler(CommandHandler('adminhelp', admin_help))
     dp.add_handler(CommandHandler('account', check_account))
     dp.add_handler(CommandHandler('start', start))
+    dp.add_handler(CommandHandler('iglogout', instagram_log_out))
     dp.add_handler(instagram_handler)
     dp.add_handler(scrape_handler)
     dp.add_handler(signout_handler)
