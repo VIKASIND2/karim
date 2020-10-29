@@ -4,7 +4,7 @@ from karim.bot.commands import *
 from karim.secrets import secrets
 from karim import LOCALHOST
 
-import asyncio, redis, socks
+import asyncio, redis
 
 from telethon.sync import TelegramClient
 from telethon import connection
