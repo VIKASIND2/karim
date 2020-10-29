@@ -57,14 +57,14 @@ def launch_scrape(target:str, scraper:Scraper, telegram_bot:MQBot):
     check_job_queue(scraper, telegram_bot)
 
     # Enqueues scrape 
-    job_id = random_string()
-    queue.enqueue(queue_scrape, job_id, target, scraper, job_id='launch_scrape:{}'.format(job_id))
+    identifier = random_string()
+    queue.enqueue(queue_scrape, identifier, target, scraper, job_id='launch_scrape:{}'.format(identifier))
 
 
-def queue_scrape(job_id, target, scraper:Scraper):
+def queue_scrape(identifier, target, scraper:Scraper):
     print('queue_scrape()')
     # ENQUEUE
-    job = queue.enqueue(scrape_job, user=target, job_id='{}:{}'.format(target, job_id), timeout=4500)
+    job = queue.enqueue(scrape_job, user=target, job_id='{}:{}'.format(target, identifier), job_timeout =4500)
     # CONNECT BOT
     api_id = secrets.get_var('API_ID')
     api_hash = secrets.get_var('API_HASH')
@@ -73,14 +73,14 @@ def queue_scrape(job_id, target, scraper:Scraper):
     while True:
         registry:FailedJobRegistry = FailedJobRegistry(queue=queue)
         print(registry.get_job_ids())
-        time.sleep(15)
+        time.sleep(30)
         print(registry.get_job_ids())
         result = job.result
         if not result:
             # Queue not finished yet
             bot.send_message(scraper.get_user_id(), update_scrape_status_text)
             continue
-        elif '{}:{}'.format(target, job_id) in registry.get_job_ids():
+        elif '{}:{}'.format(target, identifier) in registry.get_job_ids():
             print('found target in failed ids: ', target)
             # Process Failed
             bot.send_message(scraper.get_user_id(), failed_scraping_ig_text)
@@ -118,15 +118,15 @@ def launch_send_dm(targets:list, message:str, forwarder:Forwarder, telegram_bot:
     check_job_queue(forwarder, telegram_bot)
 
     # Enqueues job 
-    job_id = random_string()
-    queue.enqueue(queue_send_dm, job_id, targets, message, forwarder, job_id='launch_send_dm:{}'.format(job_id))
+    identifier = random_string()
+    queue.enqueue(queue_send_dm, identifier, targets, message, forwarder, job_id='launch_send_dm:{}'.format(identifier))
 
 
-def queue_send_dm(job_id, targets, message, forwarder):
+def queue_send_dm(identifier, targets, message, forwarder):
     # ENQUEUE and save last enqueued job
     job = None
     for target in targets:
-        job = queue.enqueue(send_dm_job, user=target, message=message, job_id='{}:{}'.format(target, job_id), timeout=120)
+        job = queue.enqueue(send_dm_job, user=target, message=message, job_id='{}:{}'.format(target, identifier), job_timeout =180)
     # CONNECT BOT
     api_id = secrets.get_var('API_ID')
     api_hash = secrets.get_var('API_HASH')
@@ -146,7 +146,7 @@ def queue_send_dm(job_id, targets, message, forwarder):
             count = 0
             failed = registry.get_job_ids()
             for target in targets:
-                if '{}:{}'.format(target, job_id) in failed:
+                if '{}:{}'.format(target, identifier) in failed:
                     count += 1
             bot.send_message(forwarder.chat_id, finished_sending_dm_text.format(count))
             return True
