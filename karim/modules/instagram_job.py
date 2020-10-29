@@ -12,7 +12,7 @@ from karim.bot.texts import *
 from telegram.inline.inlinekeyboardbutton import InlineKeyboardButton
 from telegram.inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from rq.job import Retry
-from rq.registry import FailedJobRegistry, StartedJobRegistry
+from rq.registry import FailedJobRegistry, StartedJobRegistry, FinishedJobRegistry
 import time, random, string
 
 def random_string():
@@ -123,8 +123,10 @@ def launch_send_dm(targets:list, message:str, forwarder:Forwarder, telegram_bot:
 def queue_send_dm(identifier, targets, message, forwarder):
     # ENQUEUE and save last enqueued job
     job = None
+    ids = []
     for target in targets:
-        job = queue.enqueue(send_dm_job, user=target, message=message, job_id='{}:{}'.format(target, identifier), job_timeout =180)
+        job = queue.enqueue(send_dm_job, user=target, message=message, job_id='{}:{}'.format(target, identifier), job_timeout = 300)
+        ids.append('{}:{}'.format(target, identifier))
     # CONNECT BOT
     api_id = secrets.get_var('API_ID')
     api_hash = secrets.get_var('API_HASH')
@@ -136,7 +138,13 @@ def queue_send_dm(identifier, targets, message, forwarder):
         result = job.result
         if not result:
             # Queue not finished yet
-            bot.send_message(forwarder.chat_id, message_sent_to_users)
+            sregistry = FinishedJobRegistry(queue=queue)
+            done = sregistry.get_job_ids()
+            completed = []
+            for job in done:
+                if job in ids:
+                    completed.append(job)
+            bot.send_message(forwarder.chat_id, message_sent_to_users.format(len(completed)))
             time.sleep(60)
             continue
         else:
@@ -152,6 +160,7 @@ def queue_send_dm(identifier, targets, message, forwarder):
 
 def send_dm_job(user:str, message:str):
     instaclient.send_dm(user=user, message=message)
+    time.sleep(random.randrange(15, 25))
 
         
         
