@@ -97,6 +97,7 @@ def queue_scrape(identifier, target, scraper:Scraper):
 def scrape_job(user:str):
     print('scrape_job()')
     instaclient.scrape_followers(user=user)
+    return True
 
 # SEND DM JOB HANDLER -------------------------------------------------------------------------
 def launch_send_dm(targets:list, message:str, forwarder:Forwarder, telegram_bot:MQBot):
@@ -161,6 +162,7 @@ def queue_send_dm(identifier, targets, message, forwarder):
 def send_dm_job(user:str, message:str):
     instaclient.send_dm(user=user, message=message)
     time.sleep(random.randrange(15, 25))
+    return True
 
         
         
