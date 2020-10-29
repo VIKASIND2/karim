@@ -15,6 +15,11 @@ from rq.job import Retry
 from rq.registry import FailedJobRegistry, StartedJobRegistry
 import time
 
+def random_string():
+    letters_and_digits = string.ascii_letters + string.digits
+    result_str = ''.join((random.choice(letters_and_digits) for i in range(6)))
+    return result_str
+
 
 def check_job_queue(obj: Scraper or Forwarder, telegram_bot:MQBot):
     """
@@ -33,8 +38,14 @@ def check_job_queue(obj: Scraper or Forwarder, telegram_bot:MQBot):
         elif 'launch_send_dm' in job_id:
             text = dm_job_in_queue_text
             telegram_bot.send_message(chat_id=obj.chat_id, text=text)
+    # Remove jobs from failed registry
+    failed_registry:FailedJobRegistry = FailedJobRegistry(queue=queue)
+    for job_id in failed_registry.get_job_ids():
+
+        registry.remove(job_id)
 
 
+# SCRAPE JOB HANDLER ----------------------------------------------------------------------------
 def launch_scrape(target:str, scraper:Scraper, telegram_bot:MQBot):
     """
     Add scrape job to the Worker queue. 
@@ -49,50 +60,21 @@ def launch_scrape(target:str, scraper:Scraper, telegram_bot:MQBot):
     
     # Check if no other job is in queue
     check_job_queue(scraper, telegram_bot)
-    # Remove jobs from failed registry
-    registry:FailedJobRegistry = FailedJobRegistry(queue=queue)
-    for job_id in registry.get_job_ids():
-        if 'launch_scrape' in job_id:
-            registry.remove(job_id)
-    print(registry.get_job_ids())
 
     # Enqueues scrape 
-    queue.enqueue(queue_scrape, target, scraper, job_id='launch_scrape:{}'.format(target))
+    job_id = random_string()
+    queue.enqueue(queue_scrape, job_id, target, scraper, job_id='launch_scrape:{}'.format(job_id))
 
 
-def launch_send_dm(targets:list, message:str, forwarder:Forwarder, telegram_bot:MQBot):
-    """
-    launch_send_dm Adds send DMs jobs to the Worker queue.
-
-    This method abstracts the process of enqueing send_dm jobs. It enqueues a method which takes care of enqueing the send_dm jobs and returning a response. This makes it possible to add the `queue_send_dm()` method to the Worker queue, hence it allows for it to run in the background.
-
-    Args:
-        targets (list): List of instagram usernames
-        message (str): Message to send to the users
-        forwarder (Forwarder): Forwarder object used to initialize the operation
-        telegram_bot (MQbot): Bot to use to send messages
-    """
-    
-    # Check if no other job is in queue
-    check_job_queue(forwarder, telegram_bot)
-
-    # Enqueues job 
-    # Remove jobs from failed registry
-    registry:FailedJobRegistry = FailedJobRegistry(queue=queue)
-    for job_id in registry.get_job_ids():
-        if 'launch_send_dm' in job_id:
-            registry.remove(job_id)
-    print(registry.get_job_ids())
-
-    queue.enqueue(queue_send_dm, targets, message, forwarder, job_id='launch_send_dm')
-
-
-def queue_scrape(target, scraper:Scraper):
+def queue_scrape(job_id, target, scraper:Scraper):
     print('queue_scrape()')
-    job = queue.enqueue(scrape_job, user=target, job_id=target)
+    # ENQUEUE
+    job = queue.enqueue(scrape_job, user=target, job_id='{}:{}'.format(target, job_id), timeout=4500)
+    # CONNECT BOT
     api_id = secrets.get_var('API_ID')
     api_hash = secrets.get_var('API_HASH')
     bot = TelegramClient(StringSession(), api_id, api_hash).start(bot_token=BOT_TOKEN) 
+    # CHECK FAILURE
     while True:
         registry:FailedJobRegistry = FailedJobRegistry(queue=queue)
         print(registry.get_job_ids())
@@ -103,7 +85,7 @@ def queue_scrape(target, scraper:Scraper):
             # Queue not finished yet
             bot.send_message(scraper.get_user_id(), update_scrape_status_text)
             continue
-        elif target in registry.get_job_ids():
+        elif '{}:{}'.format(target, job_id) in registry.get_job_ids():
             print('found target in failed ids: ', target)
             # Process Failed
             bot.send_message(scraper.get_user_id(), failed_scraping_ig_text)
@@ -123,14 +105,38 @@ def scrape_job(user:str):
     print('scrape_job()')
     instaclient.scrape_followers(user=user)
 
+# SEND DM JOB HANDLER -------------------------------------------------------------------------
+def launch_send_dm(targets:list, message:str, forwarder:Forwarder, telegram_bot:MQBot):
+    """
+    launch_send_dm Adds send DMs jobs to the Worker queue.
 
-def queue_send_dm(targets, message, forwarder):
+    This method abstracts the process of enqueing send_dm jobs. It enqueues a method which takes care of enqueing the send_dm jobs and returning a response. This makes it possible to add the `queue_send_dm()` method to the Worker queue, hence it allows for it to run in the background.
+
+    Args:
+        targets (list): List of instagram usernames
+        message (str): Message to send to the users
+        forwarder (Forwarder): Forwarder object used to initialize the operation
+        telegram_bot (MQbot): Bot to use to send messages
+    """
+    
+    # Check if no other job is in queue
+    check_job_queue(forwarder, telegram_bot)
+
+    # Enqueues job 
+    job_id = random_string()
+    queue.enqueue(queue_send_dm, job_id, targets, message, forwarder, job_id='launch_send_dm:{}'.format(job_id))
+
+
+def queue_send_dm(job_id, targets, message, forwarder):
+    # ENQUEUE and save last enqueued job
     job = None
     for target in targets:
-        job = queue.enqueue(send_dm_job, user=target, message=message, timeout=120)
+        job = queue.enqueue(send_dm_job, user=target, message=message, job_id='{}:{}'.format(target, job_id), timeout=120)
+    # CONNECT BOT
     api_id = secrets.get_var('API_ID')
     api_hash = secrets.get_var('API_HASH')
     bot = TelegramClient(StringSession(), api_id, api_hash).start(bot_token=BOT_TOKEN) 
+    # CHECK FAILURES AND TERMINATION
     registry:FailedJobRegistry = FailedJobRegistry(queue=queue)
     failed = 0
     while True:
@@ -142,11 +148,14 @@ def queue_send_dm(targets, message, forwarder):
             continue
         else:
             # Result is done
-            for job in registry.get_job_ids():
-                if job in targets:
-                    failed += 1
-            bot.send_message(forwarder.chat_id, finished_sending_dm_text.format(failed))
+            count = 0
+            failed = registry.get_job_ids():
+            for target in targets:
+                if '{}:{}'.format(target, job_id) in failed:
+                    count += 1
+            bot.send_message(forwarder.chat_id, finished_sending_dm_text.format(count))
             return True
+
 
 def send_dm_job(user:str, message:str):
     instaclient.send_dm(user=user, message=message)
