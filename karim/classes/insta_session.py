@@ -8,6 +8,7 @@ class InstaSession(Persistence):
         self.username = None
         self.password = None
         self.security_code = None
+        self.code_request = None
 
     @persistence_decorator
     def set_username(self, username):
@@ -20,6 +21,10 @@ class InstaSession(Persistence):
     @persistence_decorator
     def set_scode(self, scode):
         self.security_code = scode
+
+    @persistence_decorator
+    def incement_code_request(self):
+        self.code_request += 1
 
     def save_creds(self):
         """

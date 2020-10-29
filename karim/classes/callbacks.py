@@ -18,6 +18,7 @@ class Callbacks:
     TFIVE = 'TFIVE'
     FIFTY = 'FIFTY'
     SFIVE = 'SFIVE'
+    RESEND_CODE = 'RESEND_CODE'
 
 
 class LogInStates:

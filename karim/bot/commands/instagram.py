@@ -113,12 +113,14 @@ def instagram_password(update, context):
         return InstaStates.INPUT_VERIFICATION_CODE
     except SuspisciousLoginAttemptError as error:
         # Creds are correct
+        instasession.incement_code_request()
         if error.mode == SuspisciousLoginAttemptError.PHONE:
             text = input_security_code_text
         else:
             text = input_security_code_text_email
         instaclient.driver.save_screenshot("after_login.png") # TODO remove
         send_photo('after_login', context, update)
+        markup = CreateMarkup({Callbacks.RESEND_CODE: 'Resend Code', Callbacks.CANCEL: 'Cancel'}).create_markup()
         context.bot.edit_message_text(text=text, chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)
         return InstaStates.INPUT_SECURITY_CODE
 
@@ -128,6 +130,23 @@ def instagram_password(update, context):
     instasession.discard()
     return ConversationHandler.END
 
+@run_async
+@send_typing_action
+def instagram_resend_scode(update, context):
+    instasession:InstaSession = InstaSession.deserialize(Persistence.INSTASESSION, update)
+    if not instasession:
+        return InstaStates.INPUT_VERIFICATION_CODE
+
+    instaclient.driver.save_screenshot("before_resend.png") # TODO remove
+    send_photo('before_resend', context, update)
+    instaclient.resend_security_code()
+    instaclient.driver.save_screenshot("after_resend.png") # TODO remove
+    send_photo('after_resend', context, update)
+    instasession.incement_code_request()
+    update.callback_query.answer()
+    markup = CreateMarkup({Callbacks.RESEND_CODE: 'Resend Code', Callbacks.CANCEL: 'Cancel'}).create_markup()
+    context.bot.edit_message_text(text=security_code_resent.format(instasession.code_request), chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)
+    
 
 @run_async
 @send_typing_action
