@@ -1,3 +1,4 @@
+from telethon.client import buttons
 from telethon.client.telegramclient import TelegramClient
 from telethon.sessions.string import StringSession
 from karim.classes.mq_bot import MQBot
@@ -8,12 +9,18 @@ from karim.secrets import secrets
 from karim.modules import sheet
 from karim import queue, instaclient, BOT_TOKEN
 from karim.bot.texts import *
+from telethon.tl.types import KeyboardButtonUrl
 
 from telegram.inline.inlinekeyboardbutton import InlineKeyboardButton
 from telegram.inline.inlinekeyboardmarkup import InlineKeyboardMarkup
-from rq.job import Retry
+from rq.job import Job, Retry
 from rq.registry import FailedJobRegistry, StartedJobRegistry, FinishedJobRegistry
-import time, random, string
+import time, random, string, redis, os
+
+SCRAPE = 'scrape'
+CHECKSCRAPE = 'checkscrape'
+DM = 'dm'
+CHECKDM = 'checkdm'
 
 def random_string():
     letters_and_digits = string.ascii_letters + string.digits
@@ -53,51 +60,49 @@ def launch_scrape(target:str, scraper:Scraper, telegram_bot:MQBot):
         telegram_bot (MQbot): Bot to use to send messages
     """
     
-    # Check if no other job is in queue
+    # Check if other jobs are in queue
     check_job_queue(scraper, telegram_bot)
 
-    # Enqueues scrape 
+    # COMPILE SCRAPE
+    # Add scrape job
     identifier = random_string()
-    queue.enqueue(queue_scrape, identifier, target, scraper, job_id='launch_scrape:{}'.format(identifier), job_timeout =4500)
-
-
-def queue_scrape(identifier, target, scraper:Scraper):
-    print('queue_scrape()')
-    # ENQUEUE
-    job = queue.enqueue(scrape_job, user=target, job_id='{}:{}'.format(target, identifier), job_timeout =4500)
-    # CONNECT BOT
-    api_id = secrets.get_var('API_ID')
-    api_hash = secrets.get_var('API_HASH')
-    bot = TelegramClient(StringSession(), api_id, api_hash).start(bot_token=BOT_TOKEN) 
-    # CHECK FAILURE
-    while True:
-        registry:FailedJobRegistry = FailedJobRegistry(queue=queue)
-        time.sleep(30)
-        result = job.result
-        if not result:
-            # Queue not finished yet
-            bot.send_message(scraper.get_user_id(), update_scrape_status_text)
-            continue
-        elif '{}:{}'.format(target, identifier) in registry.get_job_ids():
-            print('found target in failed ids: ', target)
-            # Process Failed
-            bot.send_message(scraper.get_user_id(), failed_scraping_ig_text)
-            print('SCRAPE JOB ERROR: \n{}'.format(job.exc_info))
-            return False
-        else:
-            # Result is done
-            # Save result in sheets
-            sheet.add_scrape(scraper.get_target(), name=scraper.get_name(), scraped=result)
-            # Update user
-            markup = InlineKeyboardMarkup([InlineKeyboardButton(text='Google Sheet', url=sheet.get_sheet_url())])
-            bot.send_message(scraper.get_user_id(), finished_scrape_text, reply_markup=markup)
-            return True
+    scrape_id = '{}:{}:{}'.format(SCRAPE, target, identifier)
+    job = queue.enqueue(scrape_job, user=target, job_id=scrape_id, job_timeout=4500)
+    # Add checker job
+    checker_id = '{}:{}:{}'.format(CHECKSCRAPE, target, identifier)
+    checker = queue.enqueue(check_scrape_job, scrape_id, scraper, job_id=checker_id, job_timeout=300)
 
 
 def scrape_job(user:str):
     print('scrape_job()')
-    instaclient.scrape_followers(user=user)
-    return True
+    followers = instaclient.scrape_followers(user=user)
+    return followers
+
+
+def check_scrape_job(scrape_id:str, scraper:Scraper):
+    failed = FailedJobRegistry(queue=queue)
+
+    api_id = secrets.get_var('API_ID')
+    api_hash = secrets.get_var('API_HASH')
+    bot = TelegramClient(StringSession(), api_id, api_hash).start(bot_token=BOT_TOKEN) 
+
+    if scrape_id in failed.get_job_ids():
+        # job failed
+        bot.send_message(scraper.get_user_id(), failed_scraping_ig_text)
+        return False
+    else:
+        redis_url = os.getenv('REDISTOGO_URL', 'redis://localhost:6379')
+        conn = redis.from_url(redis_url)
+        job = Job.fetch(scrape_id, connection=conn)
+        result = job.result
+
+        # Save result in sheets
+        sheet.add_scrape(scraper.get_target(), name=scraper.get_name(), scraped=result)
+        # Update user
+        button = KeyboardButtonUrl('Google Sheet', url=sheet.get_sheet_url())
+        bot.send_message(scraper.get_user_id(), finished_scrape_text, buttons=button)
+        return True
+
 
 # SEND DM JOB HANDLER -------------------------------------------------------------------------
 def launch_send_dm(targets:list, message:str, forwarder:Forwarder, telegram_bot:MQBot):
@@ -116,56 +121,41 @@ def launch_send_dm(targets:list, message:str, forwarder:Forwarder, telegram_bot:
     # Check if no other job is in queue
     check_job_queue(forwarder, telegram_bot)
 
-    # Enqueues job 
+    # Enqueues jobs
     identifier = random_string()
-    queue.enqueue(queue_send_dm, identifier, targets, message, forwarder, job_id='launch_send_dm:{}'.format(identifier), job_timeout =84000)
-
-
-def queue_send_dm(identifier, targets, message, forwarder):
-    # ENQUEUE and save last enqueued job
-    job = None
-    ids = []
     for target in targets:
-        job = queue.enqueue(send_dm_job, user=target, message=message, job_id='{}:{}'.format(target, identifier), job_timeout = 300)
-        ids.append('{}:{}'.format(target, identifier))
-    # CONNECT BOT
+        queue.enqueue(send_dm_job, identifier, targets, message, forwarder, job_id='{}:{}:{}'.format(DM, target, identifier), job_timeout =84000)
+    # Enqueue check job
+    queue.enqueue(check_dm_job, identifier, forwarder, job_id='{}:{}'.format(CHECKDM, identifier))
+
+
+def send_dm_job(user:str, message:str, forwarder:Forwarder):
+    instaclient.send_dm(user=user, message=message)
     api_id = secrets.get_var('API_ID')
     api_hash = secrets.get_var('API_HASH')
     bot = TelegramClient(StringSession(), api_id, api_hash).start(bot_token=BOT_TOKEN) 
-    # CHECK FAILURES AND TERMINATION
-    registry:FailedJobRegistry = FailedJobRegistry(queue=queue)
-    failed = 0
-    while True:
-        result = job.result
-        if not result:
-            # Queue not finished yet
-            sregistry = FinishedJobRegistry(queue=queue)
-            done = sregistry.get_job_ids()
-            completed = []
-            for job in done:
-                if job in ids:
-                    completed.append(job)
-            bot.send_message(forwarder.chat_id, message_sent_to_users.format(len(completed)))
-            time.sleep(60)
-            continue
-        else:
-            # Result is done
-            count = 0
-            failed = registry.get_job_ids()
-            for target in targets:
-                if '{}:{}'.format(target, identifier) in failed:
-                    count += 1
-            bot.send_message(forwarder.chat_id, finished_sending_dm_text.format(count))
-            return True
-
-
-def send_dm_job(user:str, message:str):
-    instaclient.send_dm(user=user, message=message)
-    time.sleep(random.randrange(15, 25))
+    bot.send_message(forwarder.chat_id, message_sent_to_users.format(forwarder.get_completed_dm()))
+    bot.disconnect()
+    forwarder.set_completed_dm()
+    time.sleep(random.randrange(25, 60))
     return True
 
-        
-        
+
+def check_dm_job(identifier:str, forwarder:Forwarder):
+    failed = FailedJobRegistry(queue=queue)
+
+    api_id = secrets.get_var('API_ID')
+    api_hash = secrets.get_var('API_HASH')
+    bot = TelegramClient(StringSession(), api_id, api_hash).start(bot_token=BOT_TOKEN) 
+
+    count = 0
+    for id in failed.get_job_ids:
+        if identifier in id and DM in id:
+            count += 1
+
+    bot.send_message(forwarder.get_user_id(), finished_sending_dm_text.format(count))
+    bot.disconnect()
+    return True
         
 
     

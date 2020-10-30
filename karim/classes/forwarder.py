@@ -29,6 +29,7 @@ class Forwarder(SessionManager):
         # Specific to IG
         self.users = None
         self.count = None
+        self.completed = None
 
 
     def get_selection(self):
@@ -58,6 +59,17 @@ class Forwarder(SessionManager):
     def get_mode(self):
         """Return forwarder mode"""
         return self.mode
+
+    def get_completed_dm(self):
+        """
+        Get the number of completed `send_dm_job` tasks
+
+        Returns:
+            int: Number of completed `send_dm_job` tasks
+        """
+        if self.completed == None:
+            return 0
+        return self.completed
 
     def set_telethon_message(self, bot, message_date, client=None):
         print('forwarder.set_telethon_message()')
@@ -146,6 +158,12 @@ class Forwarder(SessionManager):
         self.mode = mode
         return self.mode
 
+    @persistence_decorator
+    def set_completed_dm(self, completed):
+        if self.completed == None:
+            self.completed = 1
+        else:
+            self.completed += 1
     # MANAGE MARKUP ROTATION AND SELECTIONS
     @persistence_decorator
     def add_selection(self, id):
