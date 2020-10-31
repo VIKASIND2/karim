@@ -22,6 +22,8 @@ CHECKSCRAPE = 'checkscrape'
 DM = 'dm'
 CHECKDM = 'checkdm'
 
+BOT
+
 def random_string():
     letters_and_digits = string.ascii_letters + string.digits
     result_str = ''.join((random.choice(letters_and_digits) for i in range(6)))
@@ -62,20 +64,24 @@ def launch_scrape(target:str, scraper:Scraper, telegram_bot:MQBot):
     
     # Check if other jobs are in queue
     check_job_queue(scraper, telegram_bot)
+    global BOT
+    BOT = telegram_bot
 
     # COMPILE SCRAPE
     # Add scrape job
     identifier = random_string()
     scrape_id = '{}:{}:{}'.format(SCRAPE, target, identifier)
-    job = queue.enqueue(scrape_job, user=target, job_id=scrape_id, job_timeout=4500)
+    job = queue.enqueue(scrape_job, target, scraper, job_id=scrape_id, job_timeout=4500)
     # Add checker job
     checker_id = '{}:{}:{}'.format(CHECKSCRAPE, target, identifier)
     checker = queue.enqueue(check_scrape_job, scrape_id, scraper, job_id=checker_id, job_timeout=300)
 
 
-def scrape_job(user:str):
+def scrape_job(user:str, scraper:Scraper):
     print('scrape_job()')
     followers = instaclient.scrape_followers(user=user)
+    BOT.send_photo(scraper.chat_id, 'user')
+    BOT.send_photo(scraper.chat_id, 'followers')
     return followers
 
 
