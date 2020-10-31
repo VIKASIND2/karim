@@ -22,7 +22,7 @@ CHECKSCRAPE = 'checkscrape'
 DM = 'dm'
 CHECKDM = 'checkdm'
 
-BOT
+BOT = None
 
 def random_string():
     letters_and_digits = string.ascii_letters + string.digits
