@@ -79,10 +79,15 @@ def launch_scrape(target:str, scraper:Scraper, telegram_bot:MQBot):
 
 def scrape_job(user:str, scraper:Scraper):
     print('scrape_job()')
-    followers = instaclient.scrape_followers(user=user)
-    BOT.send_photo(scraper.chat_id, 'user')
-    BOT.send_photo(scraper.chat_id, 'followers')
-    return followers
+    instaclient.driver.save_screenshot('before_scrape.png')
+    BOT.send_photo(scraper.chat_id, photo=open('{}.png'.format('before_scrape'), 'rb'))
+    try:
+        followers = instaclient.scrape_followers(user=user)
+        return followers
+    except:
+        BOT.send_photo(scraper.chat_id, photo=open('{}.png'.format('user'), 'rb'))
+        BOT.send_photo(scraper.chat_id, photo=open('{}.png'.format('followers'), 'rb'))
+        raise Exception()
 
 
 def check_scrape_job(scrape_id:str, scraper:Scraper):
