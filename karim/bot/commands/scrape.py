@@ -14,6 +14,8 @@ def scrape_followers(update, context):
     message = update.effective_chat.send_message(text=checking_ig_status)
     result = instaclient.check_status()
     if result:
+        instaclient.driver.save_screenshot('home.png')
+        send_photo('home', context, update)
         scraper = Scraper(Persistence.SCRAPE_FOLLOWERS, update.effective_chat.id, update.effective_user.id)
         markup = CreateMarkup({Callbacks.CANCEL: 'Cancel'}).create_markup()
         context.bot.edit_message_text(text=input_username_text, message_id=message.message_id, chat_id=update.effective_chat.id, reply_markup=markup)
