@@ -91,6 +91,8 @@ def confirm_scrape(update, context):
         instaclient.driver.save_screenshot('confirm_scrape.png') #TODO remove
         send_photo('confirm_scrape', context, update)
         instagram_job.launch_scrape(scraper.get_target(), scraper=scraper, telegram_bot=context.bot)
+        instaclient.driver.save_screenshot('job_enqueued.png') #TODO remove
+        send_photo('job_enqueued', context, update)
         scraper.discard()
         return ConversationHandler.END
     elif data == Callbacks.CANCEL:
