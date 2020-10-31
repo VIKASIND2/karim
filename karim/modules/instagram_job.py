@@ -76,7 +76,7 @@ def launch_scrape(target:str, scraper:Scraper, telegram_bot:MQBot):
     checker_id = '{}:{}:{}'.format(CHECKSCRAPE, target, identifier)
     checker = queue.enqueue(check_scrape_job, scrape_id, scraper, job_id=checker_id, job_timeout=300)
 
-
+ 
 def scrape_job(user:str, scraper:Scraper):
     print('scrape_job()')
     from karim import telegram_bot
