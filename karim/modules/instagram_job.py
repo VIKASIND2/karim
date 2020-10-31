@@ -79,14 +79,15 @@ def launch_scrape(target:str, scraper:Scraper, telegram_bot:MQBot):
 
 def scrape_job(user:str, scraper:Scraper):
     print('scrape_job()')
+    from karim import telegram_bot
     instaclient.driver.save_screenshot('before_scrape.png')
-    BOT.send_photo(scraper.chat_id, photo=open('{}.png'.format('before_scrape'), 'rb'))
+    telegram_bot.send_photo(scraper.chat_id, photo=open('{}.png'.format('before_scrape'), 'rb'))
     try:
         followers = instaclient.scrape_followers(user=user)
         return followers
     except:
-        BOT.send_photo(scraper.chat_id, photo=open('{}.png'.format('user'), 'rb'))
-        BOT.send_photo(scraper.chat_id, photo=open('{}.png'.format('followers'), 'rb'))
+        telegram_bot.send_photo(scraper.chat_id, photo=open('{}.png'.format('user'), 'rb'))
+        telegram_bot.send_photo(scraper.chat_id, photo=open('{}.png'.format('followers'), 'rb'))
         raise Exception()
 
 
