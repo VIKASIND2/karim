@@ -97,8 +97,6 @@ def launch_scrape(target:str, scraper:Scraper, telegram_bot:MQBot):
 def scrape_job(user:str, scraper:Scraper):
     print('scrape_job()')
     from karim import telegram_bot
-    instaclient.driver.save_screenshot('before_scrape.png')
-    telegram_bot.send_photo(scraper.chat_id, photo=open('{}.png'.format('before_scrape'), 'rb'))
     try:
         instasession = InstaSession(scraper.chat_id, scraper.user_id, scraper.message_id)
         if instasession.get_creds():

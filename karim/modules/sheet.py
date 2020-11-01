@@ -271,7 +271,7 @@ def get_sheet_url(index:int=0):
     spreadsheet = auth()
     sheet:Worksheet = spreadsheet.get_worksheet(index)
     url = 'https://docs.google.com/spreadsheets/d/{}/edit#gid={}'.format(spreadsheet.id, sheet.id)
-    return sheet.url
+    return url
 
 
 def set_sheet(client:Client):

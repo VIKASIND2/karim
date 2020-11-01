@@ -101,6 +101,7 @@ select_forward_mode_text = 'Select below on which platform you would like to for
 confirm_send_newsletter_text = 'Are you sure you want to send your message through the Karim newsletter to {} users?'
 inform_sending_newsletter_text = 'You message is being sent to your newsletter...'
 # Instagram
+select_scrape_text = 'Select below the followers selection to send your message to. To view the available selections, click <a href="{}">here</a>'
 no_selection_available_text = 'No IG users have been scraped so far. Please use /scrape to get a user\'s instagram followers.'
 confirm_send_dm_text = 'Are you sure you want to send your message to {} instagram users?'
 inform_sending_dms_text = 'You message is being sent to the selected instagram followers... This might take a while...'
