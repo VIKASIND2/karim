@@ -14,8 +14,6 @@ def scrape_followers(update, context):
     message = update.effective_chat.send_message(text=checking_ig_status)
     result = instaclient.check_status()
     if result:
-        instaclient.driver.save_screenshot('home.png')
-        send_photo('home', context, update)
         scraper = Scraper(Persistence.SCRAPE_FOLLOWERS, update.effective_chat.id, update.effective_user.id)
         markup = CreateMarkup({Callbacks.CANCEL: 'Cancel'}).create_markup()
         context.bot.edit_message_text(text=input_username_text, message_id=message.message_id, chat_id=update.effective_chat.id, reply_markup=markup)
@@ -36,8 +34,6 @@ def select_target(update, context):
     try:
         message = update.effective_chat.send_message(text=checking_user_text)
         scraper.set_message(message.message_id)
-        instaclient.driver.save_screenshot('checked_user.png')
-        send_photo('checked_user', context, update)
         result = instaclient.is_valid_user(user)
         scraper.set_target(user)
         markup = CreateMarkup({Callbacks.CANCEL: 'Cancel'}).create_markup()
@@ -69,8 +65,6 @@ def select_name(update, context):
         return ScrapeStates.SELECT_NAME
     name = update.message.text
     scraper.set_name(name)
-    instaclient.driver.save_screenshot('select_name.png') #TODO remove
-    send_photo('select_name', context, update)
     # User is valid -  confirm
     markup = CreateMarkup({Callbacks.CONFIRM: 'Confirm', Callbacks.CANCEL: 'Cancel'}).create_markup()
     message = update.message.reply_text(confirm_scrape_text.format(scraper.target), reply_markup=markup)
@@ -88,11 +82,7 @@ def confirm_scrape(update, context):
     data = update.callback_query.data
     if data == Callbacks.CONFIRM:
         context.bot.edit_message_text(chat_id=update.effective_chat.id, message_id=scraper.message_id, text=update_scraping_ig_text)
-        instaclient.driver.save_screenshot('confirm_scrape.png') #TODO remove
-        send_photo('confirm_scrape', context, update)
         instagram_job.launch_scrape(scraper.get_target(), scraper=scraper, telegram_bot=context.bot)
-        instaclient.driver.save_screenshot('job_enqueued.png') #TODO remove
-        send_photo('job_enqueued', context, update)
         scraper.discard()
         return ConversationHandler.END
     elif data == Callbacks.CANCEL:

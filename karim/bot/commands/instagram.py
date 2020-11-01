@@ -45,8 +45,6 @@ def ig_login(update, context):
                     text = input_security_code_text
                 else:
                     text = input_security_code_text_email
-                instaclient.driver.save_screenshot("after_login.png") # TODO remove
-                send_photo('after_login', context, update)
                 markup = CreateMarkup({Callbacks.RESEND_CODE: 'Resend Code', Callbacks.CANCEL: 'Cancel'}).create_markup()
                 context.bot.edit_message_text(text=text, chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)
                 return InstaStates.INPUT_SECURITY_CODE
@@ -73,12 +71,8 @@ def instagram_username(update, context):
     markup = CreateMarkup({Callbacks.CANCEL: 'Cancel'}).create_markup()
     # Verify User
     try:
-        instaclient.driver.save_screenshot("before.png") # TODO remove
-        send_photo('before', context, update)
         result = instaclient.is_valid_user(username)
         print('USER {} IS VALID: '.format(username), result)
-        instaclient.driver.save_screenshot("after.png")
-        send_photo('after', context, update)
     except InvalidUserError as error:
         context.bot.edit_message_text(text=invalid_user_text.format(error.username), chat_id=update.effective_chat.id, message_id=instasession.message_id, reply_markup=markup)
         instasession.set_message(message.message_id)
@@ -106,15 +100,11 @@ def instagram_password(update, context):
     # Attempt login
     try:
         instaclient.login(instasession.username, instasession.password, check_user=False)
-        instaclient.driver.save_screenshot("after_login.png") # TODO remove
-        send_photo('after_login', context, update)
     except InvaildPasswordError:
         context.bot.edit_message_text(text=invalid_password_text.format(instaclient.password), chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)
         return InstaStates.INPUT_PASSWORD
     except VerificationCodeNecessary:
         context.bot.edit_message_text(text=input_verification_code_text, chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)
-        instaclient.driver.save_screenshot("after_login.png") # TODO remove
-        send_photo('after_login', context, update)
         return InstaStates.INPUT_VERIFICATION_CODE
     except SuspisciousLoginAttemptError as error:
         print('Error: ', error)
@@ -124,8 +114,6 @@ def instagram_password(update, context):
             text = input_security_code_text
         else:
             text = input_security_code_text_email
-        instaclient.driver.save_screenshot("after_login.png") # TODO remove
-        send_photo('after_login', context, update)
         markup = CreateMarkup({Callbacks.RESEND_CODE: 'Resend Code', Callbacks.CANCEL: 'Cancel'}).create_markup()
         context.bot.edit_message_text(text=text, chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)
         return InstaStates.INPUT_SECURITY_CODE
@@ -143,8 +131,6 @@ def instagram_resend_scode(update, context):
     if not instasession:
         return InstaStates.INPUT_VERIFICATION_CODE
 
-    instaclient.driver.save_screenshot("before_resend.png") # TODO remove
-    send_photo('before_resend', context, update)
     try:
         instaclient.resend_security_code()
         text = 'phone number'
@@ -154,8 +140,6 @@ def instagram_resend_scode(update, context):
             text = 'email'
         else:
             text = 'phone number'
-    instaclient.driver.save_screenshot("after_resend.png") # TODO remove
-    send_photo('after_resend', context, update)
     instasession.increment_code_request()
     update.callback_query.answer()
     markup = CreateMarkup({Callbacks.RESEND_CODE: 'Resend Code', Callbacks.CANCEL: 'Cancel'}).create_markup()
@@ -204,12 +188,8 @@ def instagram_security_code(update, context):
 
     try:
         instaclient.input_security_code(code)
-        instaclient.driver.save_screenshot("after_login.png") # TODO remove
-        send_photo('after_login', context, update)
     except InvalidSecurityCodeError:
         context.bot.edit_message_text(text=invalid_security_code_text.format(code), chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)
-        instaclient.driver.save_screenshot("after_login.png") # TODO remove
-        send_photo('after_login', context, update)
         return InstaStates.INPUT_SECURITY_CODE
 
     # Login Successful

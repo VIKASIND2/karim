@@ -89,6 +89,7 @@ def remove_subscriber(id:int or str):
     log(datetime.utcnow(),id, 'UNSUBSCRIBE')
     return True
 
+
 def is_subscriber(id:int or str):
     """
     is_subscriber [summary]
@@ -257,19 +258,20 @@ def get_rows(sheet:Worksheet):
     return rows
 
 
-def get_sheet_url():
+def get_sheet_url(index:int=0):
+    """
+    Returns the link of a worksheet
+
+    Args:
+        index (int, optional): Index of the sheet to get. Can be either 0, 1 or 2. Defaults to 0.
+
+    Returns:
+        str: Url of the selected worksheet
+    """
     spreadsheet = auth()
-    sheet:Worksheet = spreadsheet.get_worksheet(0)
+    sheet:Worksheet = spreadsheet.get_worksheet(index)
+    url = 'https://docs.google.com/spreadsheets/d/{}/edit#gid={}'.format(spreadsheet.id, sheet.id)
     return sheet.url
-
-
-""" def clean_sheet(sheet):
-    rows = find_row_by_id(item_id='')
-    for row in reversed(rows):
-        if row in (None, ''):
-            try: sheet.delete_row(find_row_by_id(item_id=id)[0])
-            except: pass """
-
 
 
 def set_sheet(client:Client):

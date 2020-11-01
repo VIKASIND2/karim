@@ -134,7 +134,7 @@ def check_scrape_job(scrape_id:str, scraper:Scraper):
         # Save result in sheets
         sheet.add_scrape(scraper.get_target(), name=scraper.get_name(), scraped=result)
         # Update user
-        button = KeyboardButtonUrl('Google Sheet', url=sheet.get_sheet_url())
+        button = KeyboardButtonUrl('Google Sheet', url=sheet.get_sheet_url(1))
         bot.send_message(scraper.get_user_id(), finished_scrape_text, buttons=button)
         return True
 

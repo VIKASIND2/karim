@@ -84,7 +84,7 @@ def select_message(update, context):
         else:
             markup_dict = {}
             for item in scraped:
-                markup_dict[scraped[0]] = scraped[1]
+                markup_dict[item[0]] = item[1]
             markup_dict[Callbacks.CANCEL] = 'Cancel'
             markup = CreateMarkup(markup_dict).create_markup()
             context.bot.edit_message_text(chat_id=update.effective_chat.id, message_id=forwarder.message_id, reply_markup=markup)
