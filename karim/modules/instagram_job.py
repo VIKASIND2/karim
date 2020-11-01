@@ -5,6 +5,7 @@ from karim.classes.mq_bot import MQBot
 from karim.classes.callbacks import ScrapeStates
 from karim.classes.scraper import Scraper
 from karim.classes.forwarder import Forwarder
+from karim.classes.insta_session import InstaSession
 from karim.secrets import secrets
 from karim.modules import sheet
 from karim import queue, instaclient, BOT_TOKEN
@@ -21,8 +22,6 @@ SCRAPE = 'scrape'
 CHECKSCRAPE = 'checkscrape'
 DM = 'dm'
 CHECKDM = 'checkdm'
-
-BOT = None
 
 def random_string():
     letters_and_digits = string.ascii_letters + string.digits
@@ -49,6 +48,25 @@ def check_job_queue(obj: Scraper or Forwarder, telegram_bot:MQBot):
             telegram_bot.send_message(chat_id=obj.chat_id, text=text)
 
 
+def process_update_callback(obj: Scraper or Forwarder, message:str, message_id:int=None):
+    """
+    process_update_callback sends an update message to the user, to inform of the status of the current process. This method can be used as a callback in another method.
+
+    Args:
+        obj (ScraperorForwarder): Object to get the `chat_id` and `message_id` from.
+        message (str): The text to send via message
+        message_id (int, optional): If this argument is defined, then the method will try to edit the message matching the `message_id` of the `obj`. Defaults to None.
+    """
+    from karim import telegram_bot as bot
+    if message_id:
+        try:
+            bot.edit_message_text(text=message, chat_id=obj.chat_id, message_id=obj.get_message_id())
+            return
+        except: pass
+    bot.send_message(obj.chat_id, text=message)
+    return
+
+
 # SCRAPE JOB HANDLER ----------------------------------------------------------------------------
 def launch_scrape(target:str, scraper:Scraper, telegram_bot:MQBot):
     """
@@ -64,8 +82,6 @@ def launch_scrape(target:str, scraper:Scraper, telegram_bot:MQBot):
     
     # Check if other jobs are in queue
     check_job_queue(scraper, telegram_bot)
-    global BOT
-    BOT = telegram_bot
 
     # COMPILE SCRAPE
     # Add scrape job
@@ -83,8 +99,16 @@ def scrape_job(user:str, scraper:Scraper):
     instaclient.driver.save_screenshot('before_scrape.png')
     telegram_bot.send_photo(scraper.chat_id, photo=open('{}.png'.format('before_scrape'), 'rb'))
     try:
-        followers = instaclient.scrape_followers(user=user)
-        return followers
+        instasession = InstaSession(scraper.chat_id, scraper.user_id, scraper.message_id)
+        if instasession.get_creds():
+            process_update_callback(scraper, logging_in_with_credentials_text, scraper.get_message_id())
+            instaclient.login(instasession.username, instasession.password, check_user=False)
+            time.sleep(1)
+            process_update_callback(scraper, initiating_scrape_text.format(user, user))
+            followers = instaclient.scrape_followers(user=user)
+            return followers
+        else:
+            return None
     except:
         telegram_bot.send_photo(scraper.chat_id, photo=open('{}.png'.format('user'), 'rb'))
         telegram_bot.send_photo(scraper.chat_id, photo=open('{}.png'.format('followers'), 'rb'))
