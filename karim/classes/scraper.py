@@ -25,3 +25,6 @@ class Scraper(Persistence):
 
     def get_target(self):
         return self.target
+
+    def get_name(self):
+        return self.name

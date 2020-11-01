@@ -14,6 +14,7 @@ from telethon.tl.types import KeyboardButtonUrl
 
 from telegram.inline.inlinekeyboardbutton import InlineKeyboardButton
 from telegram.inline.inlinekeyboardmarkup import InlineKeyboardMarkup
+from telegram import ParseMode
 from rq.job import Job, Retry
 from rq.registry import FailedJobRegistry, StartedJobRegistry, FinishedJobRegistry
 import time, random, string, redis, os
@@ -60,10 +61,10 @@ def process_update_callback(obj: Scraper or Forwarder, message:str, message_id:i
     from karim import telegram_bot as bot
     if message_id:
         try:
-            bot.edit_message_text(text=message, chat_id=obj.chat_id, message_id=obj.get_message_id())
+            bot.edit_message_text(text=message, chat_id=obj.chat_id, message_id=obj.get_message_id(), parse_mode=ParseMode.HTML)
             return
         except: pass
-    bot.send_message(obj.chat_id, text=message)
+    bot.send_message(obj.chat_id, text=message, parse_mode=ParseMode.HTML)
     return
 
 
