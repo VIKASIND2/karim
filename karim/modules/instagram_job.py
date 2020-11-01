@@ -110,10 +110,8 @@ def scrape_job(user:str, scraper:Scraper):
             return followers
         else:
             return None
-    except:
-        telegram_bot.send_photo(scraper.chat_id, photo=open('{}.png'.format('user'), 'rb'))
-        telegram_bot.send_photo(scraper.chat_id, photo=open('{}.png'.format('followers'), 'rb'))
-        raise Exception()
+    except Exception as error:
+        raise error
 
 
 def check_scrape_job(scrape_id:str, scraper:Scraper):
