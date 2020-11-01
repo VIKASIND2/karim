@@ -82,7 +82,7 @@ select_name_text = 'Input below a name for this follower\'s selection (can be cu
 select_count_text = 'Select below the amount of followers you would like to scrape. Note that the higher the number, the longer the operation will take to complete.'
 confirm_scrape_text = 'Are you sure you want to scrape {}\'s followers?'
 update_scraping_ig_text = 'Starting to scrape followers... This might take a while...'
-initiating_scrape_text = 'Initiating scrape... getting <a href="https://instagram.com/{}/">{}<a>\'s followers...'
+initiating_scrape_text = 'Initiating scrape... getting <a href="https://instagram.com/{}/">{}</a>\'s followers...'
 cancelling_scrape_text = 'Scraping operation has been cancelled.'
 # Instagram Scrape Job
 failed_scraping_ig_text = 'There was an error when scraping the followers. Please try again in a bit or contact a developer of the bot'
