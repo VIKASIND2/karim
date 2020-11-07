@@ -300,6 +300,7 @@ def confirm(update, context):
             for target in targets:
                 context.bot.send_queued_message(text=forwarder.text, chat_id=target, parse_mode=ParseMode.MARKDOWN_V2)
             print('Queued messages')
+            context.bot.edit_message_text(chat_id=update.effective_chat.id, message_id=forwarder.message_id, text=finished_sending_dm_text)
             forwarder.discard()
             return ConversationHandler.END
 
