@@ -86,6 +86,7 @@ class Forwarder(SessionManager):
             self.telethon_text = message.text
         except:
             print('Message is None')
+        client.disconnect()
         return message  
 
     # Connects to Telegram API
