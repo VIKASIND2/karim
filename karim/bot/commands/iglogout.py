@@ -9,7 +9,10 @@ def instagram_log_out(update, context):
         instasession.delete_creds()
         instasession.discard()
         # User is authorised
-        message = update.effective_chat.send_message(text=logging_out)
+        if update.callback_query:
+            message = update.callback_query.edit_message_text(text=logging_out)
+        else:
+            message = update.effective_chat.send_message(text=logging_out)
         result = instaclient.logout()
         if result:
             message.edit_text(text=instagram_loggedout_text)
