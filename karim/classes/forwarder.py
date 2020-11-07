@@ -14,10 +14,10 @@ class Forwarder(SessionManager):
         self.mode = None
         self.text = None
         # Specific to Telegram mode
-        self.selected_ids = None
-        self.group_ids = None
-        self.group_titles = None
-        self.shown_ids = None
+        self.selected_ids = []
+        self.group_ids = []
+        self.group_titles = []
+        self.shown_ids = []
         self.rotate_size = 6
         self.first_index = 0
         self.last_index = 6
