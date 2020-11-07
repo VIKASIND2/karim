@@ -21,10 +21,12 @@ class MQBot(telegram.bot.Bot):
         OPTIONAL arguments'''
         return super(MQBot, self).send_message(*args, **kwargs)
 
-    def report_error(self, error):
+    def report_error(self, error=None, send_screenshot=False, screenshot_name=''):
         string = str(secrets.get_var('DEVS')).replace('[', '')
         string = string.replace(']', '')
         string = string.replace(' ', '')
         devs = list(string.split(','))
         for dev in devs:
+            if send_screenshot:
+                self.send_photo(chat_id=int(dev), photo=open('{}.png'.format(screenshot_name), 'rb'))
             self.send_message(chat_id=int(dev), text='There was an error with the Karim Luman bot: \n{}'.format(error))

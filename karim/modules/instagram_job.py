@@ -17,7 +17,7 @@ from telegram.inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram import ParseMode
 from rq.job import Job, Retry
 from rq.registry import FailedJobRegistry, StartedJobRegistry, FinishedJobRegistry
-import time, random, string, redis, os
+import time, random, string, redis, os, datetime
 
 SCRAPE = 'scrape'
 CHECKSCRAPE = 'checkscrape'
@@ -122,6 +122,7 @@ def check_scrape_job(scrape_id:str, scraper:Scraper):
     if scrape_id in failed.get_job_ids():
         # job failed
         bot.send_message(scraper.get_user_id(), failed_scraping_ig_text)
+        sheet.log(datetime.utcnow(), scraper.get_user_id(), action='FAILED SCRAPE')
         return False
     else:
         redis_url = os.getenv('REDISTOGO_URL', 'redis://localhost:6379')
@@ -131,6 +132,7 @@ def check_scrape_job(scrape_id:str, scraper:Scraper):
 
         # Save result in sheets
         sheet.add_scrape(scraper.get_target(), name=scraper.get_name(), scraped=result)
+        sheet.log(datetime.utcnow(), scraper.get_user_id(), action='SUCCESSFUL SCRAPE')
         # Update user
         button = KeyboardButtonUrl('Google Sheet', url=sheet.get_sheet_url(1))
         bot.send_message(scraper.get_user_id(), finished_scrape_text, buttons=button)
@@ -189,8 +191,3 @@ def check_dm_job(identifier:str, forwarder:Forwarder):
     bot.send_message(forwarder.get_user_id(), finished_sending_dm_text.format(count))
     bot.disconnect()
     return True
-        
-
-    
-
-

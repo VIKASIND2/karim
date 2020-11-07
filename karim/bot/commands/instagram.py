@@ -109,6 +109,10 @@ def instagram_password(update, context):
     except SuspisciousLoginAttemptError as error:
         print('Error: ', error)
         # Creds are correct
+        instaclient.driver.save_screenshot('suspicious_login_attempt.png')
+        context.bot.report_error(error, send_screenshot=True, screenshot_name='suspicious_login_attempt')
+        if os.path.exists("suspicious_login_attempt.png"):
+            os.remove("suspicious_login_attempt.png")
         instasession.increment_code_request()
         if error.mode == SuspisciousLoginAttemptError.PHONE:
             text = input_security_code_text
