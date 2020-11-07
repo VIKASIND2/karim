@@ -19,6 +19,7 @@ class Callbacks:
     FIFTY = 'FIFTY'
     SFIVE = 'SFIVE'
     RESEND_CODE = 'RESEND_CODE'
+    IGLOGOUT = 'IGLOGOUT'
 
 
 class LogInStates:

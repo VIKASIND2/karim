@@ -1,3 +1,4 @@
+from typing import Pattern
 from karim.bot.commands.signin import *
 from karim.bot.commands.instagram import *
 from karim.bot.commands.help import *
@@ -85,8 +86,9 @@ def setup(updater):
     dp.add_handler(CommandHandler("help", help_def))
     dp.add_handler(CommandHandler('adminhelp', admin_help))
     dp.add_handler(CommandHandler('account', check_account))
-    dp.add_handler(CommandHandler('start', start))
+    dp.add_handler(CommandHandler('start', start_newsletter))
     dp.add_handler(CommandHandler('iglogout', instagram_log_out))
+    dp.add_handler(CallbackQueryHandler(instagram_log_out, pattern=Callbacks.IGLOGOUT))
     dp.add_handler(instagram_handler)
     dp.add_handler(scrape_handler)
     dp.add_handler(signout_handler)

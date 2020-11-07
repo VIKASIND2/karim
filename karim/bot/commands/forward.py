@@ -111,10 +111,11 @@ def select_message(update, context):
                 update.message.reply_text(client_not_connected, parse_mode=ParseMode.HTML)
                 cancel_forward(update, context, send_message=False)
                 return ConversationHandler.END
-            #except Exception as error:
-                """ update.message.reply_text(failed_scrape_dialogues, parse_mode=ParseMode.HTML)
+            except Exception as error:
+                update.message.reply_text(failed_scrape_dialogues, parse_mode=ParseMode.HTML)
+                context.bot.report_error(error)
                 cancel_forward(update, context, send_message=False)
-                return ConversationHandler.END """
+                return ConversationHandler.END
         elif not result:
             # User is not logged in
             update.message.reply_text(client_not_connected, parse_mode=ParseMode.HTML)

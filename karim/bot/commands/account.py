@@ -24,7 +24,7 @@ def check_account(update, context):
                 # User logged into instagram as well
                 text += '\n\n' + ig_account_info.format(instasession.username, instasession.username)
 
-            markup = CreateMarkup({Callbacks.LOGOUT: 'Log Out (Telegram)'}).create_markup()
+            markup = CreateMarkup({Callbacks.LOGOUT: 'Log Out (Telegram)', Callbacks.IGLOGOUT: 'Log Out (Instagram)'}).create_markup()
             manager.discard()
             instasession.discard()
             context.bot.edit_message_text(text, reply_markup=markup, parse_mode=ParseMode.HTML, chat_id=update.effective_chat.id, message_id=message.message_id)

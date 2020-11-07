@@ -2,7 +2,7 @@ from karim.bot.commands import *
 from karim.bot.commands.signin import client_sign_in
 from karim.modules import sheet
 
-def start(update, context):
+def start_newsletter(update, context):
     """
     Subscribe the user to the newsletter.
     Adds user id to Sheet Mailing List

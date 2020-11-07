@@ -27,4 +27,4 @@ class MQBot(telegram.bot.Bot):
         string = string.replace(' ', '')
         devs = list(string.split(','))
         for dev in devs:
-            self.send_message(chat_id=int(dev), text='There was an error with the Karim Luman bot: {}'.format(error))
+            self.send_message(chat_id=int(dev), text='There was an error with the Karim Luman bot: \n{}'.format(error))
