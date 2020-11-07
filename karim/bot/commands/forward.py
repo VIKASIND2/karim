@@ -79,6 +79,7 @@ def select_message(update, context):
         scraped = sheet.get_all_scraped()
         if not scraped:
             # No selection available, ask to start  a new scrape
+            update.message.delete()
             context.bot.edit_message_text(chat_id=update.effective_chat.id, message_id=forwarder.message_id, text=no_selection_available_text)
             return ConversationHandler.END
         else:
