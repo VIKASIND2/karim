@@ -111,7 +111,7 @@ def select_message(update, context):
                 update.message.reply_text(client_not_connected, parse_mode=ParseMode.HTML)
                 cancel_forward(update, context, send_message=False)
                 return ConversationHandler.END
-            except Exception as error:
+            #except Exception as error:
                 """ update.message.reply_text(failed_scrape_dialogues, parse_mode=ParseMode.HTML)
                 cancel_forward(update, context, send_message=False)
                 return ConversationHandler.END """
