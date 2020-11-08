@@ -63,13 +63,14 @@ def select_message(update, context):
     # Set Forwarder Message
     forwarder.set_text(update.message.text_markdown_v2)
     forwarder.set_telethon_message(context.bot.username, update.message.date)
+    update.message.delete()
 
     # MODE
     if forwarder.get_mode() == Callbacks.NEWSLETTER:
         print('Newsletter selected')
         users = sheet.get_subscribers()
         markup = CreateMarkup({Callbacks.CONFIRM: 'Confirm', Callbacks.CANCEL: 'Cancel'}).create_markup()
-        message = update.message.reply_text(text=confirm_send_newsletter_text.format(len(users)), reply_markup=markup)
+        message = update.effective_chat.send_message(text=confirm_send_newsletter_text.format(len(users)), reply_markup=markup)
         forwarder.set_message(message.message_id)
         return ForwarderStates.CONFIRM
 
@@ -79,7 +80,6 @@ def select_message(update, context):
         scraped = sheet.get_all_scraped()
         if not scraped:
             # No selection available, ask to start  a new scrape
-            update.message.delete()
             context.bot.edit_message_text(chat_id=update.effective_chat.id, message_id=forwarder.message_id, text=no_selection_available_text)
             return ConversationHandler.END
         else:
