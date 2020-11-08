@@ -131,7 +131,7 @@ forward_successful = 'Forward successful! Your messages was sent successfully to
 # JOB ENQUEING TEXTS
 scrape_job_in_queue_text = 'The bot is currently scraping an instagram user\'s followers. The operation you requested just now will be executed after the currently running operation terminates.'
 dm_job_in_queue_text = 'The bot is currently sending instagram Direct Messages. The operation you requested just now will be executed after the currently running operation terminates.'
-message_sent_to_users = 'Sent message to {} users so far... Sending more messages...'
-
+processing_dm_job = 'Processing Send Direct Message request number {}...'
+dm_job_complete_waiting = 'Send DM request number {} was successful, waiting about 60 seconds before processing next request...'
 # MULTIPLE UTILITIES
 error_checking_connection = 'There was a problem in authenticating the client. Please try again or contact @davidwickerhf.'

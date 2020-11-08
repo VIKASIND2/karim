@@ -1,3 +1,4 @@
+from instaclient.errors.common import NotLoggedInError
 from telethon.client import buttons
 from telethon.client.telegramclient import TelegramClient
 from telethon.sessions.string import StringSession
@@ -159,23 +160,25 @@ def launch_send_dm(targets:list, message:str, forwarder:Forwarder, telegram_bot:
 
     # Enqueues jobs
     identifier = random_string()
-    for target in targets:
-        queue.enqueue(send_dm_job, target, message, forwarder, job_id='{}:{}:{}'.format(DM, target, identifier), job_timeout =84000)
+    for index, target in enumerate(targets):
+        queue.enqueue(send_dm_job, index, target, message, forwarder, job_id='{}:{}:{}'.format(DM, target, identifier), job_timeout =84000)
     # Enqueue check job
     queue.enqueue(check_dm_job, identifier, forwarder, job_id='{}:{}'.format(CHECKDM, identifier))
 
 
-def send_dm_job(user:str, message:str, forwarder:Forwarder):
-    instaclient.send_dm(user=user, message=message)
-    api_id = secrets.get_var('API_ID')
-    api_hash = secrets.get_var('API_HASH')
-    bot = TelegramClient(StringSession(), api_id, api_hash).start(bot_token=BOT_TOKEN) 
-    bot.send_message(forwarder.chat_id, message_sent_to_users.format(forwarder.get_completed_dm()))
-    bot.disconnect()
-    forwarder.set_completed_dm()
-    time.sleep(random.randrange(25, 60))
-    return True
-
+def send_dm_job(index:int, user:str, message:str, forwarder:Forwarder):
+    instasession = InstaSession(forwarder.chat_id, forwarder.user_id)
+    process_update_callback(forwarder, processing_dm_job.format(index), forwarder.get_message_id())
+    if instasession.get_creds():
+        instaclient.login(instasession.username, instasession.password, check_user=False)
+        time.sleep(1)
+        instaclient.send_dm(user=user, message=message)
+        process_update_callback(forwarder, dm_job_complete_waiting.format(index), forwarder.get_message_id())
+        time.sleep(random.randrange(25, 60))
+        return True
+    else:
+        raise NotLoggedInError()
+    
 
 def check_dm_job(identifier:str, forwarder:Forwarder):
     failed = FailedJobRegistry(queue=queue)
