@@ -157,15 +157,18 @@ def launch_send_dm(targets:list, message:str, forwarder:Forwarder, telegram_bot:
 
     # Enqueues jobs
     identifier = random_string()
+    instasession = InstaSession(forwarder.chat_id, forwarder.user_id)
+    instasession.get_creds()
     for index, target in enumerate(targets):
-        queue.enqueue(send_dm_job, index, target, message, forwarder, job_id='{}:{}:{}'.format(DM, target, identifier), job_timeout =84000)
+        if target != instasession.username:
+            queue.enqueue(send_dm_job, index, target, message, forwarder, job_id='{}:{}:{}'.format(DM, target, identifier), job_timeout =84000)
     # Enqueue check job
     queue.enqueue(check_dm_job, identifier, forwarder, job_id='{}:{}'.format(CHECKDM, identifier))
 
 
 def send_dm_job(index:int, user:str, message:str, forwarder:Forwarder):
     instasession = InstaSession(forwarder.chat_id, forwarder.user_id)
-    process_update_callback(forwarder, processing_dm_job.format(index), forwarder.get_message_id())
+    process_update_callback(forwarder, processing_dm_job.format(index+1), forwarder.get_message_id())
     if instasession.get_creds():
         instaclient.login(instasession.username, instasession.password, check_user=False)
         time.sleep(1)

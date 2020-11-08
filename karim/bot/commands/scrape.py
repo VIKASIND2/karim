@@ -77,7 +77,7 @@ def select_name(update, context):
 def confirm_scrape(update, context):
     scraper:Scraper = Scraper.deserialize(Persistence.SCRAPE_FOLLOWERS, update)
     if not scraper:
-        return ScrapeStates.SELECT_COUNT
+        return ScrapeStates.CONFIRM
 
     data = update.callback_query.data
     if data == Callbacks.CONFIRM:
