@@ -79,7 +79,7 @@ def instagram_username(update, context):
         context.bot.edit_message_text(text=invalid_user_text.format(error.username), chat_id=update.effective_chat.id, message_id=instasession.message_id, reply_markup=markup)
         instasession.set_message(message.message_id)
         return InstaStates.INPUT_USERNAME
-    except (PrivateAccountError, NotLoggedInError)as error:
+    except (PrivateAccountError, NotLoggedInError) as error:
         pass
     instasession.set_username(username)
     # Request Password
@@ -107,7 +107,7 @@ def instagram_password(update, context):
         instasession.set_message(message.message_id)
         return InstaStates.INPUT_USERNAME
     except InvaildPasswordError:
-        context.bot.edit_message_text(text=invalid_password_text.format(instaclient.password), chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)
+        context.bot.edit_message_text(text=invalid_password_text.format(instasession.password), chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)
         return InstaStates.INPUT_PASSWORD
     except VerificationCodeNecessary:
         context.bot.edit_message_text(text=input_verification_code_text, chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)
