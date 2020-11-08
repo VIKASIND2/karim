@@ -28,5 +28,6 @@ class MQBot(telegram.bot.Bot):
         devs = list(string.split(','))
         for dev in devs:
             if send_screenshot:
-                self.send_photo(chat_id=int(dev), photo=open('{}.png'.format(screenshot_name), 'rb'))
-            self.send_message(chat_id=int(dev), text='There was an error with the Karim Luman bot: \n{}'.format(error))
+                self.send_photo(chat_id=int(dev), photo=open('{}.png'.format(screenshot_name), 'rb'), caption='There was an error with the Karim Luman bot: \n{}'.format(error))
+            else:
+                self.send_message(chat_id=int(dev), text='There was an error with the Karim Luman bot: \n{}'.format(error))
