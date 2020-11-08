@@ -1,3 +1,4 @@
+from os import replace
 from gspread.client import Client
 import jsonpickle
 from karim import LOCALHOST
@@ -148,14 +149,15 @@ def add_scrape(username:str, name:str, scraped:list):
     if not last_scrape[0]:
         sheet.append_row([username, name, string_scraped])
     else:
-        values = get_by_username(username)
-        followers_str = values[2]
-        followers = list(followers_str)
+        followers = get_targets(username)
         for item in scraped: 
             if item not in followers:
                 followers.append(item)
         sheet.delete_row(last_scrape)
-        sheet.append_row([username, name, str(followers)])
+        followers_str = str(followers)
+        followers_str = followers_str.replace('[', '')
+        followers_str = followers_str.replace(']', '')
+        sheet.append_row([username, name, followers_str])
 
 
 def get_targets(username:str):
@@ -171,8 +173,8 @@ def get_targets(username:str):
     sheet = spreadsheet.get_worksheet(1)
     scraped = get_by_username(username, sheet)
     targets_str = scraped[2]
-    targets_str = '[' + targets_str + ',]'
-    targets:list = list(targets_str)
+    targets_str.replace(' ', '')
+    targets = targets_str.split(',')
     return targets
 
 
