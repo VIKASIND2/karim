@@ -12,6 +12,7 @@ def instagram_log_out(update, context):
         if update.callback_query:
             message = update.callback_query.edit_message_text(text=logging_out)
         else:
+            update.message.delete()
             message = update.effective_chat.send_message(text=logging_out)
         result = instaclient.logout()
         if result:

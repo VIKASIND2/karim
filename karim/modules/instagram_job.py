@@ -98,7 +98,7 @@ def launch_scrape(target:str, scraper:Scraper, telegram_bot:MQBot):
  
 def scrape_job(user:str, scraper:Scraper):
     print('scrape_job()')
-    from karim import telegram_bot
+    from karim import telegram_bot as bot
     try:
         instasession = InstaSession(scraper.chat_id, scraper.user_id, scraper.message_id)
         if instasession.get_creds():
@@ -115,11 +115,8 @@ def scrape_job(user:str, scraper:Scraper):
 
 
 def check_scrape_job(scrape_id:str, scraper:Scraper):
+    from karim import telegram_bot as bot
     failed = FailedJobRegistry(queue=queue)
-
-    api_id = secrets.get_var('API_ID')
-    api_hash = secrets.get_var('API_HASH')
-    bot = TelegramClient(StringSession(), api_id, api_hash).start(bot_token=BOT_TOKEN) 
 
     if scrape_id in failed.get_job_ids():
         # job failed
@@ -181,11 +178,8 @@ def send_dm_job(index:int, user:str, message:str, forwarder:Forwarder):
     
 
 def check_dm_job(identifier:str, forwarder:Forwarder):
+    from karim import telegram_bot as bot
     failed = FailedJobRegistry(queue=queue)
-
-    api_id = secrets.get_var('API_ID')
-    api_hash = secrets.get_var('API_HASH')
-    bot = TelegramClient(StringSession(), api_id, api_hash).start(bot_token=BOT_TOKEN) 
 
     count = 0
     for id in failed.get_job_ids:
@@ -193,5 +187,4 @@ def check_dm_job(identifier:str, forwarder:Forwarder):
             count += 1
 
     bot.send_message(forwarder.get_user_id(), finished_sending_dm_text.format(count))
-    bot.disconnect()
     return True

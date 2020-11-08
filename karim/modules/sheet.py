@@ -143,6 +143,7 @@ def add_scrape(username:str, name:str, scraped:list):
     string_scraped = str(scraped)
     string_scraped = string_scraped.replace('[', '')
     string_scraped = string_scraped.replace(']', '')
+    string_scraped = string_scraped.replace("'", '')
     spreadsheet = auth()
     sheet:Worksheet = spreadsheet.get_worksheet(1)
     last_scrape = find_by_username(username, sheet)
@@ -157,6 +158,7 @@ def add_scrape(username:str, name:str, scraped:list):
         followers_str = str(followers)
         followers_str = followers_str.replace('[', '')
         followers_str = followers_str.replace(']', '')
+        string_scraped = string_scraped.replace("'", '')
         sheet.append_row([username, name, followers_str])
 
 

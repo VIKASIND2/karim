@@ -4,14 +4,15 @@ from karim.modules import sheet
 
 def unsubscribe_command(update, context):
     if update.effective_user.id in list(secrets.get_var('USERS')):
-        update.message.replu_text(admin_cannot_unsubscribe)
+        update.effective_chat.send_message(admin_cannot_unsubscribe)
+        update.message.delete()
         return ConversationHandler.END
     message = update.effective_chat.send_message(text=checking_subscription)
     subscribed = sheet.is_subscriber(update.effective_user.id)
     if subscribed:
         # User is subscribed
         persistence = Persistence(Persistence.UNSUBSCRIBE, update.effective_chat.id, update.effective_user.id, update.message.message_id)
-        update.message.reply_text
+        update.message.delete()
         markup = CreateMarkup({Callbacks.CONFIRM: 'Confirm', Callbacks.CANCEL: 'Cancel'}).create_markup()
         message = context.bot.edit_message_text(chat_id=update.effective_chat.id, message_id=message.message_id, text=confirm_unsubscription_text, reply_markup=markup)
         persistence.set_message(message.message_id)
@@ -19,6 +20,7 @@ def unsubscribe_command(update, context):
     else:
         # User is not subscribed
         context.bot.edit_message_text(chat_id=update.effective_chat.id, message_id=message.message_id, text=not_subscribed_yet_text)
+        update.message.delete()
         return ConversationHandler.END
 
 

@@ -8,6 +8,7 @@ def check_account(update, context):
         return
     instasession = InstaSession(update.effective_chat.id, update.effective_user.id)
     manager= SessionManager(Persistence.ACCOUNT, chat_id=update.effective_chat.id, user_id=update.effective_chat.id, message_id=update.message.message_id)
+    update.message.delete()
     message = update.effective_chat.send_message(text=checking_accounts_connection)
     try:
         if manager.check_connection():

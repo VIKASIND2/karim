@@ -13,6 +13,7 @@ def start_newsletter(update, context):
         return client_sign_in(update, context)
 
     message = update.effective_chat.send_message(checking_subscription)
+    update.message.delete()
     subscribed = sheet.is_subscriber(update.effective_user.id)
     if subscribed :
         # User is already subscribed
