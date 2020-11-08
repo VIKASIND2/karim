@@ -167,7 +167,9 @@ def get_targets(username:str):
     :return: List of usernames (str) of the followers of the user
     :rtype: list
     """
-    scraped = get_by_username(username)
+    spreadsheet:Spreadsheet = auth()
+    sheet = spreadsheet.get_worksheet(1)
+    scraped = get_by_username(username, sheet)
     targets_str = scraped[2]
     targets_str = '[' + targets_str + ',]'
     targets:list = list(targets_str)
