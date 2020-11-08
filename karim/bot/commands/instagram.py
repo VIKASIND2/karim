@@ -101,7 +101,7 @@ def instagram_password(update, context):
     instasession.set_message(message.message_id)
     # Attempt login
     try:
-        instaclient.login(instasession.username, instasession.password, check_user=False)
+        instaclient.login(instasession.username, instasession.password)
     except InvalidUserError as error:
         context.bot.edit_message_text(text=invalid_user_text.format(error.username), chat_id=update.effective_chat.id, message_id=instasession.message_id, reply_markup=markup)
         instasession.set_message(message.message_id)

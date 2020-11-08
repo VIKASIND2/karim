@@ -26,7 +26,7 @@ if os.environ.get('PORT') in (None, ""):
 else:
     LOCALHOST = False
     queue = Queue(connection=conn)
-    instaclient = InstaClient(host_type=InstaClient.WEB_SERVER, debug=True, error_callback=instaclient_error_callback)
+    instaclient = InstaClient(host_type=InstaClient.WEB_SERVER, debug=False, error_callback=instaclient_error_callback)
     
 
 # Initialize Bot
