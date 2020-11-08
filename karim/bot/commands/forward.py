@@ -142,9 +142,7 @@ def select_scrape(update, context):
     if data == Callbacks.CANCEL:
         return cancel_forward(update, context, forwarder)
     else:
-        scrape = sheet.get_scraped(username=data)
-        targets_str = scrape[2]
-        targets = list(targets_str)
+        targets = sheet.get_targets(username=data)
         markup = CreateMarkup({Callbacks.TEN: '10', Callbacks.TFIVE: '25', Callbacks.FIFTY: '50', Callbacks.SFIVE: '75', Callbacks.CANCEL: 'Cancel'}).create_markup()
         message = context.bot.edit_message_text(chat_id=update.effective_chat.id, 
         message_id=forwarder.message_id, text=select_forward_count, reply_markup=markup)
