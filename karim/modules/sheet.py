@@ -244,7 +244,7 @@ def get_by_username(username:str, sheet:Worksheet):
     """
     row = find_by_username(username, sheet)[0]
     rows = get_rows(sheet)
-    return rows[row+1]
+    return rows[row-1]
 
 
 def get_rows(sheet:Worksheet):
