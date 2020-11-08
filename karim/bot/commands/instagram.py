@@ -1,4 +1,4 @@
-from instaclient.errors.common import InvaildPasswordError, InvalidSecurityCodeError, InvalidUserError, PrivateAccountError, InvalidVerificationCodeError, VerificationCodeNecessary, SuspisciousLoginAttemptError
+from instaclient.errors.common import InvaildPasswordError, InvalidSecurityCodeError, InvalidUserError, NotLoggedInError, PrivateAccountError, InvalidVerificationCodeError, VerificationCodeNecessary, SuspisciousLoginAttemptError
 from telegram.ext import updater
 from karim.bot.commands import *
 from karim import instaclient
@@ -79,7 +79,7 @@ def instagram_username(update, context):
         context.bot.edit_message_text(text=invalid_user_text.format(error.username), chat_id=update.effective_chat.id, message_id=instasession.message_id, reply_markup=markup)
         instasession.set_message(message.message_id)
         return InstaStates.INPUT_USERNAME
-    except PrivateAccountError as error:
+    except (PrivateAccountError, NotLoggedInError)as error:
         pass
     instasession.set_username(username)
     # Request Password
@@ -102,6 +102,10 @@ def instagram_password(update, context):
     # Attempt login
     try:
         instaclient.login(instasession.username, instasession.password, check_user=False)
+    except InvalidUserError as error:
+        context.bot.edit_message_text(text=invalid_user_text.format(error.username), chat_id=update.effective_chat.id, message_id=instasession.message_id, reply_markup=markup)
+        instasession.set_message(message.message_id)
+        return InstaStates.INPUT_USERNAME
     except InvaildPasswordError:
         context.bot.edit_message_text(text=invalid_password_text.format(instaclient.password), chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)
         return InstaStates.INPUT_PASSWORD
