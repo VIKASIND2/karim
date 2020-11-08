@@ -17,7 +17,8 @@ from telegram.inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram import ParseMode
 from rq.job import Job, Retry
 from rq.registry import FailedJobRegistry, StartedJobRegistry, FinishedJobRegistry
-import time, random, string, redis, os, datetime
+import time, random, string, redis, os
+from datetime import datetime
 
 SCRAPE = 'scrape'
 CHECKSCRAPE = 'checkscrape'
