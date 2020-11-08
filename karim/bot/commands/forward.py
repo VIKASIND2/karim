@@ -147,10 +147,10 @@ def select_scrape(update, context):
         targets = list(targets_str)
         markup = CreateMarkup({Callbacks.TEN: '10', Callbacks.TFIVE: '25', Callbacks.FIFTY: '50', Callbacks.SFIVE: '75', Callbacks.CANCEL: 'Cancel'}).create_markup()
         message = context.bot.edit_message_text(chat_id=update.effective_chat.id, 
-        message_id=forwarder.message_id, text=confirm_send_dm_text.format(len(targets)), reply_markup=markup)
+        message_id=forwarder.message_id, text=select_forward_count, reply_markup=markup)
         forwarder.set_message(message.message_id)
         forwarder.set_users(targets)
-        return ForwarderStates.CONFIRM
+        return ForwarderStates.SELECT_COUNT
 
 
 @run_async

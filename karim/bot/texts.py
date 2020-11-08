@@ -104,6 +104,7 @@ finished_sending_newsletter = 'Your message has been forwarder to your newslette
 # Instagram
 select_scrape_text = 'Select below the followers selection to send your message to. To view the available selections, click <a href="{}">here</a>'
 no_selection_available_text = 'No IG users have been scraped so far. Please use /scrape to get a user\'s instagram followers.'
+select_forward_count= 'Select below to how many instagram users you wish to send your message to. Note that the higher the number, the longer the task will take to execute.'
 confirm_send_dm_text = 'Are you sure you want to send your message to {} instagram users?'
 inform_sending_dms_text = 'You message is being sent to the selected instagram followers... This might take a while...'
 finished_sending_dm_text = 'You message has been successfully sent to the users. {} failed.'
