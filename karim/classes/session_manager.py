@@ -26,10 +26,10 @@ class SessionManager(Persistence):
         self.code_tries = None
 
     def __str__(self):
-        return 'SessionManager({}, {}, {}, {})'.format(self.phone, self.password, self.phone_code_hash)
+        return 'SessionManager({}, {}, {})'.format(self.phone, self.password, self.phone_code_hash)
 
     def __repr__(self):
-        return 'SessionManager({}, {}, {}, {})'.format(self.phone, self.password, self.phone_code_hash)
+        return 'SessionManager({}, {}, {})'.format(self.phone, self.password, self.phone_code_hash)
 
     @persistence_decorator
     def set_phone(self, phone):
