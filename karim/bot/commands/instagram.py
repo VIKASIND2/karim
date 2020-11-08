@@ -72,6 +72,8 @@ def instagram_username(update, context):
     # Verify User
     try:
         result = instaclient.is_valid_user(username)
+        instaclient.driver.save_screenshot('error.png')
+        context.bot.report_error('Account Found: ', send_screenshot=True, screenshot_name='error')
         print('USER {} IS VALID: '.format(username), result)
     except InvalidUserError as error:
         context.bot.edit_message_text(text=invalid_user_text.format(error.username), chat_id=update.effective_chat.id, message_id=instasession.message_id, reply_markup=markup)
