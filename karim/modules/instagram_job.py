@@ -160,7 +160,7 @@ def launch_send_dm(targets:list, message:str, forwarder:Forwarder, telegram_bot:
     # Enqueues jobs
     identifier = random_string()
     for target in targets:
-        queue.enqueue(send_dm_job, identifier, targets, message, forwarder, job_id='{}:{}:{}'.format(DM, target, identifier), job_timeout =84000)
+        queue.enqueue(send_dm_job, target, message, forwarder, job_id='{}:{}:{}'.format(DM, target, identifier), job_timeout =84000)
     # Enqueue check job
     queue.enqueue(check_dm_job, identifier, forwarder, job_id='{}:{}'.format(CHECKDM, identifier))
 

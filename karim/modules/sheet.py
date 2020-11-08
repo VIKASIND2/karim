@@ -169,7 +169,7 @@ def get_targets(username:str):
     """
     scraped = get_by_username(username)
     targets_str = scraped[2]
-    targets_str = '[' + targets_str + ']'
+    targets_str = '[' + targets_str + ',]'
     targets:list = list(targets_str)
     return targets
 
