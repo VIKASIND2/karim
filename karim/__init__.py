@@ -9,18 +9,24 @@ from karim.classes.mq_bot import MQBot
 from telegram import ParseMode
 from telegram.ext import messagequeue as mq
 
+def instaclient_error_callback(driver):
+    from karim import telegram_bot as bot
+    driver.save_screenshot('error.png')
+    bot.report_error('instaclient.__find_element() error.', send_screenshot=True, screenshot_name='error')
+    os.remove('error.png')
+
 LOCALHOST = True
 queue = None
 if os.environ.get('PORT') in (None, ""):
     # Code running locally
     LOCALHOST = True
-    instaclient = InstaClient()
+    instaclient = InstaClient(error_callback=instaclient_error_callback)
     if not os.path.exists('karim/bot/persistence'):
         os.makedirs('karim/bot/persistence')
 else:
     LOCALHOST = False
     queue = Queue(connection=conn)
-    instaclient = InstaClient(host_type=InstaClient.WEB_SERVER)
+    instaclient = InstaClient(host_type=InstaClient.WEB_SERVER, error_callback=instaclient_error_callback)
     
 
 # Initialize Bot
