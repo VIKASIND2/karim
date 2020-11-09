@@ -10,7 +10,7 @@ from karim.classes.insta_session import InstaSession
 from karim.classes.forwarder_markup import CreateMarkup
 from karim.secrets import secrets
 from karim.modules import sheet
-from karim import queue, instaclient, BOT_TOKEN
+from karim import queue, BOT_TOKEN
 from karim.bot.texts import *
 
 from telethon.tl.types import KeyboardButtonUrl
@@ -21,6 +21,7 @@ from rq.job import Job, Retry
 from rq.registry import FailedJobRegistry, StartedJobRegistry, FinishedJobRegistry
 import time, random, string, redis, os
 from datetime import datetime
+from instaclient import InstaClient
 
 SCRAPE = 'scrape'
 CHECKSCRAPE = 'checkscrape'
@@ -103,11 +104,13 @@ def scrape_job(user:str, scraper:Scraper):
     try:
         instasession = InstaSession(scraper.chat_id, scraper.user_id, scraper.message_id)
         if instasession.get_creds():
+            instaclient = InstaClient(host_type=InstaClient.WEB_SERVER, error_callback=process_update_callback)
             process_update_callback(scraper, logging_in_with_credentials_text, scraper.get_message_id())
             instaclient.login(instasession.username, instasession.password, check_user=False)
             time.sleep(1)
             process_update_callback(scraper, initiating_scrape_text.format(user, user))
             followers = instaclient.scrape_followers(user=user)
+            instaclient.__discard_driver()
             return followers
         else:
             return None
@@ -174,10 +177,12 @@ def send_dm_job(index:int, user:str, message:str, forwarder:Forwarder):
     instasession = InstaSession(forwarder.chat_id, forwarder.user_id)
     process_update_callback(forwarder, processing_dm_job.format(index+1), forwarder.get_message_id())
     if instasession.get_creds():
+        instaclient = InstaClient(host_type=InstaClient.WEB_SERVER, error_callback=process_update_callback)
         instaclient.login(instasession.username, instasession.password, check_user=False)
         time.sleep(1)
         instaclient.send_dm(user=user, message=message)
         process_update_callback(forwarder, dm_job_complete_waiting.format(index+1), forwarder.get_message_id())
+        instaclient.__discard_driver()
         time.sleep(random.randrange(25, 60))
         return True
     else:
