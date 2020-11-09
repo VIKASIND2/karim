@@ -63,7 +63,6 @@ def select_message(update, context):
     # Set Forwarder Message
     forwarder.set_text(update.message.text_markdown_v2)
     forwarder.set_telethon_message(context.bot.username, update.message.date)
-    update.message.delete()
 
     # MODE
     if forwarder.get_mode() == Callbacks.NEWSLETTER:
@@ -71,6 +70,7 @@ def select_message(update, context):
         users = sheet.get_subscribers()
         markup = CreateMarkup({Callbacks.CONFIRM: 'Confirm', Callbacks.CANCEL: 'Cancel'}).create_markup()
         message = update.effective_chat.send_message(text=confirm_send_newsletter_text.format(len(users)), reply_markup=markup)
+        update.message.delete()
         forwarder.set_message(message.message_id)
         return ForwarderStates.CONFIRM
 
@@ -81,6 +81,7 @@ def select_message(update, context):
         if not scraped:
             # No selection available, ask to start  a new scrape
             context.bot.edit_message_text(chat_id=update.effective_chat.id, message_id=forwarder.message_id, text=no_selection_available_text)
+            update.message.delete()
             return ConversationHandler.END
         else:
             markup_dict = {}
@@ -89,6 +90,7 @@ def select_message(update, context):
             markup_dict[Callbacks.CANCEL] = 'Cancel'
             markup = CreateMarkup(markup_dict).create_markup()
             context.bot.edit_message_text(text=select_scrape_text.format(sheet.get_sheet_url()), chat_id=update.effective_chat.id, message_id=forwarder.message_id, reply_markup=markup, parse_mode=ParseMode.HTML)
+            update.message.delete()
             return ForwarderStates.SELECT_SCRAPE
 
     elif forwarder.get_mode() == Callbacks.TELEGRAM:
@@ -105,25 +107,30 @@ def select_message(update, context):
                 reply_markup = markup.create_markup()
                 # Send Message
                 message = update.effective_chat.send_message(select_group_text, reply_markup=reply_markup, parse_mode=ParseMode.HTML)
+                update.message.delete()
                 forwarder.set_message(message.message_id)
                 return ForwarderStates.SELECT_GROUP
             except UnauthorizedError:
                 # User is not logged in
                 update.message.reply_text(client_not_connected, parse_mode=ParseMode.HTML)
+                update.message.delete()
                 cancel_forward(update, context, send_message=False)
                 return ConversationHandler.END
             except Exception as error:
                 update.message.reply_text(failed_scrape_dialogues, parse_mode=ParseMode.HTML)
                 context.bot.report_error(error)
+                update.message.delete()
                 cancel_forward(update, context, send_message=False)
                 return ConversationHandler.END
         elif not result:
             # User is not logged in
             update.message.reply_text(client_not_connected, parse_mode=ParseMode.HTML)
+            update.message.delete()
             cancel_forward(update, context, send_message=False)
             return ConversationHandler.END
         else:
             # Error
+            update.message.delete()
             update.effective_chat.send_message(error_checking_connection, parse_mode=ParseMode.HTML)
             return ConversationHandler.END
 
