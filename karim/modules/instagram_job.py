@@ -104,13 +104,12 @@ def scrape_job(user:str, scraper:Scraper):
     try:
         instasession = InstaSession(scraper.chat_id, scraper.user_id, scraper.message_id)
         if instasession.get_creds():
-            instaclient = InstaClient(host_type=InstaClient.WEB_SERVER, error_callback=process_update_callback)
+            instaclient:InstaClient = InstaClient(host_type=InstaClient.WEB_SERVER, error_callback=process_update_callback)
             process_update_callback(scraper, logging_in_with_credentials_text, scraper.get_message_id())
             instaclient.login(instasession.username, instasession.password, check_user=False)
             time.sleep(1)
             process_update_callback(scraper, initiating_scrape_text.format(user, user))
-            followers = instaclient.scrape_followers(user=user)
-            instaclient.__discard_driver()
+            followers = instaclient.scrape_followers(user=user, discard_driver=True)
             return followers
         else:
             return None
@@ -180,9 +179,8 @@ def send_dm_job(index:int, user:str, message:str, forwarder:Forwarder):
         instaclient = InstaClient(host_type=InstaClient.WEB_SERVER, error_callback=process_update_callback)
         instaclient.login(instasession.username, instasession.password, check_user=False)
         time.sleep(1)
-        instaclient.send_dm(user=user, message=message)
+        instaclient.send_dm(user=user, message=message, discard_driver=True)
         process_update_callback(forwarder, dm_job_complete_waiting.format(index+1), forwarder.get_message_id())
-        instaclient.__discard_driver()
         time.sleep(random.randrange(25, 60))
         return True
     else:
