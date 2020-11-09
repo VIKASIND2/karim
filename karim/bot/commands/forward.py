@@ -44,6 +44,12 @@ def forward_mode(update, context):
     mode = update.callback_query.data
     if mode == Callbacks.CANCEL:
         return cancel_forward(update, context, forwarder=forwarder)
+    elif mode == Callbacks.INSTAGRAM_DM:
+        instasession = InstaSession(forwarder.chat_id, forwarder.user_id)
+        if not instasession.get_creds():
+            message = context.bot.edit_message_text(chat_id=forwarder.chat_id, message_id=forwarder.message_id, text=ig_not_logged_in_text)
+            return ConversationHandler.END
+
     forwarder.set_mode(mode)
     # Ask for message text
     markup = CreateMarkup({Callbacks.CANCEL: 'Cancel'}).create_markup()

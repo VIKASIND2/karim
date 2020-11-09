@@ -5,7 +5,7 @@ from karim import LOCALHOST
 from gspread.models import Spreadsheet, Worksheet
 from oauth2client.service_account import ServiceAccountCredentials
 import gspread
-import os
+import os, re
 import json
 from datetime import datetime
 from karim.secrets import secrets
@@ -176,7 +176,7 @@ def get_targets(username:str):
     scraped = get_by_username(username, sheet)
     targets_str = scraped[2]
     print('TELEBOT: Target string: ', targets_str)
-    targets_str.replace(" ", "")
+    targets_str = re.sub(r"\s+", "", targets_str)
     print('TELEBOT: Target string: ', targets_str)
     targets = targets_str.split(',')
     return targets
