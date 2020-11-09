@@ -165,13 +165,13 @@ def launch_send_dm(targets:list, message:str, forwarder:Forwarder, telegram_bot:
     print('TARGETS: ', targets)
     for index, target in enumerate(targets):
         if target != instasession.username:
-            queue.enqueue(send_dm_job, index, target, message, forwarder, job_id='{}:{}:{}'.format(DM, target, identifier), job_timeout =84000)
+            queue.enqueue(send_dm_job, index, len(targets), target, message, forwarder, job_id='{}:{}:{}'.format(DM, target, identifier), job_timeout =84000)
             print('TELEBOT: Enequeued DM Job: ', target)
     # Enqueue check job
     queue.enqueue(check_dm_job, identifier, forwarder, job_id='{}:{}'.format(CHECKDM, identifier))
 
 
-def send_dm_job(index:int, user:str, message:str, forwarder:Forwarder):
+def send_dm_job(index:int, count:int, user:str, message:str, forwarder:Forwarder):
     print('TELEBOT: Send DM Job {} Initiated'.format(index+1))
     instasession = InstaSession(forwarder.chat_id, forwarder.user_id)
     process_update_callback(forwarder, processing_dm_job.format(index+1), forwarder.get_message_id())
@@ -181,7 +181,9 @@ def send_dm_job(index:int, user:str, message:str, forwarder:Forwarder):
         time.sleep(1)
         instaclient.send_dm(user=user, message=message, discard_driver=True)
         process_update_callback(forwarder, dm_job_complete_waiting.format(index+1), forwarder.get_message_id())
-        time.sleep(random.randrange(25, 60))
+        if index < count-1:
+            print('TELEBOT: Sleeping 25->60 seconds')
+            time.sleep(random.randrange(25, 60))
         return True
     else:
         raise NotLoggedInError()
