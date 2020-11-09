@@ -99,6 +99,11 @@ def instagram_password(update, context):
     instasession.set_password(password)
     message = update.effective_chat.send_message(text=attempting_login_text)
     instasession.set_message(message.message_id)
+
+    if len(password) < 6:
+        context.bot.edit_message_text(text=invalid_password_text.format(instasession.password), chat_id=instasession.chat_id, message_id=instasession.message_id, reply_markup=markup)
+        return InstaStates.INPUT_PASSWORD
+        
     # Attempt login
     try:
         instaclient.login(instasession.username, instasession.password)
