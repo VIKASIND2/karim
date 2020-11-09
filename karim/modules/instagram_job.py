@@ -192,7 +192,7 @@ def check_dm_job(identifier:str, forwarder:Forwarder):
     failed = FailedJobRegistry(queue=queue)
 
     count = 0
-    for id in failed.get_job_ids:
+    for id in failed.get_job_ids():
         if identifier in id and DM in id:
             count += 1
 

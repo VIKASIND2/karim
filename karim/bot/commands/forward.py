@@ -182,8 +182,12 @@ def select_count(update, context):
 
     targets = []
     for i in range(count):
-        rand = random.randrange(len(users))
-        targets.append(users[rand])
+        while True:
+            rand = random.randrange(len(users))
+            target = users[rand]
+            if target not in targets:
+                targets.append(target)
+                break
     forwarder.set_users(targets)
 
     # Confirm
