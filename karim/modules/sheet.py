@@ -154,7 +154,7 @@ def add_scrape(username:str, name:str, scraped:list):
         for item in scraped: 
             if item not in followers:
                 followers.append(item)
-        sheet.delete_row(last_scrape)
+        sheet.delete_row(last_scrape[0])
         followers_str = str(followers)
         followers_str = followers_str.replace('[', '')
         followers_str = followers_str.replace(']', '')
