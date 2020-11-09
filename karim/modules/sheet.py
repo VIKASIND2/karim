@@ -158,7 +158,7 @@ def add_scrape(username:str, name:str, scraped:list):
         followers_str = str(followers)
         followers_str = followers_str.replace('[', '')
         followers_str = followers_str.replace(']', '')
-        string_scraped = string_scraped.replace("'", '')
+        followers_str = followers_str.replace("'", '')
         sheet.append_row([username, name, followers_str])
 
 

@@ -7,12 +7,13 @@ from karim.classes.callbacks import ScrapeStates
 from karim.classes.scraper import Scraper
 from karim.classes.forwarder import Forwarder
 from karim.classes.insta_session import InstaSession
+from karim.classes.forwarder_markup import CreateMarkup
 from karim.secrets import secrets
 from karim.modules import sheet
 from karim import queue, instaclient, BOT_TOKEN
 from karim.bot.texts import *
-from telethon.tl.types import KeyboardButtonUrl
 
+from telethon.tl.types import KeyboardButtonUrl
 from telegram.inline.inlinekeyboardbutton import InlineKeyboardButton
 from telegram.inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram import ParseMode
@@ -133,8 +134,8 @@ def check_scrape_job(scrape_id:str, scraper:Scraper):
         sheet.add_scrape(scraper.get_target(), name=scraper.get_name(), scraped=result)
         sheet.log(datetime.utcnow(), scraper.get_user_id(), action='SUCCESSFUL SCRAPE')
         # Update user
-        button = KeyboardButtonUrl('Google Sheet', url=sheet.get_sheet_url(1))
-        bot.send_message(scraper.get_user_id(), finished_scrape_text, buttons=button)
+        markup = InlineKeyboardMarkup([[InlineKeyboardButton(text='Google Sheets', url=sheet.get_sheet_url(1))]])
+        bot.send_message(scraper.get_user_id(), finished_scrape_text, reply_markup=markup)
         return True
 
 
