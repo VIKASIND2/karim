@@ -171,6 +171,7 @@ def launch_send_dm(targets:list, message:str, forwarder:Forwarder, telegram_bot:
 
 
 def send_dm_job(index:int, user:str, message:str, forwarder:Forwarder):
+    print('TELEBOT: Send DM Job {} Initiated'.format(index+1))
     instasession = InstaSession(forwarder.chat_id, forwarder.user_id)
     process_update_callback(forwarder, processing_dm_job.format(index+1), forwarder.get_message_id())
     if instasession.get_creds():
@@ -185,6 +186,7 @@ def send_dm_job(index:int, user:str, message:str, forwarder:Forwarder):
     
 
 def check_dm_job(identifier:str, forwarder:Forwarder):
+    print('TELEBOT: Check DM Job Initiated')
     from karim import telegram_bot as bot
     failed = FailedJobRegistry(queue=queue)
 
