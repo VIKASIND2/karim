@@ -27,7 +27,7 @@ class Forwarder(SessionManager):
         # Specific to Newsletter
         self.subscribers = None
         # Specific to IG
-        self.users = None
+        self.users = []
         self.count = None
         self.completed = None
 

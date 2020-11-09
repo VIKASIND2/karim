@@ -160,7 +160,7 @@ def launch_send_dm(targets:list, message:str, forwarder:Forwarder, telegram_bot:
     identifier = random_string()
     instasession = InstaSession(forwarder.chat_id, forwarder.user_id)
     instasession.get_creds()
-    print('TARGETS: Targets')
+    print('TARGETS: ', targets)
     for index, target in enumerate(targets):
         print('Index: {} |  Target: {}'.format(index, target))
     for index, target in enumerate(targets):

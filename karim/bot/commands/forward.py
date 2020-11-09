@@ -174,9 +174,14 @@ def select_count(update, context):
 
     
     # Load targets:
-    users = forwarder.users
+    users = forwarder.get_users()
+    if forwarder.count >= len(users):
+        count = len(users)
+    else:
+        count = forwarder.count
+
     targets = []
-    for i in range(forwarder.count):
+    for i in range(count):
         rand = random.randrange(len(users))
         targets.append(users[rand])
     forwarder.set_users(targets)
