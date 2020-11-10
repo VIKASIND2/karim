@@ -10,7 +10,7 @@ from karim.classes.insta_session import InstaSession
 from karim.classes.forwarder_markup import CreateMarkup
 from karim.secrets import secrets
 from karim.modules import sheet
-from karim import queue, BOT_TOKEN
+from karim import instaclient_error_callback, queue, BOT_TOKEN
 from karim.bot.texts import *
 
 from telethon.tl.types import KeyboardButtonUrl
@@ -104,7 +104,7 @@ def scrape_job(user:str, scraper:Scraper):
     try:
         instasession = InstaSession(scraper.chat_id, scraper.user_id, scraper.message_id)
         if instasession.get_creds():
-            instaclient:InstaClient = InstaClient(host_type=InstaClient.WEB_SERVER, error_callback=process_update_callback)
+            instaclient:InstaClient = InstaClient(host_type=InstaClient.WEB_SERVER, error_callback=instaclient_error_callback, debug=True)
             process_update_callback(scraper, logging_in_with_credentials_text, scraper.get_message_id())
             instaclient.login(instasession.username, instasession.password, check_user=False)
             time.sleep(1)
@@ -176,7 +176,7 @@ def send_dm_job(index:int, count:int, user:str, message:str, forwarder:Forwarder
     instasession = InstaSession(forwarder.chat_id, forwarder.user_id)
     process_update_callback(forwarder, processing_dm_job.format(index+1), forwarder.get_message_id())
     if instasession.get_creds():
-        instaclient = InstaClient(host_type=InstaClient.WEB_SERVER, error_callback=process_update_callback)
+        instaclient = InstaClient(host_type=InstaClient.WEB_SERVER, error_callback=instaclient_error_callback, debug=True)
         instaclient.login(instasession.username, instasession.password, check_user=False)
         time.sleep(1)
         instaclient.send_dm(user=user, message=message, discard_driver=True)
