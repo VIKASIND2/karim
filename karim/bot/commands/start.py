@@ -8,7 +8,7 @@ def start_newsletter(update, context):
     Adds user id to Sheet Mailing List
     """
     users = list(secrets.get_var('USERS'))
-    if update.effective_user.id in users:
+    if str(update.effective_user.id) in users:
         # User is Admin, start sign in
         return client_sign_in(update, context)
 
