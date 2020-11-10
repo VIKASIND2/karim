@@ -179,7 +179,10 @@ def send_dm_job(index:int, count:int, user:str, message:str, forwarder:Forwarder
         instaclient = InstaClient(host_type=InstaClient.WEB_SERVER, error_callback=instaclient_error_callback, debug=True)
         instaclient.login(instasession.username, instasession.password, check_user=False)
         time.sleep(1)
-        instaclient.send_dm(user=user, message=message, discard_driver=True)
+        try:
+            instaclient.send_dm(user=user, message=message, discard_driver=True)
+        except NotLoggedInError:
+            instaclient.login(instasession.username, instasession.password)
         process_update_callback(forwarder, dm_job_complete_waiting.format(index+1), forwarder.get_message_id())
         if index < count-1:
             print('TELEBOT: Sleeping 25->60 seconds')
