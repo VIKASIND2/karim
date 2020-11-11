@@ -96,7 +96,8 @@ def launch_scrape(target:str, scraper:Scraper, telegram_bot:MQBot):
     queue.enqueue_job(job)
     # Add checker job
     checker_id = '{}:{}:{}'.format(CHECKSCRAPE, target, identifier)
-    checker = queue.enqueue(check_scrape_job, scrape_id, scraper, job_id=checker_id, job_timeout=300)
+    job = Job.create(send_dm_job, kwargs={'scrape_id': scrape_id, 'scraper': scraper}, id=checker_id, timeout=380, ttl=None, connection=queue.connection)
+    queue.enqueue_job(job)
 
  
 def scrape_job(user:str, scraper:Scraper):
@@ -169,7 +170,8 @@ def launch_send_dm(targets:list, message:str, forwarder:Forwarder, telegram_bot:
             queue.enqueue_job(job)
             print('TELEBOT: Enequeued DM Job: ', target)
     # Enqueue check job
-    queue.enqueue(check_dm_job, identifier, forwarder, job_id='{}:{}'.format(CHECKDM, identifier))
+    job = Job.create(send_dm_job, kwargs={'identifier': identifier, 'forwarder': forwarder}, id='{}:{}'.format(CHECKDM, identifier), timeout=380, ttl=None, connection=queue.connection)
+    queue.enqueue_job(job)
 
 
 def send_dm_job(index:int, count:int, user:str, message:str, forwarder:Forwarder):
@@ -185,6 +187,7 @@ def send_dm_job(index:int, count:int, user:str, message:str, forwarder:Forwarder
         try:
             instaclient.send_dm(user=user, message=message, discard_driver=True)
         except NotLoggedInError:
+            print('TELEBOT: Client not logged in. Logging In...')
             instaclient.login(instasession.username, instasession.password)
         
         if index < count-1:
