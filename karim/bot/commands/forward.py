@@ -151,12 +151,12 @@ def select_scrape(update, context):
 
     # GET INPUT CALLBACK 
     data = update.callback_query.data
-    update.callback_query.answer()
     if data == Callbacks.CANCEL:
         return cancel_forward(update, context, forwarder)
     else:
         targets = sheet.get_targets(username=data)
         markup = CreateMarkup({Callbacks.TEN: '10', Callbacks.TFIVE: '25', Callbacks.FIFTY: '50', Callbacks.SFIVE: '75', Callbacks.CANCEL: 'Cancel'}).create_markup()
+        update.callback_query.answer()
         message = context.bot.edit_message_text(chat_id=update.effective_chat.id, 
         message_id=forwarder.message_id, text=select_forward_count, reply_markup=markup)
         forwarder.set_message(message.message_id)
