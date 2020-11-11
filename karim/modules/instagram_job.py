@@ -93,7 +93,7 @@ def launch_scrape(target:str, scraper:Scraper, telegram_bot:MQBot):
     identifier = random_string()
     scrape_id = '{}:{}:{}'.format(SCRAPE, target, identifier)
     job = Job.create(scrape_job, kwargs={'user': target, 'scraper': scraper}, id=scrape_id, timeout=3600, ttl=None)
-    queue.enqueue(job)
+    queue.enqueue_job(job)
     # Add checker job
     checker_id = '{}:{}:{}'.format(CHECKSCRAPE, target, identifier)
     checker = queue.enqueue(check_scrape_job, scrape_id, scraper, job_id=checker_id, job_timeout=300)
@@ -166,7 +166,7 @@ def launch_send_dm(targets:list, message:str, forwarder:Forwarder, telegram_bot:
     for index, target in enumerate(targets):
         if target != instasession.username:
             job = Job.create(send_dm_job, kwargs={'index': index, 'count': len(targets), 'user': target, 'message': message, 'forwarder': forwarder}, id='{}:{}:{}'.format(DM, target, identifier), timeout=380, ttl=None)
-            queue.enqueue(job)
+            queue.enqueue_job(job)
             print('TELEBOT: Enequeued DM Job: ', target)
     # Enqueue check job
     queue.enqueue(check_dm_job, identifier, forwarder, job_id='{}:{}'.format(CHECKDM, identifier))
