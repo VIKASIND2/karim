@@ -188,6 +188,7 @@ def send_dm_job(index:int, count:int, user:str, message:str, forwarder:Forwarder
         except NotLoggedInError:
             print('TELEBOT: Client not logged in. Logging In...')
             instaclient.login(instasession.username, instasession.password)
+            instaclient.send_dm(user=user, message=message, discard_driver=True)
         
         if index < count-1:
             process_update_callback(forwarder, dm_job_complete_waiting.format(index+1), forwarder.get_message_id())
