@@ -330,7 +330,7 @@ def confirm(update, context):
             context.bot.edit_message_text(chat_id=update.effective_chat.id, message_id=forwarder.message_id, text=inform_sending_dms_text)
             text = forwarder.text
             text = text.replace("\\", "")
-            instagram_job.launch_send_dm(targets=users, message=forwarder.text, forwarder=forwarder, telegram_bot=context.bot)
+            instagram_job.launch_send_dm(targets=users, message=text, forwarder=forwarder, telegram_bot=context.bot)
             forwarder.discard()
             return ConversationHandler.END
 
