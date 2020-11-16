@@ -1,4 +1,4 @@
-from instaclient.errors.common import InvaildPasswordError, InvalidUserError, NotLoggedInError, SuspisciousLoginAttemptError, VerificationCodeNecessary
+from instaclient.errors.common import BlockedAccountError, InvaildPasswordError, InvalidUserError, NotLoggedInError, RestrictedAccountError, SuspisciousLoginAttemptError, VerificationCodeNecessary
 from telethon.client import buttons
 from telethon.client.telegramclient import TelegramClient
 from telethon.sessions.string import StringSession
@@ -18,7 +18,7 @@ from telegram.inline.inlinekeyboardbutton import InlineKeyboardButton
 from telegram.inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram import ParseMode
 from rq.job import Job, Retry
-from rq.registry import FailedJobRegistry, StartedJobRegistry, FinishedJobRegistry
+from rq.registry import DeferredJobRegistry, FailedJobRegistry, StartedJobRegistry, FinishedJobRegistry
 import time, random, string, redis, os
 from datetime import datetime
 from instaclient import InstaClient
@@ -189,10 +189,67 @@ def send_dm_job(index:int, count:int, user:str, message:str, forwarder:Forwarder
             instaclient.send_dm(user=user, message=message, discard_driver=True)
         except (InvaildPasswordError, InvalidUserError):
             print('TELEBOT: IG Credentials Incorrect')
+            process_update_callback(forwarder, incorrect_credentials_error.format(index), forwarder.get_message_id())
+            registry = StartedJobRegistry(queue=queue)
+            for job_id in registry.get_job_ids:
+                if DM in job_id:
+                    registry.remove(job_id)
+            registry = DeferredJobRegistry(queue=queue)
+            for job_id in registry.get_job_ids:
+                if DM in job_id:
+                    registry.remove(job_id)
+
         except SuspisciousLoginAttemptError:
             print('TELEBOT: Suspicious Login Attempt')
+            process_update_callback(forwarder, suspicious_login.format(index), forwarder.get_message_id())
+            registry = StartedJobRegistry(queue=queue)
+            for job_id in registry.get_job_ids:
+                if DM in job_id:
+                    registry.remove(job_id)
+            registry = DeferredJobRegistry(queue=queue)
+            for job_id in registry.get_job_ids:
+                if DM in job_id:
+                    registry.remove(job_id)
+            return
+
         except VerificationCodeNecessary:
             print('TELEBOT: Verification Code Necessary. Turn it off')
+            process_update_callback(forwarder, verification_necessary.format(index), forwarder.get_message_id())
+            registry = StartedJobRegistry(queue=queue)
+            for job_id in registry.get_job_ids:
+                if DM in job_id:
+                    registry.remove(job_id)
+            registry = DeferredJobRegistry(queue=queue)
+            for job_id in registry.get_job_ids:
+                if DM in job_id:
+                    registry.remove(job_id)
+            return
+
+        except RestrictedAccountError:
+            print('TELEBOT: Account is restricted')
+            process_update_callback(forwarder, restricted_account.format(index), forwarder.get_message_id())
+            registry = StartedJobRegistry(queue=queue)
+            for job_id in registry.get_job_ids:
+                if DM in job_id:
+                    registry.remove(job_id)
+                    registry = DeferredJobRegistry(queue=queue)
+            for job_id in registry.get_job_ids:
+                if DM in job_id:
+                    registry.remove(job_id)
+            return
+
+        except BlockedAccountError:
+            print('TELEBOT: Account is blocked')
+            process_update_callback(forwarder, blocked_account.format(index), forwarder.get_message_id())
+            registry = StartedJobRegistry(queue=queue)
+            for job_id in registry.get_job_ids:
+                if DM in job_id:
+                    registry.remove(job_id)
+            registry = DeferredJobRegistry(queue=queue)
+            for job_id in registry.get_job_ids:
+                if DM in job_id:
+                    registry.remove(job_id)
+            return
         
         if index < count-1:
             process_update_callback(forwarder, dm_job_complete_waiting.format(index+1), forwarder.get_message_id())

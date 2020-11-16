@@ -135,3 +135,8 @@ processing_dm_job = 'Processing Send Direct Message request number {}...'
 dm_job_complete_waiting = 'Send DM request number {} was successful, waiting about 60 seconds before processing next request...'
 # MULTIPLE UTILITIES
 error_checking_connection = 'There was a problem in authenticating the client. Please try again or contact @davidwickerhf.'
+incorrect_credentials_error = 'When sending the messages the client wasn\'t able to log into the account due to incorrect credentials... Please check and edit your credentials with /instagram\n{} Send DM requests completed so far.'
+suspicious_login = 'There was a problem connecting to the client when processing your request... Please log out with /iglogout and then log back into the client with /instagram\n{} Send DM requests completed so far.'
+verification_necessary = 'Your account has 2FA turned on. In order to process this request, you must turn 2FA off from your account.\n{} Send DM requests completed so far.'
+restricted_account = 'Your account has been restricted from Instagram! \nLog into your account manually and try to engage with the website. Try to send this request again after at least 24 hours.\n{} Send DM requests completed so far.'
+blocked_account = 'Your account has been blocked! \nLog into your account from your own device to unblock the account - then, wait at least 24 hours before sending another request\n{} Send DM requests completed so far.'
