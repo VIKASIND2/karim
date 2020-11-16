@@ -186,6 +186,7 @@ def send_dm_job(index:int, count:int, user:str, message:str, forwarder:Forwarder
     if instasession.get_creds():
         instaclient = InstaClient(host_type=InstaClient.WEB_SERVER, error_callback=instaclient_error_callback, debug=True)
         try:
+            instaclient.login(instasession.username, instasession.password)
             instaclient.send_dm(user=user, message=message, discard_driver=True)
         except (InvaildPasswordError, InvalidUserError):
             print('TELEBOT: IG Credentials Incorrect')
