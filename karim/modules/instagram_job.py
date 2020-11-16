@@ -1,4 +1,4 @@
-from instaclient.errors.common import NotLoggedInError
+from instaclient.errors.common import InvaildPasswordError, InvalidUserError, NotLoggedInError, SuspisciousLoginAttemptError, VerificationCodeNecessary
 from telethon.client import buttons
 from telethon.client.telegramclient import TelegramClient
 from telethon.sessions.string import StringSession
@@ -163,7 +163,11 @@ def launch_send_dm(targets:list, message:str, forwarder:Forwarder, telegram_bot:
     identifier = random_string()
     instasession = InstaSession(forwarder.chat_id, forwarder.user_id)
     instasession.get_creds()
+    
+    if instasession.username in targets:
+        targets = targets.remove(instasession.username)
     print('TARGETS: ', targets)
+
     for index, target in enumerate(targets):
         if target != instasession.username:
             job = Job.create(send_dm_job, kwargs={'index': index, 'count': len(targets), 'user': target, 'message': message, 'forwarder': forwarder}, id='{}:{}:{}'.format(DM, target, identifier), timeout=380, ttl=None, connection=queue.connection)
@@ -181,14 +185,14 @@ def send_dm_job(index:int, count:int, user:str, message:str, forwarder:Forwarder
     print('TELEBOT: Message: ', message)
     if instasession.get_creds():
         instaclient = InstaClient(host_type=InstaClient.WEB_SERVER, error_callback=instaclient_error_callback, debug=True)
-        instaclient.login(instasession.username, instasession.password, check_user=False)
-        time.sleep(1)
         try:
             instaclient.send_dm(user=user, message=message, discard_driver=True)
-        except NotLoggedInError:
-            print('TELEBOT: Client not logged in. Logging In...')
-            instaclient.login(instasession.username, instasession.password)
-            instaclient.send_dm(user=user, message=message, discard_driver=True)
+        except (InvaildPasswordError, InvalidUserError):
+            print('TELEBOT: IG Credentials Incorrect')
+        except SuspisciousLoginAttemptError:
+            print('TELEBOT: Suspicious Login Attempt')
+        except VerificationCodeNecessary:
+            print('TELEBOT: Verification Code Necessary. Turn it off')
         
         if index < count-1:
             process_update_callback(forwarder, dm_job_complete_waiting.format(index+1), forwarder.get_message_id())
