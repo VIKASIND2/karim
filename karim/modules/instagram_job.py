@@ -232,14 +232,8 @@ def send_dm_job(index:int, count:int, user:str, message:str, forwarder:Forwarder
 
 
 def remove_jobs():
-    registry = StartedJobRegistry(queue=queue)
-    for job_id in registry.get_job_ids():
-        if DM in job_id:
-            registry.remove(job_id)
-    registry = DeferredJobRegistry(queue=queue)
-    for job_id in registry.get_job_ids():
-        if DM in job_id:
-            registry.remove(job_id)
+    queue.empty()
+    print('TELEBOT: Queue Emptied')
     
 
 def check_dm_job(identifier:str, forwarder:Forwarder):
