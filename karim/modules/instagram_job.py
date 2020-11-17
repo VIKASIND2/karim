@@ -1,3 +1,4 @@
+from os import error
 from instaclient.errors.common import BlockedAccountError, InvaildPasswordError, InvalidUserError, NotLoggedInError, RestrictedAccountError, SuspisciousLoginAttemptError, VerificationCodeNecessary
 from telethon.client import buttons
 from telethon.client.telegramclient import TelegramClient
@@ -187,70 +188,37 @@ def send_dm_job(index:int, count:int, user:str, message:str, forwarder:Forwarder
         instaclient = InstaClient(host_type=InstaClient.WEB_SERVER, error_callback=instaclient_error_callback, debug=True)
         try:
             instaclient.login(instasession.username, instasession.password)
-            instaclient.send_dm(user=user, message=message, discard_driver=True)
-        except (InvaildPasswordError, InvalidUserError):
+        except (InvaildPasswordError, InvalidUserError) as error:
             print('TELEBOT: IG Credentials Incorrect')
             process_update_callback(forwarder, incorrect_credentials_error.format(index), forwarder.get_message_id())
-            registry = StartedJobRegistry(queue=queue)
-            for job_id in registry.get_job_ids():
-                if DM in job_id:
-                    registry.remove(job_id)
-            registry = DeferredJobRegistry(queue=queue)
-            for job_id in registry.get_job_ids():
-                if DM in job_id:
-                    registry.remove(job_id)
+            remove_jobs()
+            raise error
 
-        except SuspisciousLoginAttemptError:
+        try:
+            instaclient.send_dm(user=user, message=message, discard_driver=True)
+        except SuspisciousLoginAttemptError as error:
             print('TELEBOT: Suspicious Login Attempt')
             process_update_callback(forwarder, suspicious_login.format(index), forwarder.get_message_id())
-            registry = StartedJobRegistry(queue=queue)
-            for job_id in registry.get_job_ids():
-                if DM in job_id:
-                    registry.remove(job_id)
-            registry = DeferredJobRegistry(queue=queue)
-            for job_id in registry.get_job_ids():
-                if DM in job_id:
-                    registry.remove(job_id)
-            return
+            remove_jobs()
+            raise error
 
-        except VerificationCodeNecessary:
+        except VerificationCodeNecessary as error:
             print('TELEBOT: Verification Code Necessary. Turn it off')
             process_update_callback(forwarder, verification_necessary.format(index), forwarder.get_message_id())
-            registry = StartedJobRegistry(queue=queue)
-            for job_id in registry.get_job_ids():
-                if DM in job_id:
-                    registry.remove(job_id)
-            registry = DeferredJobRegistry(queue=queue)
-            for job_id in registry.get_job_ids():
-                if DM in job_id:
-                    registry.remove(job_id)
-            return
+            remove_jobs()
+            raise error
 
-        except RestrictedAccountError:
+        except RestrictedAccountError as error:
             print('TELEBOT: Account is restricted')
             process_update_callback(forwarder, restricted_account.format(index), forwarder.get_message_id())
-            registry = StartedJobRegistry(queue=queue)
-            for job_id in registry.get_job_ids():
-                if DM in job_id:
-                    registry.remove(job_id)
-                    registry = DeferredJobRegistry(queue=queue)
-            for job_id in registry.get_job_ids():
-                if DM in job_id:
-                    registry.remove(job_id)
-            return
+            remove_jobs()
+            raise error
 
-        except BlockedAccountError:
+        except BlockedAccountError as error:
             print('TELEBOT: Account is blocked')
             process_update_callback(forwarder, blocked_account.format(index), forwarder.get_message_id())
-            registry = StartedJobRegistry(queue=queue)
-            for job_id in registry.get_job_ids():
-                if DM in job_id:
-                    registry.remove(job_id)
-            registry = DeferredJobRegistry(queue=queue)
-            for job_id in registry.get_job_ids():
-                if DM in job_id:
-                    registry.remove(job_id)
-            return
+            remove_jobs()
+            raise error
         
         if index < count-1:
             process_update_callback(forwarder, dm_job_complete_waiting.format(index+1), forwarder.get_message_id())
@@ -261,6 +229,17 @@ def send_dm_job(index:int, count:int, user:str, message:str, forwarder:Forwarder
         return True
     else:
         raise NotLoggedInError()
+
+
+def remove_jobs():
+    registry = StartedJobRegistry(queue=queue)
+    for job_id in registry.get_job_ids():
+        if DM in job_id:
+            registry.remove(job_id)
+    registry = DeferredJobRegistry(queue=queue)
+    for job_id in registry.get_job_ids():
+        if DM in job_id:
+            registry.remove(job_id)
     
 
 def check_dm_job(identifier:str, forwarder:Forwarder):
