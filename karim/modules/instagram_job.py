@@ -192,11 +192,11 @@ def send_dm_job(index:int, count:int, user:str, message:str, forwarder:Forwarder
             print('TELEBOT: IG Credentials Incorrect')
             process_update_callback(forwarder, incorrect_credentials_error.format(index), forwarder.get_message_id())
             registry = StartedJobRegistry(queue=queue)
-            for job_id in registry.get_job_ids:
+            for job_id in registry.get_job_ids():
                 if DM in job_id:
                     registry.remove(job_id)
             registry = DeferredJobRegistry(queue=queue)
-            for job_id in registry.get_job_ids:
+            for job_id in registry.get_job_ids():
                 if DM in job_id:
                     registry.remove(job_id)
 
@@ -204,11 +204,11 @@ def send_dm_job(index:int, count:int, user:str, message:str, forwarder:Forwarder
             print('TELEBOT: Suspicious Login Attempt')
             process_update_callback(forwarder, suspicious_login.format(index), forwarder.get_message_id())
             registry = StartedJobRegistry(queue=queue)
-            for job_id in registry.get_job_ids:
+            for job_id in registry.get_job_ids():
                 if DM in job_id:
                     registry.remove(job_id)
             registry = DeferredJobRegistry(queue=queue)
-            for job_id in registry.get_job_ids:
+            for job_id in registry.get_job_ids():
                 if DM in job_id:
                     registry.remove(job_id)
             return
@@ -217,11 +217,11 @@ def send_dm_job(index:int, count:int, user:str, message:str, forwarder:Forwarder
             print('TELEBOT: Verification Code Necessary. Turn it off')
             process_update_callback(forwarder, verification_necessary.format(index), forwarder.get_message_id())
             registry = StartedJobRegistry(queue=queue)
-            for job_id in registry.get_job_ids:
+            for job_id in registry.get_job_ids():
                 if DM in job_id:
                     registry.remove(job_id)
             registry = DeferredJobRegistry(queue=queue)
-            for job_id in registry.get_job_ids:
+            for job_id in registry.get_job_ids():
                 if DM in job_id:
                     registry.remove(job_id)
             return
@@ -230,11 +230,11 @@ def send_dm_job(index:int, count:int, user:str, message:str, forwarder:Forwarder
             print('TELEBOT: Account is restricted')
             process_update_callback(forwarder, restricted_account.format(index), forwarder.get_message_id())
             registry = StartedJobRegistry(queue=queue)
-            for job_id in registry.get_job_ids:
+            for job_id in registry.get_job_ids():
                 if DM in job_id:
                     registry.remove(job_id)
                     registry = DeferredJobRegistry(queue=queue)
-            for job_id in registry.get_job_ids:
+            for job_id in registry.get_job_ids():
                 if DM in job_id:
                     registry.remove(job_id)
             return
@@ -243,11 +243,11 @@ def send_dm_job(index:int, count:int, user:str, message:str, forwarder:Forwarder
             print('TELEBOT: Account is blocked')
             process_update_callback(forwarder, blocked_account.format(index), forwarder.get_message_id())
             registry = StartedJobRegistry(queue=queue)
-            for job_id in registry.get_job_ids:
+            for job_id in registry.get_job_ids():
                 if DM in job_id:
                     registry.remove(job_id)
             registry = DeferredJobRegistry(queue=queue)
-            for job_id in registry.get_job_ids:
+            for job_id in registry.get_job_ids():
                 if DM in job_id:
                     registry.remove(job_id)
             return
