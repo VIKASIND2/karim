@@ -298,7 +298,6 @@ def confirm(update, context):
         return
 
     data = update.callback_query.data
-    print('CONFIRM DATA:  ', data)
     if data == Callbacks.CANCEL:
         context.bot.edit_message_text(cancel_forward_text, parse_mode=ParseMode.HTML, chat_id=update.effective_chat.id, message_id=forwarder.message_id)
         forwarder.discard()
