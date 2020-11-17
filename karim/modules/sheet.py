@@ -175,9 +175,7 @@ def get_targets(username:str):
     sheet = spreadsheet.get_worksheet(1)
     scraped = get_by_username(username, sheet)
     targets_str = scraped[2]
-    print('TELEBOT: Target string: ', targets_str)
     targets_str = re.sub(r"\s+", "", targets_str)
-    print('TELEBOT: Target string: ', targets_str)
     targets = targets_str.split(',')
     return targets
 
