@@ -177,6 +177,7 @@ def get_targets(username:str):
     targets_str = scraped[2]
     targets_str = re.sub(r"\s+", "", targets_str)
     targets = targets_str.split(',')
+    print('SHEET TARGETS: ', targets)
     return targets
 
 
