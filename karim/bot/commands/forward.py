@@ -156,7 +156,6 @@ def select_scrape(update, context):
     else:
         targets = sheet.get_targets(username=data)
         forwarder.set_users(targets)
-        print('SAVED TARGETS: ', forwarder.get_users())
         markup = CreateMarkup({Callbacks.TEN: '10', Callbacks.TFIVE: '25', Callbacks.FIFTY: '50', Callbacks.SFIVE: '75', Callbacks.CANCEL: 'Cancel'}).create_markup()
         update.callback_query.answer()
         message = context.bot.edit_message_text(chat_id=update.effective_chat.id, 
@@ -189,7 +188,6 @@ def select_count(update, context):
     
     # Load targets:
     users = forwarder.get_users()
-    print('RETRIEVED TARGETS: ', users)
     if forwarder.count >= len(users):
         count = len(users)
         targets = users
@@ -203,7 +201,6 @@ def select_count(update, context):
                 if target not in targets:
                     targets.append(target)
                     break
-    print('EDITED TARGETS: ', targets)
     forwarder.set_users(targets)
 
     # Confirm
@@ -329,7 +326,6 @@ def confirm(update, context):
 
         elif forwarder.get_mode() == Callbacks.INSTAGRAM_DM:
             users = forwarder.get_users()
-            print('RETRIEVE FINAL TARGETS: ', users)
             context.bot.edit_message_text(chat_id=update.effective_chat.id, message_id=forwarder.message_id, text=inform_sending_dms_text)
             text = forwarder.text
             text = text.replace("\\", "")

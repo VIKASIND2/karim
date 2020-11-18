@@ -165,9 +165,9 @@ def launch_send_dm(targets:list, message:str, forwarder:Forwarder, telegram_bot:
     instasession = InstaSession(forwarder.chat_id, forwarder.user_id)
     instasession.get_creds()
     
+
     if instasession.username in targets:
-        targets = targets.remove(instasession.username)
-    print('TARGETS: ', targets)
+        targets.remove(instasession.username)
 
     for index, target in enumerate(targets):
         if target != instasession.username:
