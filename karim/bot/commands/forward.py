@@ -192,18 +192,18 @@ def select_count(update, context):
     print('RETRIEVED TARGETS: ', users)
     if forwarder.count >= len(users):
         count = len(users)
+        targets = users
     else:
         count = forwarder.count
-
-    targets = []
-    for i in range(count):
-        while True:
-            rand = random.randrange(len(users))
-            target = users[rand]
-            if target not in targets:
-                targets.append(target)
-                break
-    print('EDITED TARGETS: ', target)
+        targets = []
+        for i in range(count):
+            while True:
+                rand = random.randrange(len(users))
+                target = users[rand]
+                if target not in targets:
+                    targets.append(target)
+                    break
+    print('EDITED TARGETS: ', targets)
     forwarder.set_users(targets)
 
     # Confirm
