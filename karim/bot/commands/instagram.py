@@ -1,7 +1,6 @@
 from instaclient.errors.common import InvaildPasswordError, InvalidSecurityCodeError, InvalidUserError, NotLoggedInError, PrivateAccountError, InvalidVerificationCodeError, VerificationCodeNecessary, SuspisciousLoginAttemptError
 from telegram.ext import updater
 from karim.bot.commands import *
-from karim import instaclient
 
 @run_async
 @send_typing_action

@@ -1,7 +1,6 @@
 import os
 from rq import Queue
 from worker import conn
-from instaclient import InstaClient
 from telegram.ext.updater import Updater
 from telegram.ext.defaults import Defaults
 from telegram.utils.request import Request
@@ -20,13 +19,11 @@ queue = None
 if os.environ.get('PORT') in (None, ""):
     # Code running locally
     LOCALHOST = True
-    instaclient = InstaClient(error_callback=instaclient_error_callback)
     if not os.path.exists('karim/bot/persistence'):
         os.makedirs('karim/bot/persistence')
 else:
     LOCALHOST = False
     queue = Queue(connection=conn)
-    instaclient = InstaClient(host_type=InstaClient.WEB_SERVER, debug=False, error_callback=instaclient_error_callback)
     
 
 # Initialize Bot
