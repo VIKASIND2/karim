@@ -7,7 +7,8 @@ def get_var(key="", parent="", default="", value="", localhost=False):
     Retrieve configuration variables from the secrets.json file.
     :variable: String of the name of the variable you are retrieving (see secrets.json)
     """
-    if localhost:
+    from karim import LOCALHOST
+    if LOCALHOST or localhost:
         # CODE RUNNING LOCALLY
         variables = {}
         with open('karim/secrets/secrets.json') as variables_file:

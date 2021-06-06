@@ -23,7 +23,7 @@ class SessionManager(Persistence):
         self.password = None
         self.code = None
         self.phone_code_hash = None
-        self.code_tries = None
+        self.code_tries = 0
 
     def __str__(self):
         return 'SessionManager({}, {}, {})'.format(self.phone, self.password, self.phone_code_hash)

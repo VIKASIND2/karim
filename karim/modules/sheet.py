@@ -26,7 +26,7 @@ def auth():
         if LOCALHOST:
             # CODE RUNNING LOCALLY
             print('DATABASE: Resorted to local JSON file')
-            with open('movement_assistant/secrets/client_secret.json') as json_file:
+            with open('karim/secrets/client_secret.json') as json_file:
                 client_secret_dict = json.load(json_file)
         else:
             # CODE RUNNING ON SERVER

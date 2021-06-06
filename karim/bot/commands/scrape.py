@@ -2,12 +2,12 @@ from karim.classes.scraper import Scraper
 from instaclient.errors.common import InvalidUserError, PrivateAccountError
 from karim.bot.commands import *
 from karim.modules import instagram_job
-from karim import instaclient
 
 
 @run_async
 @send_typing_action
 def scrape_followers(update, context):
+    from karim import instaclient 
     if not check_auth(update, context):
         return ConversationHandler.END
     # Check IG Connection
@@ -27,6 +27,7 @@ def scrape_followers(update, context):
 @run_async
 @send_typing_action
 def select_target(update, context):
+    from karim import instaclient 
     scraper:Scraper = Scraper.deserialize(Persistence.SCRAPE_FOLLOWERS, update)
     if not scraper:
         return ScrapeStates.SELECT_TARGET

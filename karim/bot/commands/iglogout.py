@@ -1,10 +1,10 @@
 from karim.bot.commands import *
-from karim import instaclient 
 
 @run_async
 @send_typing_action
 def instagram_log_out(update, context):
     if check_auth(update, context):
+        from karim import instaclient 
         instasession = InstaSession(update.effective_chat.id, update.effective_user.id)
         instasession.delete_creds()
         instasession.discard()

@@ -28,8 +28,8 @@ else:
 
 # Initialize Bot
 from karim.secrets import secrets
-BOT_TOKEN = secrets.get_var('BOT_TOKEN')
-URL = secrets.get_var('SERVER_APP_DOMAIN')
+BOT_TOKEN = secrets.get_var('BOT_TOKEN', localhost=LOCALHOST)
+URL = secrets.get_var('SERVER_APP_DOMAIN', localhost=LOCALHOST)
 PORT = int(os.environ.get('PORT', 5000))
 from karim.bot import telebot
 
